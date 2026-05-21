@@ -20,6 +20,36 @@ export interface UploadMeImageResult {
 	thumbnailUrl?: string;
 }
 
+/**
+ * Mirror a primary-slot change into the platform's mana-me service.
+ * The managarten Dexie row stays authoritative locally; mana-me is the
+ * cross-app source for "which photo is the user's current face/body".
+ * Best-effort — a failure does not block the user-facing setPrimary.
+ *
+ * Only fires for `face-ref` and `body-ref`. The legacy `avatar` slot is
+ * synced separately via `syncAvatarToAuth` and doesn't need a mana-me
+ * mirror.
+ */
+export async function syncMeImagePrimaryToPlatform(
+	mediaId: string,
+	slot: 'face-ref' | 'body-ref'
+): Promise<void> {
+	try {
+		const token = await authStore.getValidToken();
+		if (!token) return;
+		await fetch(`${getManaApiUrl()}/api/v1/profile/me-images/sync-primary`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({ mediaId, slot }),
+		});
+	} catch (err) {
+		console.warn('[profile] mana-me primary sync failed', err);
+	}
+}
+
 export async function uploadMeImageFile(file: File): Promise<UploadMeImageResult> {
 	// Fail-fast wenn der Auth-Store keinen Token liefern kann. Vorher
 	// schickten wir die Anfrage trotzdem ohne `Authorization`-Header

@@ -13,6 +13,7 @@ import { emitDomainEvent } from '$lib/data/events';
 import { scopedForModule, getActiveSpace } from '$lib/data/scope';
 import { profileService } from '$lib/api/profile';
 import { meImagesTable } from '../collections';
+import { syncMeImagePrimaryToPlatform } from '../api/me-images';
 import { toMeImage } from '../types';
 import type {
 	LocalMeImage,
@@ -233,6 +234,18 @@ export const meImagesStore = {
 		});
 		if (slot === 'avatar' || slot === 'face-ref') {
 			await syncAvatarToAuth();
+		}
+		// Mirror face-ref / body-ref into mana-me so cross-app
+		// consumers (Werdrobe, Memoro, …) get the user's current
+		// face/body without depending on the managarten DB. Skipped
+		// for the legacy `avatar` slot because `syncAvatarToAuth`
+		// already covers it via Better Auth. Best-effort — failures
+		// don't roll back the local primary swap.
+		if (slot === 'face-ref' || slot === 'body-ref') {
+			const row = await meImagesTable.get(id);
+			if (row?.mediaId) {
+				void syncMeImagePrimaryToPlatform(row.mediaId, slot);
+			}
 		}
 	},
 

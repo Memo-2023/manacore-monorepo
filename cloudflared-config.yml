@@ -195,6 +195,10 @@ ingress:
     service: http://localhost:3072
   - hostname: mcp.mana.how
     service: http://localhost:3069
+  # mana-me — User-globale Identitäts-Refs (Code/mana/services/mana-me).
+  # Erst-Konsument: werdrobe Try-On. Strategy: USER_CONTEXT_STRATEGY.md.
+  - hostname: me.mana.how
+    service: http://localhost:3078
 
   - hostname: cardecky-api.mana.how
     service: http://localhost:3191
