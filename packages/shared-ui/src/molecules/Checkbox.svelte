@@ -1,173 +1,160 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	interface Props {
-		/** Whether the checkbox is checked */
-		checked: boolean;
-		/** Called when checked state changes */
-		onchange?: (checked: boolean) => void;
-		/** Label text */
+		checked?: boolean;
 		label?: string;
-		/** Description text below label */
-		description?: string;
-		/** Disable the checkbox */
+		hint?: string;
 		disabled?: boolean;
-		/** Show indeterminate state */
+		required?: boolean;
 		indeterminate?: boolean;
-		/** Additional CSS classes */
-		class?: string;
+		id?: string;
+		name?: string;
+		ariaLabel?: string;
+		onchange?: (e: Event) => void;
+		children?: Snippet;
 	}
 
 	let {
-		checked = $bindable(),
-		onchange,
+		checked = $bindable(false),
 		label,
-		description,
+		hint,
 		disabled = false,
+		required = false,
 		indeterminate = false,
-		class: className = '',
+		id,
+		name,
+		ariaLabel,
+		onchange,
+		children,
 	}: Props = $props();
 
-	let inputElement: HTMLInputElement | null = $state(null);
+	const inputId = $derived(id ?? `checkbox-${Math.random().toString(36).slice(2, 9)}`);
+	const hintId = $derived(hint ? `${inputId}-hint` : undefined);
 
-	$effect(() => {
-		if (inputElement) {
-			inputElement.indeterminate = indeterminate;
-		}
-	});
-
-	function handleChange(e: Event) {
-		const target = e.target as HTMLInputElement;
-		checked = target.checked;
-		onchange?.(target.checked);
+	function handleRef(node: HTMLInputElement) {
+		node.indeterminate = indeterminate;
+		$effect(() => {
+			node.indeterminate = indeterminate;
+		});
 	}
 </script>
 
-<label class="checkbox-wrapper {disabled ? 'checkbox-wrapper--disabled' : ''} {className}">
-	<div class="checkbox-input-wrapper">
-		<input
-			bind:this={inputElement}
-			type="checkbox"
-			{checked}
-			{disabled}
-			onchange={handleChange}
-			class="checkbox-input"
-		/>
-		<div class="checkbox-box">
-			{#if indeterminate}
-				<svg
-					class="checkbox-icon"
-					viewBox="0 0 24 24"
+<label class="checkbox" class:disabled for={inputId}>
+	<input
+		type="checkbox"
+		id={inputId}
+		{name}
+		{disabled}
+		{required}
+		aria-label={ariaLabel}
+		aria-describedby={hintId}
+		bind:checked
+		{onchange}
+		use:handleRef
+	/>
+	<span class="indicator" aria-hidden="true">
+		{#if indeterminate}
+			<svg viewBox="0 0 16 16" width="12" height="12">
+				<path d="M3 8h10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+			</svg>
+		{:else if checked}
+			<svg viewBox="0 0 16 16" width="12" height="12">
+				<path
+					d="M3 8l3.5 3.5L13 5"
 					fill="none"
 					stroke="currentColor"
-					stroke-width="3"
-				>
-					<line x1="5" y1="12" x2="19" y2="12" />
-				</svg>
-			{:else if checked}
-				<svg
-					class="checkbox-icon"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="3"
-				>
-					<polyline points="20 6 9 17 4 12" />
-				</svg>
-			{/if}
-		</div>
-	</div>
-
-	{#if label || description}
-		<div class="checkbox-content">
-			{#if label}
-				<span class="checkbox-label">{label}</span>
-			{/if}
-			{#if description}
-				<span class="checkbox-description">{description}</span>
-			{/if}
-		</div>
-	{/if}
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			</svg>
+		{/if}
+	</span>
+	<span class="label-text">
+		{#if children}
+			{@render children()}
+		{:else if label}
+			{label}
+		{/if}
+		{#if required}<span class="required" aria-hidden="true">*</span>{/if}
+		{#if hint}
+			<span class="hint" id={hintId}>{hint}</span>
+		{/if}
+	</span>
 </label>
 
 <style>
-	.checkbox-wrapper {
-		display: flex;
+	.checkbox {
+		display: inline-flex;
 		align-items: flex-start;
-		gap: 0.75rem;
+		gap: 0.5rem;
 		cursor: pointer;
+		font: inherit;
+		color: hsl(var(--color-foreground));
 	}
 
-	.checkbox-wrapper--disabled {
-		opacity: 0.5;
+	.checkbox.disabled {
 		cursor: not-allowed;
+		opacity: 0.6;
 	}
 
-	.checkbox-input-wrapper {
-		position: relative;
-		flex-shrink: 0;
-	}
-
-	.checkbox-input {
+	input {
 		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
+		opacity: 0;
+		pointer-events: none;
+		width: 1rem;
+		height: 1rem;
 	}
 
-	.checkbox-box {
-		display: flex;
+	.indicator {
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 1.25rem;
-		height: 1.25rem;
-		background-color: hsl(var(--color-surface));
-		border: 2px solid hsl(var(--color-border-strong));
+		width: 1rem;
+		height: 1rem;
+		flex-shrink: 0;
+		margin-top: 0.125rem;
+		background: hsl(var(--color-surface));
+		border: 1px solid hsl(var(--color-border));
 		border-radius: 0.25rem;
-		transition: all 0.15s ease;
+		color: hsl(var(--color-primary-foreground));
+		transition:
+			background-color 0.15s ease,
+			border-color 0.15s ease;
 	}
 
-	.checkbox-input:hover:not(:disabled) + .checkbox-box {
+	input:checked + .indicator,
+	input:indeterminate + .indicator {
+		background: hsl(var(--color-primary));
 		border-color: hsl(var(--color-primary));
 	}
 
-	.checkbox-input:focus-visible + .checkbox-box {
-		outline: 2px solid hsl(var(--color-ring));
+	input:focus-visible + .indicator {
+		outline: 2px solid hsl(var(--color-primary));
 		outline-offset: 2px;
 	}
 
-	.checkbox-input:checked + .checkbox-box,
-	.checkbox-input:indeterminate + .checkbox-box {
-		background-color: hsl(var(--color-primary));
-		border-color: hsl(var(--color-primary));
+	.label-text {
+		font-size: 0.9375rem;
+		line-height: 1.35;
 	}
 
-	.checkbox-icon {
-		width: 0.875rem;
-		height: 0.875rem;
-		stroke: hsl(var(--color-primary-foreground));
+	.required {
+		color: hsl(var(--color-error));
+		margin-left: 0.125rem;
 	}
 
-	.checkbox-content {
-		display: flex;
-		flex-direction: column;
-		gap: 0.125rem;
-		padding-top: 0.0625rem;
-	}
-
-	.checkbox-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: hsl(var(--color-foreground));
-		line-height: 1.25rem;
-	}
-
-	.checkbox-description {
-		font-size: 0.75rem;
+	.hint {
+		display: block;
+		margin-top: 0.125rem;
+		font-size: 0.8125rem;
 		color: hsl(var(--color-muted-foreground));
-		line-height: 1.25;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.indicator {
+			transition: none;
+		}
 	}
 </style>

@@ -1,201 +1,186 @@
 <script lang="ts">
 	interface Props {
-		/** Current value */
-		value: string;
-		/** Called on input */
-		oninput?: (value: string) => void;
-		/** Called on change (blur) */
-		onchange?: (value: string) => void;
-		/** Label text */
-		label?: string;
-		/** Placeholder text */
+		value?: string;
 		placeholder?: string;
-		/** Number of visible rows */
-		rows?: number;
-		/** Maximum character count */
-		maxlength?: number;
-		/** Show character count */
-		showCount?: boolean;
-		/** Error message */
+		label?: string;
+		hint?: string;
 		error?: string;
-		/** Disable the textarea */
 		disabled?: boolean;
-		/** Mark as required */
+		readonly?: boolean;
 		required?: boolean;
-		/** Enable auto-resize based on content */
-		autoResize?: boolean;
-		/** Additional CSS classes */
-		class?: string;
-		/** Unique ID for accessibility */
+		rows?: number;
+		maxLength?: number;
 		id?: string;
+		name?: string;
+		ariaLabel?: string;
+		oninput?: (e: Event) => void;
+		onchange?: (e: Event) => void;
+		onblur?: (e: FocusEvent) => void;
 	}
 
 	let {
-		value = $bindable(),
-		oninput,
-		onchange,
-		label,
+		value = $bindable(''),
 		placeholder,
-		rows = 3,
-		maxlength,
-		showCount = false,
+		label,
+		hint,
 		error,
 		disabled = false,
+		readonly = false,
 		required = false,
-		autoResize = false,
-		class: className = '',
-		id = `textarea-${Math.random().toString(36).slice(2, 9)}`,
+		rows = 4,
+		maxLength,
+		id,
+		name,
+		ariaLabel,
+		oninput,
+		onchange,
+		onblur,
 	}: Props = $props();
 
-	let textareaElement: HTMLTextAreaElement | null = $state(null);
-
-	const charCount = $derived(value?.length ?? 0);
-	const isOverLimit = $derived(maxlength ? charCount > maxlength : false);
-
-	function handleInput(e: Event) {
-		const target = e.target as HTMLTextAreaElement;
-		value = target.value;
-		oninput?.(target.value);
-
-		if (autoResize && textareaElement) {
-			textareaElement.style.height = 'auto';
-			textareaElement.style.height = `${textareaElement.scrollHeight}px`;
-		}
-	}
-
-	function handleChange(e: Event) {
-		const target = e.target as HTMLTextAreaElement;
-		onchange?.(target.value);
-	}
+	const inputId = $derived(id ?? `textarea-${Math.random().toString(36).slice(2, 9)}`);
+	const hintId = $derived(hint || error ? `${inputId}-hint` : undefined);
+	const remainingChars = $derived(maxLength ? maxLength - (value?.length ?? 0) : null);
 </script>
 
-<div class="textarea-wrapper {className}">
+<div class="field">
 	{#if label}
-		<label for={id} class="textarea-label">
+		<label for={inputId}>
 			{label}
-			{#if required}
-				<span class="textarea-required">*</span>
-			{/if}
+			{#if required}<span class="required" aria-hidden="true">*</span>{/if}
 		</label>
 	{/if}
-
-	<textarea
-		{id}
-		bind:this={textareaElement}
-		{value}
-		{placeholder}
-		{rows}
-		{maxlength}
-		{disabled}
-		{required}
-		oninput={handleInput}
-		onchange={handleChange}
-		class="textarea-input {error || isOverLimit ? 'textarea-input--error' : ''} {autoResize
-			? 'textarea-input--auto-resize'
-			: ''}"
-	></textarea>
-
-	<div class="textarea-footer">
+	<div class="wrap" class:disabled class:has-error={!!error}>
+		<textarea
+			id={inputId}
+			{name}
+			{placeholder}
+			{disabled}
+			{readonly}
+			{required}
+			{rows}
+			maxlength={maxLength}
+			aria-label={ariaLabel}
+			aria-invalid={error ? 'true' : undefined}
+			aria-describedby={hintId}
+			bind:value
+			{oninput}
+			{onchange}
+			{onblur}
+		></textarea>
+	</div>
+	<div class="meta">
 		{#if error}
-			<p class="textarea-error">{error}</p>
+			<p class="hint error" id={hintId} role="alert">{error}</p>
+		{:else if hint}
+			<p class="hint" id={hintId}>{hint}</p>
 		{:else}
 			<span></span>
 		{/if}
-
-		{#if showCount || maxlength}
-			<span class="textarea-count {isOverLimit ? 'textarea-count--error' : ''}">
-				{charCount}{#if maxlength}/{maxlength}{/if}
+		{#if remainingChars !== null}
+			<span class="char-count" class:near-limit={remainingChars <= 20}>
+				{remainingChars}
 			</span>
 		{/if}
 	</div>
 </div>
 
 <style>
-	.textarea-wrapper {
+	.field {
 		display: flex;
 		flex-direction: column;
 		gap: 0.375rem;
 	}
 
-	.textarea-label {
+	label {
 		font-size: 0.875rem;
 		font-weight: 500;
 		color: hsl(var(--color-foreground));
 	}
 
-	.textarea-required {
+	.required {
 		color: hsl(var(--color-error));
 		margin-left: 0.125rem;
 	}
 
-	.textarea-input {
-		width: 100%;
-		padding: 0.625rem 1rem;
-		font-size: 0.875rem;
-		font-family: inherit;
-		line-height: 1.5;
-		color: hsl(var(--color-foreground));
-		background-color: hsl(var(--color-surface));
+	.wrap {
+		background: hsl(var(--color-surface));
 		border: 1px solid hsl(var(--color-border));
 		border-radius: 0.5rem;
-		resize: vertical;
-		transition: all 0.15s ease;
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
 	}
 
-	.textarea-input:hover:not(:disabled) {
-		border-color: hsl(var(--color-border-strong));
-	}
-
-	.textarea-input:focus {
-		outline: none;
+	.wrap:focus-within {
 		border-color: hsl(var(--color-primary));
-		box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
+		box-shadow: 0 0 0 2px hsl(var(--color-primary) / 0.2);
 	}
 
-	.textarea-input:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-		resize: none;
+	.wrap.disabled {
+		opacity: 0.6;
+		background: hsl(var(--color-muted));
 	}
 
-	.textarea-input--error {
+	.wrap.has-error {
 		border-color: hsl(var(--color-error));
 	}
 
-	.textarea-input--error:focus {
-		border-color: hsl(var(--color-error));
-		box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.1);
+	.wrap.has-error:focus-within {
+		box-shadow: 0 0 0 2px hsl(var(--color-error) / 0.2);
 	}
 
-	.textarea-input--auto-resize {
-		resize: none;
-		overflow: hidden;
+	textarea {
+		display: block;
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		border: none;
+		background: transparent;
+		color: hsl(var(--color-foreground));
+		font: inherit;
+		font-family: inherit;
+		outline: none;
+		resize: vertical;
+		min-height: 4rem;
 	}
 
-	.textarea-input::placeholder {
+	textarea::placeholder {
 		color: hsl(var(--color-muted-foreground));
 	}
 
-	.textarea-footer {
+	textarea:disabled {
+		cursor: not-allowed;
+	}
+
+	.meta {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		min-height: 1.25rem;
+		align-items: baseline;
+		gap: 0.5rem;
 	}
 
-	.textarea-error {
-		font-size: 0.75rem;
-		color: hsl(var(--color-error));
+	.hint {
 		margin: 0;
+		font-size: 0.8125rem;
+		color: hsl(var(--color-muted-foreground));
 	}
 
-	.textarea-count {
+	.hint.error {
+		color: hsl(var(--color-error));
+	}
+
+	.char-count {
 		font-size: 0.75rem;
 		color: hsl(var(--color-muted-foreground));
-		margin-left: auto;
+		font-variant-numeric: tabular-nums;
 	}
 
-	.textarea-count--error {
-		color: hsl(var(--color-error));
+	.char-count.near-limit {
+		color: hsl(var(--color-warning));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.wrap {
+			transition: none;
+		}
 	}
 </style>

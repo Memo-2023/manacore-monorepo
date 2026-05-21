@@ -1,118 +1,87 @@
 <script lang="ts">
-	/**
-	 * FormModal - Modal with built-in form handling
-	 *
-	 * Extends Modal with form submission, validation error display,
-	 * and standardized footer buttons.
-	 *
-	 * @example Basic form modal
-	 * ```svelte
-	 * <FormModal
-	 *   visible={showModal}
-	 *   onClose={() => showModal = false}
-	 *   onSubmit={handleSubmit}
-	 *   title="Create Item"
-	 *   submitLabel="Create"
-	 * >
-	 *   <Input label="Name" bind:value={name} />
-	 *   <Textarea label="Description" bind:value={description} />
-	 * </FormModal>
-	 * ```
-	 */
-
 	import type { Snippet } from 'svelte';
 	import Modal from './Modal.svelte';
-	import { Button, Text } from '../atoms';
+	import Button from '../atoms/Button.svelte';
 
-	type SubmitVariant = 'primary' | 'danger' | 'success';
+	type Size = 'sm' | 'md' | 'lg';
 
 	interface Props {
-		/** Whether the modal is visible */
-		visible: boolean;
-		/** Called when modal is closed */
-		onClose: () => void;
-		/** Called when form is submitted */
-		onSubmit: () => void | Promise<void>;
-		/** Modal title */
+		open?: boolean;
+		/** v0.1.x-Compat-Alias für `open`. */
+		visible?: boolean;
 		title: string;
-		/** Form content */
-		children: Snippet;
-		/** Icon snippet for header */
-		icon?: Snippet;
-		/** Submit button label */
+		description?: string;
+		size?: Size;
 		submitLabel?: string;
-		/** Cancel button label */
 		cancelLabel?: string;
-		/** Submit button variant */
-		submitVariant?: SubmitVariant;
-		/** Whether submission is in progress */
-		loading?: boolean;
-		/** Error message to display */
-		error?: string | null;
-		/** Max width of modal */
-		maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
-		/** Whether submit button is disabled */
-		submitDisabled?: boolean;
+		submitting?: boolean;
+		canSubmit?: boolean;
+		onSubmit: (e: SubmitEvent) => void;
+		onCancel?: () => void;
+		ariaLabel?: string;
+		children?: Snippet;
 	}
 
 	let {
+		open = $bindable(false),
 		visible,
-		onClose,
-		onSubmit,
 		title,
+		description,
+		size = 'md',
+		submitLabel = 'Speichern',
+		cancelLabel = 'Abbrechen',
+		submitting = false,
+		canSubmit = true,
+		onSubmit,
+		onCancel,
+		ariaLabel,
 		children,
-		icon,
-		submitLabel = 'Submit',
-		cancelLabel = 'Cancel',
-		submitVariant = 'primary',
-		loading = false,
-		error = null,
-		maxWidth = 'md',
-		submitDisabled = false,
 	}: Props = $props();
 
-	async function handleSubmit(e: Event) {
-		e.preventDefault();
-		await onSubmit();
+	let formRef: HTMLFormElement | null = $state(null);
+
+	function handleClose() {
+		open = false;
+		onCancel?.();
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Enter' && e.ctrlKey && !loading && !submitDisabled) {
-			handleSubmit(e);
-		}
+	function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		if (!canSubmit || submitting) return;
+		onSubmit(e);
+	}
+
+	function handleSubmitClick() {
+		formRef?.requestSubmit();
 	}
 </script>
 
-<Modal {visible} {onClose} {title} {icon} {maxWidth}>
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<form onsubmit={handleSubmit} onkeydown={handleKeydown} class="space-y-4">
-		<!-- Error message -->
-		{#if error}
-			<div class="rounded-lg bg-error/10 border border-error/30 p-3">
-				<Text variant="small" class="text-error">
-					{error}
-				</Text>
-			</div>
-		{/if}
-
-		<!-- Form content -->
-		{@render children()}
-	</form>
-
+<Modal open={visible ?? open} {title} {description} {size} {ariaLabel} onClose={handleClose}>
+	{#snippet children()}
+		<form bind:this={formRef} onsubmit={handleSubmit} class="form">
+			{#if children}{@render children()}{/if}
+		</form>
+	{/snippet}
 	{#snippet footer()}
-		<div class="flex gap-3 justify-end">
-			<Button variant="ghost" onclick={onClose} disabled={loading}>
-				{cancelLabel}
-			</Button>
-			<Button
-				variant={submitVariant}
-				type="submit"
-				onclick={handleSubmit}
-				{loading}
-				disabled={submitDisabled}
-			>
-				{submitLabel}
-			</Button>
-		</div>
+		<Button variant="ghost" size="sm" onclick={handleClose} disabled={submitting}>
+			{cancelLabel}
+		</Button>
+		<Button
+			variant="primary"
+			size="sm"
+			loading={submitting}
+			disabled={!canSubmit}
+			onclick={handleSubmitClick}
+		>
+			{submitLabel}
+		</Button>
 	{/snippet}
 </Modal>
+
+<style>
+	.form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+</style>

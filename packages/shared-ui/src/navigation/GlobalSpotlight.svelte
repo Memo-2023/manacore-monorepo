@@ -7,7 +7,7 @@
 		ContentSearcher,
 	} from './types';
 	import { createAppNavigationStore } from './appNavigationStore.svelte';
-	import { SEARCH_DEBOUNCE_MS } from '../search-core';
+	import { SEARCH_DEBOUNCE_MS } from '../quick-input';
 
 	interface Props {
 		open: boolean;

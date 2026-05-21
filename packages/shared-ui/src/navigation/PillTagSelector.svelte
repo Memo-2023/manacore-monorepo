@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Tag, X, Plus, CaretDown } from '@mana/shared-icons';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
 	export interface TagItem {
 		id: string;
@@ -100,9 +100,11 @@
 		class="pill glass-pill trigger-button"
 		class:has-selection={hasSelection}
 	>
-		<Tag size={16} weight={hasSelection ? 'fill' : 'regular'} />
+		<DynamicIcon name="tag" size="md" />
 		<span class="pill-label">{displayLabel}</span>
-		<CaretDown size={12} class={`chevron-icon ${isOpen ? 'rotated' : ''}`} />
+		<span class="chevron-icon" class:rotated={isOpen}>
+			<DynamicIcon name="caret-down" size="xs" />
+		</span>
 	</button>
 
 	{#if isOpen}
@@ -128,7 +130,7 @@
 					<span>Keine Tags vorhanden</span>
 					{#if onCreate}
 						<button class="create-link" onclick={handleCreateClick}>
-							<Plus size={14} weight="bold" />
+							<DynamicIcon name="plus" size="sm" />
 							<span>Erstellen</span>
 						</button>
 					{/if}
@@ -153,13 +155,13 @@
 				<div class="dropdown-footer">
 					{#if hasSelection}
 						<button class="footer-btn clear-btn" onclick={handleClearClick}>
-							<X size={14} weight="bold" />
+							<DynamicIcon name="x" size="sm" />
 							<span>Löschen</span>
 						</button>
 					{/if}
 					{#if onCreate}
 						<button class="footer-btn create-btn" onclick={handleCreateClick}>
-							<Plus size={14} weight="bold" />
+							<DynamicIcon name="plus" size="sm" />
 							<span>Neuer Tag</span>
 						</button>
 					{/if}
@@ -202,7 +204,7 @@
 
 	/* Solid theme-tokened pill (formerly the "glass" frosted pill). */
 	.glass-pill {
-		background: hsl(var(--color-card));
+		background: hsl(var(--color-surface));
 		border: 1px solid hsl(var(--color-border));
 		box-shadow:
 			0 1px 2px hsl(0 0% 0% / 0.05),
@@ -212,7 +214,7 @@
 
 	.glass-pill:hover {
 		background: hsl(var(--color-surface-hover));
-		border-color: hsl(var(--color-border-strong, var(--color-border)));
+		border-color: hsl(var(--color-border));
 		box-shadow:
 			0 6px 12px hsl(0 0% 0% / 0.08),
 			0 2px 4px hsl(0 0% 0% / 0.05);
@@ -220,13 +222,8 @@
 
 	/* Active selection state */
 	.trigger-button.has-selection {
-		background: color-mix(in srgb, var(--pill-primary-color, #3b82f6) 15%, white 85%);
-		border-color: color-mix(in srgb, var(--pill-primary-color, #3b82f6) 25%, transparent 75%);
-	}
-
-	:global(.dark) .trigger-button.has-selection {
-		background: color-mix(in srgb, var(--pill-primary-color, #3b82f6) 25%, transparent 75%);
-		border-color: color-mix(in srgb, var(--pill-primary-color, #3b82f6) 35%, transparent 65%);
+		background: hsl(var(--color-primary) / 0.15);
+		border-color: hsl(var(--color-primary) / 0.4);
 	}
 
 	:global(.chevron-icon) {
@@ -328,37 +325,29 @@
 		font-size: 0.8125rem;
 		font-weight: 500;
 		cursor: pointer;
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		background: rgba(255, 255, 255, 0.8);
-		color: #374151;
-		transition: all 0.15s ease;
-	}
-
-	:global(.dark) .tag-pill {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		color: #f3f4f6;
+		border: 1px solid hsl(var(--color-border));
+		background: hsl(var(--color-surface));
+		color: hsl(var(--color-foreground));
+		transition:
+			background-color 150ms ease,
+			border-color 150ms ease,
+			transform 150ms ease;
+		font-family: inherit;
 	}
 
 	.tag-pill:hover {
 		transform: scale(1.05);
-		background: rgba(255, 255, 255, 0.95);
-		border-color: rgba(0, 0, 0, 0.15);
-	}
-
-	:global(.dark) .tag-pill:hover {
-		background: rgba(255, 255, 255, 0.2);
-		border-color: rgba(255, 255, 255, 0.25);
+		background: hsl(var(--color-surface-hover));
 	}
 
 	.tag-pill.selected {
 		background: var(--tag-color) !important;
 		border-color: var(--tag-color) !important;
-		color: white;
+		color: hsl(var(--color-primary-foreground));
 	}
 
 	.tag-pill.selected .tag-dot {
-		background-color: white;
+		background-color: currentColor;
 	}
 
 	.tag-dot {
@@ -380,11 +369,7 @@
 		justify-content: flex-end;
 		gap: 0.5rem;
 		padding-top: 0.5rem;
-		border-top: 1px solid rgba(0, 0, 0, 0.1);
-	}
-
-	:global(.dark) .dropdown-footer {
-		border-top-color: rgba(255, 255, 255, 0.15);
+		border-top: 1px solid hsl(var(--color-border));
 	}
 
 	.footer-btn {
@@ -398,58 +383,34 @@
 		cursor: pointer;
 		border: none;
 		background: transparent;
-		color: #6b7280;
-		transition: all 0.15s ease;
-	}
-
-	:global(.dark) .footer-btn {
-		color: #9ca3af;
+		color: hsl(var(--color-muted-foreground));
+		transition:
+			background-color 150ms ease,
+			color 150ms ease;
+		font-family: inherit;
 	}
 
 	.footer-btn:hover {
-		background: rgba(0, 0, 0, 0.05);
-		color: #374151;
-	}
-
-	:global(.dark) .footer-btn:hover {
-		background: rgba(255, 255, 255, 0.1);
-		color: #f3f4f6;
+		background: hsl(var(--color-surface-hover));
+		color: hsl(var(--color-foreground));
 	}
 
 	.clear-btn {
-		color: #ef4444;
+		color: hsl(var(--color-error));
 	}
 
 	.clear-btn:hover {
-		background: rgba(239, 68, 68, 0.1);
-		color: #dc2626;
-	}
-
-	:global(.dark) .clear-btn {
-		color: #f87171;
-	}
-
-	:global(.dark) .clear-btn:hover {
-		background: rgba(239, 68, 68, 0.15);
-		color: #fca5a5;
+		background: hsl(var(--color-error) / 0.12);
+		color: hsl(var(--color-error));
 	}
 
 	.create-btn {
-		color: #3b82f6;
+		color: hsl(var(--color-primary));
 	}
 
 	.create-btn:hover {
-		background: rgba(59, 130, 246, 0.1);
-		color: #2563eb;
-	}
-
-	:global(.dark) .create-btn {
-		color: #60a5fa;
-	}
-
-	:global(.dark) .create-btn:hover {
-		background: rgba(59, 130, 246, 0.15);
-		color: #93c5fd;
+		background: hsl(var(--color-primary) / 0.12);
+		color: hsl(var(--color-primary));
 	}
 
 	/* Loading and empty states */
@@ -458,12 +419,7 @@
 		padding: 1rem;
 		text-align: center;
 		font-size: 0.875rem;
-		color: #6b7280;
-	}
-
-	:global(.dark) .loading-state,
-	:global(.dark) .empty-state {
-		color: #9ca3af;
+		color: hsl(var(--color-muted-foreground));
 	}
 
 	.empty-state {
@@ -481,22 +437,15 @@
 		border-radius: 9999px;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		color: #3b82f6;
+		color: hsl(var(--color-primary));
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		transition: all 0.15s ease;
+		transition: background-color 150ms ease;
+		font-family: inherit;
 	}
 
 	.create-link:hover {
-		background: rgba(59, 130, 246, 0.1);
-	}
-
-	:global(.dark) .create-link {
-		color: #60a5fa;
-	}
-
-	:global(.dark) .create-link:hover {
-		background: rgba(59, 130, 246, 0.15);
+		background: hsl(var(--color-primary) / 0.12);
 	}
 </style>

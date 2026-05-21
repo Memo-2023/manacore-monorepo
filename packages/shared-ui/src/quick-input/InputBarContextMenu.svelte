@@ -1,13 +1,5 @@
 <script lang="ts">
-	import { ContextMenu, type ContextMenuItem } from '../context-menu';
-	import {
-		HighlighterCircle,
-		Target,
-		Calendar,
-		Trash,
-		Keyboard,
-		Question,
-	} from '@mana/shared-icons';
+	import ContextMenu, { type ContextMenuItem } from '../organisms/ContextMenu.svelte';
 	import { getInputBarSettingsStore } from './inputBarSettings.svelte';
 	import { clearRecentHistory } from './recentInputHistory';
 
@@ -82,7 +74,7 @@
 		items.push({
 			id: 'syntax-highlighting',
 			label: 'Syntax Highlighting',
-			icon: HighlighterCircle,
+			iconName: 'edit',
 			toggle: true,
 			checked: settingsStore.syntaxHighlighting,
 			action: toggleSyntaxHighlighting,
@@ -91,7 +83,7 @@
 		items.push({
 			id: 'auto-focus',
 			label: 'Auto-Focus',
-			icon: Target,
+			iconName: 'eye',
 			toggle: true,
 			checked: settingsStore.autoFocus,
 			action: toggleAutoFocus,
@@ -110,7 +102,7 @@
 			items.push({
 				id: 'default-option-header',
 				label: defaultOptionLabel,
-				icon: Calendar,
+				iconName: 'calendar',
 				disabled: true,
 			});
 
@@ -136,7 +128,7 @@
 		items.push({
 			id: 'clear-history',
 			label: 'Verlauf löschen',
-			icon: Trash,
+			iconName: 'trash',
 			variant: 'danger',
 			action: handleClearHistory,
 		});
@@ -152,7 +144,7 @@
 			items.push({
 				id: 'shortcuts',
 				label: 'Tastenkürzel',
-				icon: Keyboard,
+				iconName: 'gear',
 				shortcut: '?',
 				action: onShowShortcuts,
 			});
@@ -162,7 +154,7 @@
 			items.push({
 				id: 'syntax-help',
 				label: 'Syntax-Hilfe',
-				icon: Question,
+				iconName: 'info',
 				action: onShowSyntaxHelp,
 			});
 		}

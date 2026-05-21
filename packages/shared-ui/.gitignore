@@ -1,0 +1,10 @@
+# Storybook static-build (Output, kein Source)
+storybook-static/
+
+# Lost-Pixel-Artefakte pro Run — nur die Baseline wird versioniert
+lost-pixel/current/
+lost-pixel/diff/
+
+# Vite/Svelte caches
+.svelte-kit/
+.vite/

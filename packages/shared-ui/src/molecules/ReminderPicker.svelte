@@ -1,24 +1,15 @@
 <script lang="ts">
-	import { Bell, BellSlash } from '@mana/shared-icons';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
-	/**
-	 * Reusable reminder time picker dropdown.
-	 * Lets user select "X minutes before" for reminders on tasks, events, etc.
-	 */
-
-	interface ReminderOption {
+	export interface ReminderOption {
 		value: number | null;
 		label: string;
 	}
 
 	interface Props {
-		/** Selected value in minutes (null = no reminder) */
 		value: number | null;
-		/** Called when selection changes */
 		onChange: (minutes: number | null) => void;
-		/** Custom options (defaults to standard set) */
 		options?: ReminderOption[];
-		/** Disable the picker */
 		disabled?: boolean;
 	}
 
@@ -39,30 +30,56 @@
 		onChange(raw === '' ? null : parseInt(raw, 10));
 	}
 
-	const displayLabel = $derived(
-		options.find((o) => o.value === value)?.label ?? 'Keine Erinnerung'
-	);
-
 	const hasReminder = $derived(value !== null);
 </script>
 
-<div class="inline-flex items-center gap-1.5">
-	{#if hasReminder}
-		<Bell size={14} weight="fill" class="text-primary flex-shrink-0" />
-	{:else}
-		<BellSlash size={14} class="text-muted-foreground flex-shrink-0" />
-	{/if}
-	<select
-		class="appearance-none bg-transparent text-xs cursor-pointer
-			{hasReminder ? 'text-primary font-medium' : 'text-muted-foreground'}
-			focus:outline-none"
-		{disabled}
-		onchange={handleChange}
-	>
-		{#each options as option}
-			<option value={option.value ?? ''} selected={option.value === value}>
-				{option.label}
-			</option>
+<label class="reminder-picker" class:active={hasReminder}>
+	<DynamicIcon name={hasReminder ? 'bell-fill' : 'bell-slash'} size="sm" ariaLabel="Erinnerung" />
+	<select {disabled} onchange={handleChange} value={value ?? ''}>
+		{#each options as option (option.value ?? 'none')}
+			<option value={option.value ?? ''}>{option.label}</option>
 		{/each}
 	</select>
-</div>
+</label>
+
+<style>
+	.reminder-picker {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.125rem 0.25rem;
+		color: hsl(var(--color-muted-foreground));
+		font-family: inherit;
+	}
+
+	.reminder-picker.active {
+		color: hsl(var(--color-primary));
+	}
+
+	.reminder-picker select {
+		appearance: none;
+		-webkit-appearance: none;
+		background: transparent;
+		border: none;
+		color: inherit;
+		font: inherit;
+		font-size: 0.75rem;
+		cursor: pointer;
+		padding: 0;
+	}
+
+	.reminder-picker.active select {
+		font-weight: 500;
+	}
+
+	.reminder-picker select:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
+		border-radius: 0.25rem;
+	}
+
+	.reminder-picker select:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+</style>

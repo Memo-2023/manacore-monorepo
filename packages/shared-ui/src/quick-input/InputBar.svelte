@@ -4,8 +4,9 @@
 	import type { QuickInputItem, CreatePreview } from './types';
 	import InputBarContextMenu from './InputBarContextMenu.svelte';
 	import { getInputBarSettingsStore } from './inputBarSettings.svelte';
-	import { getHighlightPatterns, highlightText, SEARCH_DEBOUNCE_MS } from '../search-core';
-	import type { HighlightPattern } from '../search-core';
+	import { getHighlightPatterns, highlightText } from './highlightPatterns';
+	import { SEARCH_DEBOUNCE_MS } from './index';
+	import type { HighlightPattern } from './types';
 
 	// Settings store
 	const settingsStore = getInputBarSettingsStore();
@@ -16,7 +17,7 @@
 	}
 
 	import type { Snippet } from 'svelte';
-	import { ArrowRight, Heart, MagnifyingGlass, Plus } from '@mana/shared-icons';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
 	interface Props {
 		onSearch: (query: string) => Promise<QuickInputItem[]>;
@@ -404,7 +405,7 @@
 							{#if creating}
 								<div class="loading-spinner-small"></div>
 							{:else}
-								<Plus size={20} />
+								<DynamicIcon name="plus" size="md" />
 							{/if}
 						</div>
 						<div class="result-info">
@@ -427,7 +428,7 @@
 						onmouseenter={() => (selectedIndex = searchOptionIndex)}
 					>
 						<div class="result-avatar search-avatar">
-							<MagnifyingGlass size={20} />
+							<DynamicIcon name="search" size="md" />
 						</div>
 						<div class="result-info">
 							<div class="result-name">"{searchQuery}" {searchText.toLowerCase()}</div>
@@ -470,7 +471,7 @@
 								{/if}
 							</div>
 							{#if item.isFavorite}
-								<Heart size={20} weight="fill" class="favorite-icon" />
+								<span class="favorite-icon"><DynamicIcon name="heart-fill" size="md" /></span>
 							{/if}
 						</button>
 					{/each}
@@ -524,7 +525,7 @@
 				{#if creating}
 					<div class="loading-spinner-small"></div>
 				{:else}
-					<ArrowRight size={20} />
+					<DynamicIcon name="arrow-right" size="md" />
 				{/if}
 			</button>
 		{/if}
@@ -734,12 +735,12 @@
 	}
 
 	.input-highlight-backdrop :global(.hl-date) {
-		color: hsl(var(--color-accent, 262 83% 58%));
+		color: hsl(var(--color-primary));
 		font-weight: 500;
 	}
 
 	.input-highlight-backdrop :global(.hl-time) {
-		color: hsl(var(--color-accent, 262 83% 58%));
+		color: hsl(var(--color-primary));
 		font-weight: 500;
 	}
 

@@ -1,57 +1,45 @@
 <script lang="ts">
 	/**
 	 * Drop zone that appears when a drag is active (Layer 1 or Layer 2).
-	 *
-	 * Slides in from the bottom during any drag, acts as a drop target
-	 * for actions like delete, archive, etc.
-	 *
-	 * Usage:
-	 *   <ActionZone
-	 *     accepts={['task', 'card']}
-	 *     onDrop={(payload) => deleteItem(payload.data.id)}
-	 *     variant="danger"
-	 *     label="Löschen"
-	 *   />
 	 */
-
 	import { dragState } from './drag-state.svelte';
 	import { dropTarget } from './drop-target';
 	import { passiveDropZone } from './passive-drop';
 	import type { DragPayload, DragType } from './types';
-	import { Trash, Archive, FolderOpen } from '@mana/shared-icons';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
+
+	type Variant = 'danger' | 'warning' | 'info' | 'success';
 
 	interface Props {
 		accepts: DragType[];
 		onDrop: (payload: DragPayload) => void;
 		canDrop?: (payload: DragPayload) => boolean;
-		variant?: 'danger' | 'warning' | 'info' | 'success';
+		variant?: Variant;
 		label?: string;
-		icon?: typeof Trash;
+		/** Custom inline SVG path for the icon. Falls back to a per-variant default. */
+		iconSvg?: string;
 	}
 
-	let { accepts, onDrop, canDrop, variant = 'danger', label = '', icon }: Props = $props();
+	let { accepts, onDrop, canDrop, variant = 'danger', label = '', iconSvg }: Props = $props();
 
 	const visible = $derived(dragState.anyDragActive);
 
-	const iconComponent = $derived(
-		icon ?? (variant === 'danger' ? Trash : variant === 'warning' ? Archive : FolderOpen)
-	);
+	const defaultIconName = $derived.by(() => {
+		if (variant === 'danger') return 'trash' as const;
+		if (variant === 'warning') return 'archive' as const;
+		if (variant === 'info') return 'info' as const;
+		return 'check' as const;
+	});
 
-	// The zone is both a Layer 1 drop target and a Layer 2 passive zone
 	function handleDrop(payload: DragPayload) {
 		onDrop(payload);
 	}
 </script>
 
 {#if visible}
-	{@const Icon = iconComponent}
 	<div
 		class="action-zone variant-{variant}"
-		use:dropTarget={{
-			accepts,
-			onDrop: handleDrop,
-			canDrop,
-		}}
+		use:dropTarget={{ accepts, onDrop: handleDrop, canDrop }}
 		use:passiveDropZone={{
 			accepts,
 			onDrop: handleDrop,
@@ -61,7 +49,11 @@
 		role="button"
 		tabindex="-1"
 	>
-		<Icon size={20} weight="bold" />
+		{#if iconSvg}
+			<DynamicIcon {iconSvg} size="lg" />
+		{:else}
+			<DynamicIcon name={defaultIconName} size="lg" />
+		{/if}
 		{#if label}
 			<span class="action-label">{label}</span>
 		{/if}
@@ -80,11 +72,15 @@
 		gap: 0.5rem;
 		padding: 0.75rem 1.5rem;
 		border-radius: 9999px;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		transition: all 0.2s ease;
+		border-width: 1.5px;
+		border-style: solid;
+		transition:
+			background-color 200ms ease,
+			border-color 200ms ease,
+			transform 200ms ease;
 		animation: action-zone-in 200ms ease-out;
 		cursor: default;
+		font-family: inherit;
 	}
 
 	@keyframes action-zone-in {
@@ -104,32 +100,30 @@
 		white-space: nowrap;
 	}
 
-	/* Variants */
 	.variant-danger {
-		background: rgba(239, 68, 68, 0.15);
-		border: 1.5px solid rgba(239, 68, 68, 0.3);
-		color: #ef4444;
+		background: hsl(var(--color-error) / 0.15);
+		border-color: hsl(var(--color-error) / 0.3);
+		color: hsl(var(--color-error));
 	}
 
 	.variant-warning {
-		background: rgba(245, 158, 11, 0.15);
-		border: 1.5px solid rgba(245, 158, 11, 0.3);
-		color: #f59e0b;
+		background: hsl(var(--color-warning) / 0.15);
+		border-color: hsl(var(--color-warning) / 0.3);
+		color: hsl(var(--color-warning));
 	}
 
 	.variant-info {
-		background: rgba(59, 130, 246, 0.15);
-		border: 1.5px solid rgba(59, 130, 246, 0.3);
-		color: #3b82f6;
+		background: hsl(var(--color-primary) / 0.15);
+		border-color: hsl(var(--color-primary) / 0.3);
+		color: hsl(var(--color-primary));
 	}
 
 	.variant-success {
-		background: rgba(16, 185, 129, 0.15);
-		border: 1.5px solid rgba(16, 185, 129, 0.3);
-		color: #10b981;
+		background: hsl(var(--color-success) / 0.15);
+		border-color: hsl(var(--color-success) / 0.3);
+		color: hsl(var(--color-success));
 	}
 
-	/* Hover state (when item is over the zone) */
 	:global(.action-zone.mana-drop-target-hover),
 	:global(.action-zone.action-zone-active) {
 		transform: translateX(-50%) scale(1.1);
@@ -137,33 +131,28 @@
 
 	:global(.variant-danger.mana-drop-target-hover),
 	:global(.variant-danger.action-zone-active) {
-		background: rgba(239, 68, 68, 0.3);
-		border-color: rgba(239, 68, 68, 0.6);
-		box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+		background: hsl(var(--color-error) / 0.3);
+		border-color: hsl(var(--color-error) / 0.6);
 	}
 
 	:global(.variant-warning.mana-drop-target-hover),
 	:global(.variant-warning.action-zone-active) {
-		background: rgba(245, 158, 11, 0.3);
-		border-color: rgba(245, 158, 11, 0.6);
-		box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+		background: hsl(var(--color-warning) / 0.3);
+		border-color: hsl(var(--color-warning) / 0.6);
 	}
 
 	:global(.variant-info.mana-drop-target-hover),
 	:global(.variant-info.action-zone-active) {
-		background: rgba(59, 130, 246, 0.3);
-		border-color: rgba(59, 130, 246, 0.6);
-		box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+		background: hsl(var(--color-primary) / 0.3);
+		border-color: hsl(var(--color-primary) / 0.6);
 	}
 
 	:global(.variant-success.mana-drop-target-hover),
 	:global(.variant-success.action-zone-active) {
-		background: rgba(16, 185, 129, 0.3);
-		border-color: rgba(16, 185, 129, 0.6);
-		box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+		background: hsl(var(--color-success) / 0.3);
+		border-color: hsl(var(--color-success) / 0.6);
 	}
 
-	/* Success flash after drop */
 	:global(.action-zone.mana-drop-target-success),
 	:global(.action-zone.mana-passive-zone-success) {
 		animation: action-success 400ms ease-out;
@@ -179,25 +168,5 @@
 		100% {
 			transform: translateX(-50%) scale(1);
 		}
-	}
-
-	:global(.dark) .variant-danger {
-		background: rgba(239, 68, 68, 0.2);
-		border-color: rgba(239, 68, 68, 0.4);
-	}
-
-	:global(.dark) .variant-warning {
-		background: rgba(245, 158, 11, 0.2);
-		border-color: rgba(245, 158, 11, 0.4);
-	}
-
-	:global(.dark) .variant-info {
-		background: rgba(59, 130, 246, 0.2);
-		border-color: rgba(59, 130, 246, 0.4);
-	}
-
-	:global(.dark) .variant-success {
-		background: rgba(16, 185, 129, 0.2);
-		border-color: rgba(16, 185, 129, 0.4);
 	}
 </style>

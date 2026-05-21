@@ -1,210 +1,184 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { phosphorIcons } from './phosphor-icon-map';
+
+	type Size = 'sm' | 'md';
 
 	interface Props {
-		/** Phosphor icon name (see phosphor-icon-map.ts). */
-		icon?: string;
-		/** URL to navigate to. If set, renders an <a>; otherwise a <button>. */
+		size?: Size;
 		href?: string;
-		/** Display label. Use `iconOnly` to hide. */
-		label?: string;
-		/** Hide label (label is still used for aria-label/title). */
-		iconOnly?: boolean;
-		/** Height preset. 'sm' = 36px (PillNav), 'md' = 44px (bar pills). */
-		size?: 'sm' | 'md';
-		/** Active/selected state */
-		active?: boolean;
-		/** Primary accent (e.g. "Erstellen") */
-		primary?: boolean;
-		/** Destructive style (e.g. Logout) */
-		danger?: boolean;
-		/** Disabled state (button only) */
-		disabled?: boolean;
-		/** Click handler */
 		onclick?: (e: MouseEvent) => void;
-		/** Right-click handler */
 		oncontextmenu?: (e: MouseEvent) => void;
-		/** Tooltip */
+		/** v0.1.x-Compat PascalCase-Alias für oncontextmenu. */
+		onContextMenu?: (e: MouseEvent) => void;
+		active?: boolean;
+		disabled?: boolean;
+		danger?: boolean;
+		primary?: boolean;
+		iconOnly?: boolean;
+		ariaLabel?: string;
 		title?: string;
-		/** Extra class names (e.g. drag-source marker) */
-		class?: string;
-		/** Bind the rendered <button>/<a> element for programmatic focus/click. */
-		element?: HTMLButtonElement | HTMLAnchorElement | null;
-		/** Arbitrary data-* attributes to forward (e.g. {'data-menu-trigger': ''}). */
-		data?: Record<string, string>;
-		/** Custom content rendered before the label (e.g. colored tag dot). */
+		children?: Snippet;
 		leading?: Snippet;
-		/** Custom content rendered after the label. */
 		trailing?: Snippet;
+		/** v0.1.x-Compat: Label-String als Alternative zum children-Snippet. */
+		label?: string;
+		/** v0.1.x-Compat: Icon-Name oder Component (heute ignoriert; nutze leading-Snippet). */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		icon?: any;
+		/** v0.1.x-Compat: Custom-Class auf Wrapper. */
+		class?: string;
+		/** v0.1.x-Compat: Bindbares Element-Ref. */
+		element?: HTMLElement | null;
+		/** v0.1.x-Compat: Data-Attribute. */
+		data?: Record<string, string>;
 	}
 
 	let {
-		icon,
-		href,
-		label,
-		iconOnly = false,
 		size = 'md',
-		active = false,
-		primary = false,
-		danger = false,
-		disabled = false,
+		href,
 		onclick,
 		oncontextmenu,
+		onContextMenu,
+		active = false,
+		disabled = false,
+		danger = false,
+		primary = false,
+		iconOnly = false,
+		ariaLabel,
 		title,
-		class: className,
-		element = $bindable(null),
-		data,
+		children,
 		leading,
 		trailing,
+		label,
+		class: className = '',
+		element = $bindable(null),
 	}: Props = $props();
 
-	const IconComp = $derived(icon ? phosphorIcons[icon] : null);
-	const iconPx = $derived(size === 'sm' ? 18 : 20);
-	const ariaLabel = $derived(iconOnly ? label : undefined);
-	const effectiveTitle = $derived(title ?? (iconOnly ? label : undefined));
+	const tag = $derived(href ? 'a' : 'button');
 </script>
 
-{#snippet body()}
-	{#if leading}{@render leading()}{/if}
-	{#if IconComp}
-		<IconComp size={iconPx} weight="bold" class="pill-icon" />
+<svelte:element
+	this={tag}
+	bind:this={element}
+	class="pill size-{size} {className}"
+	class:active
+	class:disabled
+	class:danger
+	class:primary
+	class:icon-only={iconOnly}
+	{href}
+	type={tag === 'button' ? 'button' : undefined}
+	disabled={tag === 'button' ? disabled : undefined}
+	aria-disabled={tag === 'a' && disabled ? 'true' : undefined}
+	aria-pressed={onclick && active ? 'true' : undefined}
+	aria-label={ariaLabel}
+	{title}
+	{onclick}
+	oncontextmenu={oncontextmenu ?? onContextMenu}
+>
+	{#if leading}<span class="affix">{@render leading()}</span>{/if}
+	{#if !iconOnly}
+		{#if children}<span class="label">{@render children()}</span>
+		{:else if label}<span class="label">{label}</span>{/if}
 	{/if}
-	{#if label && !iconOnly}
-		<span class="pill-label">{label}</span>
-	{/if}
-	{#if trailing}{@render trailing()}{/if}
-{/snippet}
-
-{#if href}
-	<a
-		bind:this={element as HTMLAnchorElement}
-		{href}
-		class={[
-			'pill',
-			`pill-${size}`,
-			iconOnly && 'icon-only',
-			active && 'active',
-			primary && 'primary',
-			danger && 'danger',
-			className,
-		]
-			.filter(Boolean)
-			.join(' ')}
-		aria-label={ariaLabel}
-		title={effectiveTitle}
-		{onclick}
-		{oncontextmenu}
-		{...data}
-	>
-		{@render body()}
-	</a>
-{:else}
-	<button
-		bind:this={element as HTMLButtonElement}
-		type="button"
-		class={[
-			'pill',
-			`pill-${size}`,
-			iconOnly && 'icon-only',
-			active && 'active',
-			primary && 'primary',
-			danger && 'danger',
-			className,
-		]
-			.filter(Boolean)
-			.join(' ')}
-		aria-label={ariaLabel}
-		title={effectiveTitle}
-		{disabled}
-		{onclick}
-		{oncontextmenu}
-		{...data}
-	>
-		{@render body()}
-	</button>
-{/if}
+	{#if trailing}<span class="affix">{@render trailing()}</span>{/if}
+</svelte:element>
 
 <style>
 	.pill {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.375rem;
-		padding: 0 0.875rem;
 		border-radius: 9999px;
-		font-size: 0.875rem;
+		border: 1px solid hsl(var(--color-border));
+		background: hsl(var(--color-surface));
+		color: hsl(var(--color-foreground));
+		font-family: inherit;
 		font-weight: 500;
-		white-space: nowrap;
 		text-decoration: none;
 		cursor: pointer;
-		flex-shrink: 0;
-		transition: all 0.15s ease;
-		border: 1px solid hsl(var(--color-border));
-		background: hsl(var(--color-card));
-		color: hsl(var(--color-foreground));
-		box-shadow:
-			0 1px 2px hsl(0 0% 0% / 0.05),
-			0 2px 6px hsl(0 0% 0% / 0.04);
+		transition:
+			background-color 0.15s ease,
+			border-color 0.15s ease,
+			color 0.15s ease;
 	}
 
-	.pill-md {
-		height: 44px;
-	}
-
-	.pill-sm {
-		height: 36px;
-	}
-
-	/* Icon-only pill: wider than tall so it reads as a pill, not a chip. */
-	.pill.icon-only {
-		gap: 0;
-		padding: 0 1.125rem;
-	}
-
-	.pill:hover:not(:disabled) {
-		background: hsl(var(--color-surface-hover, var(--color-card)));
-		border-color: hsl(var(--color-border-strong, var(--color-border)));
-	}
-
-	.pill:disabled {
+	.pill:disabled,
+	.pill.disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
 	}
 
+	.pill:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
+	}
+
+	.pill:not(:disabled):not(.disabled):hover {
+		background: hsl(var(--color-surface-hover));
+	}
+
+	/* sizes */
+	.size-sm {
+		padding: 0.25rem 0.625rem;
+		font-size: 0.8125rem;
+	}
+	.size-md {
+		padding: 0.375rem 0.75rem;
+		font-size: 0.875rem;
+	}
+
+	.size-sm.icon-only {
+		padding: 0.25rem;
+	}
+	.size-md.icon-only {
+		padding: 0.375rem;
+	}
+
+	/* active */
 	.pill.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #f8d62b)) 20%,
-			white 80%
-		);
-		border-color: var(--pill-primary-color, var(--color-primary-500, rgba(248, 214, 43, 0.5)));
-		color: #1a1a1a;
+		background: hsl(var(--color-primary) / 0.15);
+		border-color: hsl(var(--color-primary) / 0.4);
+		color: hsl(var(--color-primary));
+	}
+	.pill.active:not(:disabled):hover {
+		background: hsl(var(--color-primary) / 0.2);
 	}
 
-	:global(.dark) .pill.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #f8d62b)) 30%,
-			transparent 70%
-		);
-		color: var(--pill-primary-color, var(--color-primary-500, #f8d62b));
-	}
-
+	/* primary — vibrant CTA pill */
 	.pill.primary {
-		background: var(--pill-primary-color, var(--color-primary-500, #6366f1));
-		border-color: transparent;
-		color: white;
+		background: hsl(var(--color-primary));
+		border-color: hsl(var(--color-primary));
+		color: hsl(var(--color-primary-foreground));
+	}
+	.pill.primary:not(:disabled):hover {
+		background: hsl(var(--color-primary) / 0.9);
 	}
 
+	/* danger */
 	.pill.danger {
-		color: #dc2626;
+		color: hsl(var(--color-error));
+		border-color: hsl(var(--color-error) / 0.3);
+	}
+	.pill.danger:not(:disabled):hover {
+		background: hsl(var(--color-error) / 0.1);
+		border-color: hsl(var(--color-error) / 0.5);
 	}
 
-	:global(.dark) .pill.danger {
-		color: #ef4444;
+	.affix {
+		display: inline-flex;
+		align-items: center;
+		flex-shrink: 0;
 	}
 
-	.pill :global(.pill-label) {
-		font-weight: 500;
+	.label {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pill {
+			transition: none;
+		}
 	}
 </style>

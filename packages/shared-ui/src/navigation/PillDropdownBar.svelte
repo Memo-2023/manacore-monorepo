@@ -1,24 +1,21 @@
 <script lang="ts">
-	import type { PillDropdownItem } from './types';
-	import { phosphorIcons } from './phosphor-icon-map';
+	import type { PillDropdownItem } from './PillDropdown.svelte';
 	import Pill from './Pill.svelte';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
 	interface Props {
-		/** Items to render as pills in the bar */
 		items: PillDropdownItem[];
-		/** Label shown at the start of the bar (title of the opened dropdown) */
 		label?: string;
-		/** Icon rendered next to the label */
-		icon?: string;
-		/** Use 'static' when inside a flex container (bottom-stack pattern). */
+		/** Inline SVG path string for the leading label-pill icon. */
+		iconSvg?: string;
+		/** v0.1.x-Compat: Icon-Namen-String. Wird heute ignoriert; nutze iconSvg. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		icon?: any;
 		positioning?: 'fixed' | 'static';
 	}
 
-	let { items, label, icon, positioning = 'static' }: Props = $props();
+	let { items, label, iconSvg, positioning = 'static' }: Props = $props();
 
-	// A render element is either a single item, a divider/section-label, or a
-	// group of items that share the same `group` id (rendered as a segmented
-	// toggle pill).
 	type RenderElement =
 		| { kind: 'item'; id: string; item: PillDropdownItem }
 		| { kind: 'divider'; id: string }
@@ -27,10 +24,8 @@
 
 	const renderElements = $derived.by<RenderElement[]>(() => {
 		const out: RenderElement[] = [];
-		// Track groups already emitted so we only render each once.
 		const emittedGroups = new Set<string>();
 
-		// First flatten submenus, then collect groups.
 		const flat: PillDropdownItem[] = [];
 		for (const item of items) {
 			if (item.submenu && item.submenu.length > 0) {
@@ -71,7 +66,14 @@
 <div class="dropdown-bar-wrapper" class:static={positioning === 'static'}>
 	<div class="dropdown-bar-container">
 		{#if label}
-			<Pill {icon} {label} disabled class="bar-label" />
+			<Pill disabled title={label}>
+				{#snippet leading()}
+					{#if iconSvg}
+						<DynamicIcon {iconSvg} size="md" />
+					{/if}
+				{/snippet}
+				{label}
+			</Pill>
 		{/if}
 
 		{#each renderElements as el (el.id)}
@@ -80,11 +82,8 @@
 			{:else if el.kind === 'section-label'}
 				<div class="bar-section-label">{el.label}</div>
 			{:else if el.kind === 'group'}
-				<!-- Segmented toggle pill. If any label in the group is longer
-					 than 10 chars the group shows icon+label; otherwise icon-only
-					 (e.g. the Light/Dark/System triple). -->
 				{@const showLabels = el.items.some((i) => (i.label?.length ?? 0) > 10)}
-				<div class="segmented-toggle glass-pill" class:with-labels={showLabels}>
+				<div class="segmented-toggle" class:with-labels={showLabels}>
 					{#each el.items as gi (gi.id)}
 						<button
 							type="button"
@@ -107,9 +106,8 @@
 										stroke-dashoffset={8 * 2 * Math.PI * (1 - gi.progress)}
 									/>
 								</svg>
-							{:else if gi.icon && phosphorIcons[gi.icon]}
-								{@const GIcon = phosphorIcons[gi.icon]}
-								<GIcon size={20} weight="bold" class="segmented-icon" />
+							{:else if gi.iconSvg}
+								<span class="segmented-icon"><DynamicIcon iconSvg={gi.iconSvg} size="md" /></span>
 							{/if}
 							{#if showLabels}
 								<span class="segmented-label">{gi.label}</span>
@@ -120,8 +118,6 @@
 			{:else}
 				{@const item = el.item}
 				<Pill
-					icon={item.imageUrl ? undefined : item.icon}
-					label={item.label}
 					active={item.active}
 					primary={item.primary}
 					danger={item.danger}
@@ -132,8 +128,11 @@
 					{#snippet leading()}
 						{#if item.imageUrl}
 							<img src={item.imageUrl} alt="" class="bar-img" />
+						{:else if item.iconSvg}
+							<DynamicIcon iconSvg={item.iconSvg} size="md" />
 						{/if}
 					{/snippet}
+					{item.label}
 				</Pill>
 			{/if}
 		{/each}
@@ -147,7 +146,6 @@
 		align-items: stretch;
 		justify-content: center;
 		pointer-events: none;
-		/* Matches tags/tabbar/quickinput slot (see bottomChromeHeight in (app)/+layout.svelte). */
 		height: 64px;
 	}
 
@@ -188,14 +186,6 @@
 		display: none;
 	}
 
-	/* .bar-label override: muted background, non-interactive */
-	:global(.bar-label) {
-		opacity: 1 !important;
-		cursor: default !important;
-		background: hsl(var(--color-muted, var(--color-card))) !important;
-		font-weight: 600 !important;
-	}
-
 	.bar-divider {
 		width: 1px;
 		height: 1.5rem;
@@ -224,7 +214,6 @@
 		object-fit: cover;
 	}
 
-	/* Segmented toggle pill (e.g. Light / Dark / System three-way) */
 	.segmented-toggle {
 		display: inline-flex;
 		align-items: center;
@@ -233,10 +222,7 @@
 		height: 44px;
 		border-radius: 9999px;
 		border: 1px solid hsl(var(--color-border));
-		background: hsl(var(--color-card));
-		box-shadow:
-			0 1px 2px hsl(0 0% 0% / 0.05),
-			0 2px 6px hsl(0 0% 0% / 0.04);
+		background: hsl(var(--color-surface));
 		flex-shrink: 0;
 	}
 
@@ -252,27 +238,22 @@
 		border-radius: 9999px;
 		cursor: pointer;
 		color: hsl(var(--color-foreground));
-		transition: all 0.15s;
+		transition: background-color 150ms;
+		font-family: inherit;
 	}
 
 	.segmented-btn:hover:not(.active):not(:disabled) {
-		background: hsl(var(--color-surface-hover, var(--color-muted)));
+		background: hsl(var(--color-surface-hover));
+	}
+
+	.segmented-btn:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
 	}
 
 	.segmented-btn.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #6366f1)) 20%,
-			white 80%
-		);
-	}
-
-	:global(.dark) .segmented-btn.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #6366f1)) 30%,
-			transparent 70%
-		);
+		background: hsl(var(--color-primary) / 0.2);
+		color: hsl(var(--color-primary));
 	}
 
 	.segmented-btn :global(.segmented-icon) {
@@ -280,10 +261,10 @@
 		height: 1.25rem;
 	}
 
-	/* When the group shows labels, give the buttons more padding */
 	.segmented-toggle.with-labels .segmented-btn {
 		gap: 0.375rem;
 		padding: 0.375rem 0.625rem;
+		width: auto;
 	}
 
 	.segmented-label {
@@ -292,7 +273,6 @@
 		white-space: nowrap;
 	}
 
-	/* Inline progress ring (replaces icon when downloading) */
 	.progress-ring-inline {
 		width: 20px;
 		height: 20px;
@@ -308,10 +288,10 @@
 
 	.progress-fill {
 		fill: none;
-		stroke: var(--pill-primary-color, var(--color-primary-500, #6366f1));
+		stroke: hsl(var(--color-primary));
 		stroke-width: 2.5;
 		stroke-linecap: round;
-		transition: stroke-dashoffset 0.3s ease;
+		transition: stroke-dashoffset 300ms ease;
 	}
 
 	.segmented-btn.has-progress {

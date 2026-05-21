@@ -1,213 +1,99 @@
 <script lang="ts">
-	/**
-	 * PageHeader - Standardized page header layout
-	 *
-	 * Provides consistent page title, description, and action buttons layout.
-	 *
-	 * @example Basic usage
-	 * ```svelte
-	 * <PageHeader title="My Memos" />
-	 * ```
-	 *
-	 * @example With description and actions
-	 * ```svelte
-	 * <PageHeader
-	 *   title="Flashcard Decks"
-	 *   description="Manage your study decks"
-	 * >
-	 *   {#snippet actions()}
-	 *     <Button onclick={createDeck}>New Deck</Button>
-	 *   {/snippet}
-	 * </PageHeader>
-	 * ```
-	 *
-	 * @example With back navigation
-	 * ```svelte
-	 * <PageHeader title="Space Details" backHref="/spaces" />
-	 * ```
-	 *
-	 * @example With breadcrumb and icon
-	 * ```svelte
-	 * <PageHeader title="Edit Profile">
-	 *   {#snippet breadcrumb()}
-	 *     <a href="/settings">Settings</a> / Profile
-	 *   {/snippet}
-	 *   {#snippet icon()}
-	 *     <UserIcon />
-	 *   {/snippet}
-	 * </PageHeader>
-	 * ```
-	 */
-
 	import type { Snippet } from 'svelte';
-	import { Text } from '../atoms';
-	import { CaretLeft } from '@mana/shared-icons';
-
-	type HeaderSize = 'sm' | 'md' | 'lg';
 
 	interface Props {
-		/** Page title */
 		title: string;
-		/** Page description/subtitle */
+		subtitle?: string;
+		/** Alias für subtitle (v0.1.x-Compat). */
 		description?: string;
-		/** Header size variant */
-		size?: HeaderSize;
-		/** Whether to show bottom border */
-		bordered?: boolean;
-		/** Center the title (with actions on the right, back on the left) */
-		centered?: boolean;
-		/** Back navigation href (shows back arrow button) */
-		backHref?: string;
-		/** Sticky position at top of viewport with frosted-glass background */
-		sticky?: boolean;
-		/** Icon snippet (before title) */
-		icon?: Snippet;
-		/** Breadcrumb snippet (above title) */
-		breadcrumb?: Snippet;
-		/** Actions snippet (right side) */
+		eyebrow?: string;
 		actions?: Snippet;
-		/** Tabs or navigation snippet (below header) */
-		tabs?: Snippet;
-		/** Additional CSS classes */
+		breadcrumb?: Snippet;
+		/** v0.1.x-Compat: heute ignoriert, alle Header rendern in der gleichen Größe. */
+		size?: 'sm' | 'md' | 'lg';
+		/** v0.1.x-Compat: Header zentrieren statt links-bündig. */
+		centered?: boolean;
+		/** v0.1.x-Compat. */
 		class?: string;
 	}
 
-	let {
-		title,
-		description,
-		size = 'md',
-		bordered = false,
-		centered = false,
-		backHref,
-		sticky = false,
-		icon,
-		breadcrumb,
-		actions,
-		tabs,
-		class: className = '',
-	}: Props = $props();
-
-	const stickyClasses =
-		'sticky top-0 z-40 backdrop-blur-lg bg-[hsl(var(--color-background,0_0%_100%)/0.8)] border-b border-[hsl(var(--color-border)/0.3)]';
-
-	const sizeClasses: Record<HeaderSize, { container: string; title: string }> = {
-		sm: {
-			container: 'py-3',
-			title: 'text-lg',
-		},
-		md: {
-			container: 'py-4',
-			title: 'text-xl',
-		},
-		lg: {
-			container: 'py-6',
-			title: 'text-2xl',
-		},
-	};
+	let { title, subtitle, description, eyebrow, actions, breadcrumb }: Props = $props();
+	const effectiveSubtitle = $derived(subtitle ?? description);
 </script>
 
-<header
-	class="page-header {sizeClasses[size].container} {bordered ? 'border-b border-theme' : ''} {sticky
-		? stickyClasses
-		: ''} {className}"
->
-	<!-- Breadcrumb -->
+<header class="page-header">
 	{#if breadcrumb}
-		<div
-			class="page-header__breadcrumb mb-2 text-sm text-theme-secondary {centered
-				? 'text-center'
-				: ''}"
-		>
-			{@render breadcrumb()}
-		</div>
+		<div class="breadcrumb">{@render breadcrumb()}</div>
 	{/if}
-
-	{#if centered}
-		<!-- Centered Layout -->
-		<div class="relative flex items-center justify-center min-h-[2.5rem]">
-			<!-- Back Button (left) -->
-			{#if backHref}
-				<a
-					href={backHref}
-					class="absolute left-0 p-1.5 rounded-lg text-theme-secondary hover:text-theme hover:bg-theme-secondary/10 transition-colors"
-					aria-label="Zurück"
-				>
-					<CaretLeft size={20} />
-				</a>
-			{/if}
-
-			<!-- Centered Title & Description -->
-			<div class="text-center">
-				{#if icon}
-					<div class="page-header__icon inline-block text-theme-secondary mb-1">
-						{@render icon()}
-					</div>
-				{/if}
-				<h1 class="font-semibold text-theme {sizeClasses[size].title}">
-					{title}
-				</h1>
-				{#if description}
-					<Text variant="muted" class="mt-1">
-						{description}
-					</Text>
-				{/if}
-			</div>
-
-			<!-- Actions (right) -->
-			{#if actions}
-				<div class="absolute right-0 flex items-center gap-2">
-					{@render actions()}
-				</div>
-			{/if}
+	<div class="header-row">
+		<div class="header-text">
+			{#if eyebrow}<p class="eyebrow">{eyebrow}</p>{/if}
+			<h1 class="title">{title}</h1>
+			{#if effectiveSubtitle}<p class="subtitle">{effectiveSubtitle}</p>{/if}
 		</div>
-	{:else}
-		<!-- Default Layout -->
-		<div class="flex items-center justify-between gap-4">
-			<div class="flex items-center gap-3 min-w-0">
-				<!-- Back Button -->
-				{#if backHref}
-					<a
-						href={backHref}
-						class="page-header__back flex-shrink-0 p-1.5 -ml-1.5 rounded-lg text-theme-secondary hover:text-theme hover:bg-theme-secondary/10 transition-colors"
-						aria-label="Zurück"
-					>
-						<CaretLeft size={20} />
-					</a>
-				{/if}
-
-				<!-- Icon -->
-				{#if icon}
-					<div class="page-header__icon flex-shrink-0 text-theme-secondary">
-						{@render icon()}
-					</div>
-				{/if}
-
-				<!-- Title & Description -->
-				<div class="min-w-0">
-					<h1 class="font-semibold text-theme {sizeClasses[size].title} truncate">
-						{title}
-					</h1>
-					{#if description}
-						<Text variant="muted" class="mt-1">
-							{description}
-						</Text>
-					{/if}
-				</div>
-			</div>
-
-			<!-- Actions -->
-			{#if actions}
-				<div class="page-header__actions flex-shrink-0 flex items-center gap-2">
-					{@render actions()}
-				</div>
-			{/if}
-		</div>
-	{/if}
-
-	<!-- Tabs/Navigation -->
-	{#if tabs}
-		<div class="page-header__tabs mt-4">
-			{@render tabs()}
-		</div>
-	{/if}
+		{#if actions}
+			<div class="header-actions">{@render actions()}</div>
+		{/if}
+	</div>
 </header>
+
+<style>
+	.page-header {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding-bottom: 1rem;
+		margin-bottom: 1.5rem;
+		border-bottom: 1px solid hsl(var(--color-border));
+		font-family: inherit;
+	}
+
+	.breadcrumb {
+		font-size: 0.8125rem;
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.header-row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.header-text {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.title {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: 600;
+		line-height: 1.25;
+		color: hsl(var(--color-foreground));
+	}
+
+	.subtitle {
+		margin: 0.375rem 0 0;
+		font-size: 0.9375rem;
+		color: hsl(var(--color-muted-foreground));
+		line-height: 1.45;
+	}
+
+	.header-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		flex-shrink: 0;
+	}
+</style>

@@ -6,15 +6,12 @@
 	 *   <DragPreview />
 	 *
 	 * It reads from dragState and renders a pill showing what's being dragged.
-	 * For tags: colored dot + tag name.
-	 * For entities: app color dot + item title + app name.
 	 */
 
 	import { dragState } from './drag-state.svelte';
 	import type { TagDragData } from './types';
 
 	interface Props {
-		/** Resolve display data for a dragged entity. */
 		resolveEntity?: (
 			type: string,
 			data: Record<string, unknown>
@@ -55,7 +52,11 @@
 			<span class="preview-title">{tagData.name}</span>
 		{:else if entityData()}
 			{@const entity = entityData()}
-			<span class="preview-dot" style="background-color: {entity?.color ?? '#6B7280'}"></span>
+			{#if entity?.color}
+				<span class="preview-dot" style="background-color: {entity.color}"></span>
+			{:else}
+				<span class="preview-dot fallback-dot"></span>
+			{/if}
 			<span class="preview-title">{entity?.title}</span>
 			{#if entity?.appName}
 				<span class="preview-app">{entity.appName}</span>
@@ -76,23 +77,14 @@
 		gap: 0.375rem;
 		padding: 0.375rem 0.75rem;
 		border-radius: 9999px;
-		background: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(0, 0, 0, 0.12);
-		box-shadow:
-			0 8px 24px -4px rgba(0, 0, 0, 0.15),
-			0 2px 6px -1px rgba(0, 0, 0, 0.1);
+		background: hsl(var(--color-surface));
+		border: 1px solid hsl(var(--color-border));
 		font-size: 0.8125rem;
 		white-space: nowrap;
 		max-width: 280px;
 		transform: scale(1.05);
 		animation: drag-preview-in 150ms ease-out;
-	}
-
-	:global(.dark) .drag-preview {
-		background: rgba(30, 30, 30, 0.95);
-		border-color: rgba(255, 255, 255, 0.15);
+		font-family: inherit;
 	}
 
 	@keyframes drag-preview-in {
@@ -113,18 +105,19 @@
 		flex-shrink: 0;
 	}
 
+	.fallback-dot {
+		background: hsl(var(--color-muted-foreground));
+	}
+
 	.preview-title {
 		font-weight: 600;
-		color: #1a1a1a;
+		color: hsl(var(--color-foreground));
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	:global(.dark) .preview-title {
-		color: #e5e5e5;
-	}
 
 	.preview-title.fallback {
-		color: #6b7280;
+		color: hsl(var(--color-muted-foreground));
 		text-transform: capitalize;
 		font-weight: 500;
 	}
@@ -132,7 +125,7 @@
 	.preview-app {
 		font-size: 0.6875rem;
 		font-weight: 400;
-		color: #9ca3af;
+		color: hsl(var(--color-muted-foreground));
 		flex-shrink: 0;
 	}
 </style>

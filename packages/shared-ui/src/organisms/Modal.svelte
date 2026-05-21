@@ -1,111 +1,167 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { X } from '@mana/shared-icons';
-	import Text from '../atoms/Text.svelte';
-	import { focusTrap } from '../actions/focusTrap';
+
+	type Size = 'sm' | 'md' | 'lg';
 
 	interface Props {
-		visible: boolean;
-		onClose: () => void;
+		open?: boolean;
+		/** v0.1.x-Compat-Alias für `open`. */
+		visible?: boolean;
+		onClose?: () => void;
 		title?: string;
-		icon?: Snippet;
-		children: Snippet;
+		description?: string;
+		size?: Size;
+		/** v0.1.x-Compat-Alias für `size`. */
+		maxWidth?: Size;
+		closeOnBackdrop?: boolean;
+		ariaLabel?: string;
+		children?: Snippet;
 		footer?: Snippet;
-		maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
-		showHeader?: boolean;
+		/** v0.1.x-Compat: Custom-Class. */
+		class?: string;
 	}
 
 	let {
+		open = $bindable(false),
 		visible,
 		onClose,
 		title,
-		icon,
+		description,
+		size = 'md',
+		maxWidth,
+		closeOnBackdrop = true,
+		ariaLabel,
 		children,
 		footer,
-		maxWidth = 'lg',
-		showHeader = true,
 	}: Props = $props();
 
-	const maxWidthClasses = {
-		sm: 'max-w-sm',
-		md: 'max-w-md',
-		lg: 'max-w-lg',
-		xl: 'max-w-xl',
-		'2xl': 'max-w-2xl',
-		'3xl': 'max-w-3xl',
-	};
+	let dialog: HTMLDialogElement | null = $state(null);
 
-	function handleBackdropClick(e: MouseEvent) {
-		if (e.target === e.currentTarget) {
-			onClose();
+	const effectiveOpen = $derived(visible ?? open);
+	const effectiveSize = $derived(maxWidth ?? size);
+
+	$effect(() => {
+		if (!dialog) return;
+		if (effectiveOpen && !dialog.open) {
+			dialog.showModal();
+		} else if (!effectiveOpen && dialog.open) {
+			dialog.close();
 		}
+	});
+
+	function handleClose() {
+		open = false;
+		onClose?.();
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape' && visible) {
-			onClose();
-		}
+	function handleBackdropClick(e: MouseEvent) {
+		if (!closeOnBackdrop) return;
+		// click on the dialog itself (backdrop area) — content is wrapped in <div class="content">
+		if (e.target === dialog) handleClose();
+	}
+
+	function handleCancel(e: Event) {
+		// fires on Escape — let it bubble to native close, then sync state
+		e.preventDefault();
+		handleClose();
 	}
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
-
-{#if visible}
-	<!-- Modal Backdrop -->
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<div
-		class="fixed inset-0 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
-		style="z-index: 9990;"
-		onclick={handleBackdropClick}
-		onkeydown={(e) => e.key === 'Enter' && handleBackdropClick(e as unknown as MouseEvent)}
-		role="dialog"
-		aria-modal="true"
-		tabindex="-1"
-		use:focusTrap
-	>
-		<!-- Modal Content -->
-		<div
-			class="relative flex max-h-[95vh] sm:max-h-[90vh] w-full {maxWidthClasses[
-				maxWidth
-			]} flex-col rounded-t-2xl sm:rounded-2xl border border-border bg-surface-elevated-2 backdrop-blur-xl shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
-			onkeydown={(e) => e.stopPropagation()}
-			role="none"
-		>
-			{#if showHeader}
-				<!-- Header -->
-				<div class="flex items-center justify-between p-4 sm:p-6 border-b border-border">
-					<div class="flex items-center gap-3 flex-1">
-						{#if icon}
-							{@render icon()}
-						{/if}
-						{#if title}
-							<Text variant="large" weight="semibold">
-								{title}
-							</Text>
-						{/if}
-					</div>
-					<button
-						onclick={onClose}
-						class="p-2.5 sm:p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 transition-all duration-200 hover:scale-105"
-						aria-label="Close"
-					>
-						<X size={18} weight="bold" class="text-muted-foreground" />
-					</button>
-				</div>
-			{/if}
-
-			<!-- Body (scrollable) -->
-			<div class="flex-1 overflow-y-auto p-4 sm:p-6">
-				{@render children()}
-			</div>
-
-			<!-- Footer (optional) -->
-			{#if footer}
-				<div class="border-t border-border p-4 sm:p-6">
-					{@render footer()}
-				</div>
-			{/if}
+<dialog
+	bind:this={dialog}
+	class="modal size-{effectiveSize}"
+	aria-label={ariaLabel ?? title}
+	aria-describedby={description ? 'modal-desc' : undefined}
+	onclick={handleBackdropClick}
+	oncancel={handleCancel}
+>
+	<div class="content" role="document">
+		{#if title || description}
+			<header class="head">
+				{#if title}<h2 class="title">{title}</h2>{/if}
+				{#if description}<p class="desc" id="modal-desc">{description}</p>{/if}
+			</header>
+		{/if}
+		<div class="body">
+			{#if children}{@render children()}{/if}
 		</div>
+		{#if footer}
+			<footer class="foot">{@render footer()}</footer>
+		{/if}
 	</div>
-{/if}
+</dialog>
+
+<style>
+	.modal {
+		padding: 0;
+		border: 1px solid hsl(var(--color-border));
+		border-radius: 0.875rem;
+		background: hsl(var(--color-surface));
+		color: hsl(var(--color-foreground));
+		font-family: inherit;
+		max-height: 90vh;
+		max-width: 95vw;
+		box-shadow:
+			0 8px 24px hsl(var(--color-foreground) / 0.12),
+			0 2px 6px hsl(var(--color-foreground) / 0.06);
+	}
+
+	.size-sm {
+		width: 26rem;
+	}
+	.size-md {
+		width: 36rem;
+	}
+	.size-lg {
+		width: 52rem;
+	}
+
+	.modal::backdrop {
+		background: hsl(var(--color-foreground) / 0.4);
+		backdrop-filter: blur(2px);
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		max-height: 90vh;
+	}
+
+	.head {
+		padding: 1.25rem 1.25rem 0.75rem;
+		border-bottom: 1px solid hsl(var(--color-border));
+	}
+
+	.title {
+		margin: 0 0 0.25rem;
+		font-size: 1.125rem;
+		font-weight: 600;
+	}
+
+	.desc {
+		margin: 0;
+		font-size: 0.875rem;
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.body {
+		padding: 1.25rem;
+		overflow-y: auto;
+		flex: 1;
+	}
+
+	.foot {
+		padding: 0.875rem 1.25rem;
+		border-top: 1px solid hsl(var(--color-border));
+		display: flex;
+		gap: 0.5rem;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.modal::backdrop {
+			backdrop-filter: none;
+		}
+	}
+</style>

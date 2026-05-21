@@ -1,57 +1,18 @@
 <script lang="ts" generics="T">
-	/**
-	 * BaseListView — shared scaffolding for module ListView components.
-	 *
-	 * Encodes the workbench convention every Mana module's ListView shares:
-	 *   wrapper padding → optional stats header → scrollable item region → empty state.
-	 *
-	 * Per-item rendering and data fetching stay with the consumer:
-	 *   - Pass `items` (already filtered & decrypted via queries.ts).
-	 *   - Provide an `item` snippet that renders one row.
-	 *   - Provide an optional `header` snippet for stat counts or filters.
-	 *
-	 * @example
-	 * ```svelte
-	 * <BaseListView items={sorted} getKey={(q) => q.id} emptyTitle="Keine Fragen">
-	 *   {#snippet header()}
-	 *     <span>{questions.length} Fragen</span>
-	 *   {/snippet}
-	 *   {#snippet item(question)}
-	 *     <button onclick={() => navigate('detail', { id: question.id })}>
-	 *       {question.title}
-	 *     </button>
-	 *   {/snippet}
-	 * </BaseListView>
-	 * ```
-	 */
 	import type { Snippet } from 'svelte';
-	import { EmptyState } from '../molecules';
+	import EmptyState from '../molecules/EmptyState.svelte';
 
 	interface Props<TItem> {
-		/** Items to render. Should already be filtered (deletedAt) and decrypted. */
 		items: TItem[];
-		/** Stable key extractor for the {#each} block. */
 		getKey: (item: TItem) => string | number;
-		/** Snippet that renders a single item row. */
 		item: Snippet<[TItem, number]>;
-		/** Optional header snippet (e.g. stat counts, filters). */
 		header?: Snippet;
-		/** Optional snippet rendered above the items but inside the scroll area. */
 		listHeader?: Snippet;
-		/** Optional snippet rendered at the very top, outside the scroll area (toolbar, voice bar, ...). */
 		toolbar?: Snippet;
-		/** Empty-state title. */
 		emptyTitle?: string;
-		/** Empty-state message. */
 		emptyMessage?: string;
-		/** Custom empty-state icon snippet. */
 		emptyIcon?: Snippet;
-		/** Override the entire empty area. */
 		empty?: Snippet;
-		/** Optional outer class override. */
-		class?: string;
-		/** Optional class for the inner scroll/list area. Use this to switch to grid, etc. */
-		listClass?: string;
 	}
 
 	let {
@@ -65,23 +26,21 @@
 		emptyMessage,
 		emptyIcon,
 		empty,
-		class: className = '',
-		listClass = '',
 	}: Props<T> = $props();
 </script>
 
-<div class="flex h-full flex-col gap-3 p-3 sm:p-4 {className}">
+<div class="base-list-view">
 	{#if toolbar}
 		{@render toolbar()}
 	{/if}
 
 	{#if header}
-		<div class="flex gap-3 text-xs text-[hsl(var(--color-muted-foreground))]">
+		<div class="header-row">
 			{@render header()}
 		</div>
 	{/if}
 
-	<div class="flex-1 overflow-auto {listClass}">
+	<div class="list-region">
 		{#if listHeader}
 			{@render listHeader()}
 		{/if}
@@ -99,3 +58,32 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	.base-list-view {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		height: 100%;
+		padding: 0.75rem;
+		font-family: inherit;
+	}
+
+	@media (min-width: 640px) {
+		.base-list-view {
+			padding: 1rem;
+		}
+	}
+
+	.header-row {
+		display: flex;
+		gap: 0.75rem;
+		font-size: 0.75rem;
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.list-region {
+		flex: 1;
+		overflow: auto;
+	}
+</style>

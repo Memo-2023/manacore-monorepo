@@ -1,80 +1,193 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { Snippet } from 'svelte';
+
+	type Type = 'text' | 'email' | 'url' | 'password' | 'number' | 'search' | 'tel' | 'date' | 'time';
+	type Size = 'sm' | 'md' | 'lg';
 
 	interface Props {
-		value: string;
-		oninput?: (value: string) => void;
-		onchange?: (value: string) => void;
-		onkeydown?: (e: KeyboardEvent) => void;
-		label?: string;
+		type?: Type;
+		value?: string | number;
 		placeholder?: string;
-		type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url';
+		label?: string;
+		hint?: string;
 		error?: string;
 		disabled?: boolean;
+		readonly?: boolean;
 		required?: boolean;
-		autocomplete?: HTMLInputAttributes['autocomplete'];
-		class?: string;
+		size?: Size;
 		id?: string;
 		name?: string;
+		autocomplete?: string;
+		ariaLabel?: string;
+		leading?: Snippet;
+		trailing?: Snippet;
+		oninput?: (e: Event) => void;
+		onchange?: (e: Event) => void;
+		onblur?: (e: FocusEvent) => void;
+		onfocus?: (e: FocusEvent) => void;
+		/** v0.1.x-Compat. */
+		class?: string;
 	}
 
 	let {
-		value = $bindable(),
-		oninput,
-		onchange,
-		onkeydown,
-		label,
-		placeholder,
 		type = 'text',
+		value = $bindable(''),
+		placeholder,
+		label,
+		hint,
 		error,
 		disabled = false,
+		readonly = false,
 		required = false,
-		autocomplete,
-		class: className = '',
-		id = `input-${Math.random().toString(36).slice(2, 9)}`,
+		size = 'md',
+		id,
 		name,
+		autocomplete,
+		ariaLabel,
+		leading,
+		trailing,
+		oninput,
+		onchange,
+		onblur,
+		onfocus,
+		class: className = '',
 	}: Props = $props();
 
-	function handleInput(e: Event) {
-		const target = e.target as HTMLInputElement;
-		value = target.value;
-		oninput?.(target.value);
-	}
-
-	function handleChange(e: Event) {
-		const target = e.target as HTMLInputElement;
-		onchange?.(target.value);
-	}
+	const inputId = $derived(id ?? `input-${Math.random().toString(36).slice(2, 9)}`);
+	const hintId = $derived(hint || error ? `${inputId}-hint` : undefined);
 </script>
 
-<div class="flex flex-col gap-1.5 {className}">
+<div class="field {className}">
 	{#if label}
-		<label for={id} class="text-sm font-medium text-theme">
+		<label for={inputId}>
 			{label}
-			{#if required}
-				<span class="text-red-500">*</span>
-			{/if}
+			{#if required}<span class="required" aria-hidden="true">*</span>{/if}
 		</label>
 	{/if}
-
-	<input
-		{id}
-		{name}
-		{type}
-		{value}
-		{placeholder}
-		{disabled}
-		{required}
-		autocomplete={autocomplete as HTMLInputAttributes['autocomplete']}
-		oninput={handleInput}
-		onchange={handleChange}
-		{onkeydown}
-		class="w-full rounded-lg border px-4 py-2.5 text-theme bg-content transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed {error
-			? 'border-red-500 focus:ring-red-500/50'
-			: 'border-theme'}"
-	/>
-
+	<div class="input-wrap size-{size}" class:disabled class:has-error={!!error}>
+		{#if leading}<span class="affix leading">{@render leading()}</span>{/if}
+		<input
+			id={inputId}
+			{type}
+			{name}
+			{placeholder}
+			{disabled}
+			{readonly}
+			{required}
+			autocomplete={autocomplete as never}
+			aria-label={ariaLabel}
+			aria-invalid={error ? 'true' : undefined}
+			aria-describedby={hintId}
+			bind:value
+			{oninput}
+			{onchange}
+			{onblur}
+			{onfocus}
+		/>
+		{#if trailing}<span class="affix trailing">{@render trailing()}</span>{/if}
+	</div>
 	{#if error}
-		<p class="text-sm text-red-500">{error}</p>
+		<p class="hint error" id={hintId} role="alert">{error}</p>
+	{:else if hint}
+		<p class="hint" id={hintId}>{hint}</p>
 	{/if}
 </div>
+
+<style>
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	label {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: hsl(var(--color-foreground));
+	}
+
+	.required {
+		color: hsl(var(--color-error));
+		margin-left: 0.125rem;
+	}
+
+	.input-wrap {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: hsl(var(--color-surface));
+		border: 1px solid hsl(var(--color-border));
+		border-radius: 0.5rem;
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
+	}
+
+	.input-wrap:focus-within {
+		border-color: hsl(var(--color-primary));
+		box-shadow: 0 0 0 2px hsl(var(--color-primary) / 0.2);
+	}
+
+	.input-wrap.disabled {
+		opacity: 0.6;
+		background: hsl(var(--color-muted));
+	}
+
+	.input-wrap.has-error {
+		border-color: hsl(var(--color-error));
+	}
+
+	.input-wrap.has-error:focus-within {
+		box-shadow: 0 0 0 2px hsl(var(--color-error) / 0.2);
+	}
+
+	.size-sm {
+		padding: 0.25rem 0.625rem;
+	}
+	.size-md {
+		padding: 0.5rem 0.75rem;
+	}
+	.size-lg {
+		padding: 0.625rem 0.875rem;
+	}
+
+	input {
+		flex: 1;
+		min-width: 0;
+		border: none;
+		background: transparent;
+		color: hsl(var(--color-foreground));
+		font: inherit;
+		outline: none;
+	}
+
+	input::placeholder {
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	input:disabled {
+		cursor: not-allowed;
+	}
+
+	.affix {
+		display: inline-flex;
+		align-items: center;
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.hint {
+		margin: 0;
+		font-size: 0.8125rem;
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.hint.error {
+		color: hsl(var(--color-error));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.input-wrap {
+			transition: none;
+		}
+	}
+</style>

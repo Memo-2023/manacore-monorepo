@@ -1,38 +1,24 @@
 <script lang="ts">
-	import { Heart, Star, PushPin } from '@mana/shared-icons';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
-	/**
-	 * Reusable favorite/pin toggle button.
-	 * Renders a heart, star, or pin icon that toggles between filled and outline.
-	 */
+	type Variant = 'heart' | 'star' | 'pin';
 
 	interface Props {
 		active: boolean;
 		onclick: () => void;
-		/** Icon variant */
-		variant?: 'heart' | 'star' | 'pin';
-		/** Icon size in pixels */
-		size?: number;
-		/** Active color (CSS color) */
-		activeColor?: string;
-		/** Inactive color (CSS color) */
-		inactiveColor?: string;
-		/** Extra CSS classes on the button */
-		class?: string;
-		/** Accessible label */
+		variant?: Variant;
+		size?: 'sm' | 'md' | number;
 		label?: string;
+		/** v0.1.x-Compat: aktive Farbe (heute ignoriert — Token primary). */
+		activeColor?: string;
+		/** v0.1.x-Compat. */
+		class?: string;
 	}
 
-	let {
-		active,
-		onclick,
-		variant = 'heart',
-		size = 18,
-		activeColor = variant === 'pin' ? 'var(--color-primary, #3b82f6)' : '#ef4444',
-		inactiveColor = 'currentColor',
-		class: className = '',
-		label,
-	}: Props = $props();
+	let { active, onclick, variant = 'heart', size = 'md', label }: Props = $props();
+	const normalizedSize = $derived<'sm' | 'md'>(
+		typeof size === 'number' ? (size < 16 ? 'sm' : 'md') : size
+	);
 
 	const defaultLabel = $derived(
 		variant === 'pin'
@@ -44,21 +30,63 @@
 				: 'Favorit'
 	);
 
-	const icons = { heart: Heart, star: Star, pin: PushPin };
-	const Icon = $derived(icons[variant]);
+	const iconName = $derived.by(() => {
+		if (active) return `${variant}-fill` as const;
+		return variant;
+	});
+
+	const iconSize = $derived(size === 'sm' ? ('sm' as const) : ('md' as const));
 </script>
 
 <button
 	type="button"
 	{onclick}
-	class="inline-flex items-center justify-center rounded-md p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10 {className}"
+	class="favorite-btn size-{normalizedSize}"
+	class:active
 	aria-label={label ?? defaultLabel}
+	aria-pressed={active}
 	title={label ?? defaultLabel}
 >
-	<Icon
-		{size}
-		weight={active ? 'fill' : 'regular'}
-		class="transition-colors"
-		style="color: {active ? activeColor : inactiveColor}"
-	/>
+	<DynamicIcon name={iconName} size={iconSize} />
 </button>
+
+<style>
+	.favorite-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.25rem;
+		background: transparent;
+		border: none;
+		border-radius: 0.375rem;
+		color: hsl(var(--color-muted-foreground));
+		cursor: pointer;
+		transition:
+			background-color 120ms,
+			color 120ms;
+		font-family: inherit;
+	}
+
+	.favorite-btn.size-sm {
+		padding: 0.125rem;
+	}
+
+	.favorite-btn:hover {
+		background: hsl(var(--color-surface-hover));
+		color: hsl(var(--color-foreground));
+	}
+
+	.favorite-btn:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
+	}
+
+	.favorite-btn.active {
+		color: hsl(var(--color-primary));
+	}
+
+	.favorite-btn.active:hover {
+		color: hsl(var(--color-primary));
+		background: hsl(var(--color-primary) / 0.08);
+	}
+</style>

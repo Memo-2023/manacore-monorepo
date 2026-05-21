@@ -464,7 +464,7 @@
 		transform: translateX(-50%);
 		display: flex;
 		flex-direction: column;
-		background: hsl(var(--color-card));
+		background: hsl(var(--color-surface));
 		border: 1px solid hsl(var(--color-border));
 		border-radius: 1rem;
 		box-shadow:
@@ -562,7 +562,7 @@
 		padding: 0.375rem 0.625rem;
 		border-radius: 9999px;
 		border: 1px solid hsl(var(--color-border));
-		background: hsl(var(--color-card));
+		background: hsl(var(--color-surface));
 		font-size: 0.8125rem;
 		font-weight: 500;
 		white-space: nowrap;
@@ -572,7 +572,7 @@
 	}
 
 	.chip:hover:not(:disabled) {
-		background: hsl(var(--color-surface-hover, var(--color-muted)));
+		background: hsl(var(--color-surface-hover));
 	}
 
 	.chip:disabled {
@@ -581,22 +581,9 @@
 	}
 
 	.chip.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #6366f1)) 20%,
-			white 80%
-		);
-		border-color: var(--pill-primary-color, var(--color-primary-500, rgba(99, 102, 241, 0.4)));
-		color: #1a1a1a;
-	}
-
-	:global(.dark) .chip.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #6366f1)) 30%,
-			transparent 70%
-		);
-		color: var(--pill-primary-color, var(--color-primary-500, #6366f1));
+		background: hsl(var(--color-primary) / 0.18);
+		border-color: hsl(var(--color-primary) / 0.4);
+		color: hsl(var(--color-primary));
 	}
 
 	.chip-img {
@@ -614,7 +601,7 @@
 		padding: 0.25rem;
 		border-radius: 9999px;
 		border: 1px solid hsl(var(--color-border));
-		background: hsl(var(--color-card));
+		background: hsl(var(--color-surface));
 		box-shadow:
 			0 1px 2px hsl(0 0% 0% / 0.05),
 			0 2px 6px hsl(0 0% 0% / 0.04);
@@ -637,23 +624,12 @@
 	}
 
 	.segmented-btn:hover:not(.active):not(:disabled) {
-		background: hsl(var(--color-surface-hover, var(--color-muted)));
+		background: hsl(var(--color-surface-hover));
 	}
 
 	.segmented-btn.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #6366f1)) 20%,
-			white 80%
-		);
-	}
-
-	:global(.dark) .segmented-btn.active {
-		background: color-mix(
-			in srgb,
-			var(--pill-primary-color, var(--color-primary-500, #6366f1)) 30%,
-			transparent 70%
-		);
+		background: hsl(var(--color-primary) / 0.2);
+		color: hsl(var(--color-primary));
 	}
 
 	.segmented-btn:disabled {
@@ -677,7 +653,7 @@
 
 	.progress-fill {
 		fill: none;
-		stroke: var(--pill-primary-color, var(--color-primary-500, #6366f1));
+		stroke: hsl(var(--color-primary));
 		stroke-width: 2.5;
 		stroke-linecap: round;
 		transition: stroke-dashoffset 0.3s ease;
@@ -692,8 +668,8 @@
 		padding: 0.625rem 0.875rem;
 		border-radius: 9999px;
 		border: none;
-		background: var(--pill-primary-color, var(--color-primary-500, #6366f1));
-		color: white;
+		background: hsl(var(--color-primary));
+		color: hsl(var(--color-primary-foreground));
 		font-size: 0.875rem;
 		font-weight: 600;
 		cursor: pointer;
@@ -719,21 +695,20 @@
 		padding: 0.5rem 0.875rem;
 		border-radius: 9999px;
 		border: 1px solid hsl(var(--color-border));
-		background: hsl(var(--color-card));
-		color: #dc2626;
+		background: hsl(var(--color-surface));
+		color: hsl(var(--color-error));
 		font-size: 0.8125rem;
 		font-weight: 500;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition:
+			background-color 150ms,
+			color 150ms;
 		justify-content: center;
-	}
-
-	:global(.dark) .logout-btn {
-		color: #ef4444;
+		font-family: inherit;
 	}
 
 	.logout-btn:hover {
-		background: hsl(var(--color-surface-hover, var(--color-muted)));
+		background: hsl(var(--color-surface-hover));
 	}
 
 	/* Mobile: bottom sheet */

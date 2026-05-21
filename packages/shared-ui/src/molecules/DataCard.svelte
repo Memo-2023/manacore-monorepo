@@ -1,161 +1,109 @@
 <script lang="ts">
-	/**
-	 * DataCard - Generic card for displaying data items
-	 *
-	 * Used for displaying items like memos, decks, blueprints, etc.
-	 * Provides consistent layout with title, description, metadata, and actions.
-	 *
-	 * @example Basic usage
-	 * ```svelte
-	 * <DataCard
-	 *   title="My Deck"
-	 *   description="A collection of flashcards"
-	 *   onclick={() => openDeck(deck.id)}
-	 * />
-	 * ```
-	 *
-	 * @example With metadata and actions
-	 * ```svelte
-	 * <DataCard title={memo.title} description={memo.summary}>
-	 *   {#snippet metadata()}
-	 *     <span>5 min ago</span>
-	 *     <Badge>Audio</Badge>
-	 *   {/snippet}
-	 *   {#snippet actions()}
-	 *     <Button variant="ghost" size="sm" onclick={edit}>Edit</Button>
-	 *     <Button variant="ghost" size="sm" onclick={del}>Delete</Button>
-	 *   {/snippet}
-	 * </DataCard>
-	 * ```
-	 */
-
 	import type { Snippet } from 'svelte';
-	import { Text } from '../atoms';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
-	type CardVariant = 'default' | 'elevated' | 'outlined' | 'ghost';
+	type Trend = 'up' | 'down' | 'flat';
 
 	interface Props {
-		/** Card title */
-		title: string;
-		/** Card description/subtitle */
-		description?: string;
-		/** Card variant */
-		variant?: CardVariant;
-		/** Whether card is interactive (clickable) */
-		interactive?: boolean;
-		/** Click handler */
-		onclick?: () => void;
-		/** Icon/thumbnail snippet (left side) */
+		label: string;
+		value: string | number;
+		hint?: string;
+		change?: string;
+		trend?: Trend;
 		icon?: Snippet;
-		/** Metadata snippet (below description) */
-		metadata?: Snippet;
-		/** Actions snippet (right side or bottom) */
-		actions?: Snippet;
-		/** Badge/status snippet (top right) */
-		badge?: Snippet;
-		/** Additional CSS classes */
-		class?: string;
 	}
 
-	let {
-		title,
-		description,
-		variant = 'default',
-		interactive = false,
-		onclick,
-		icon,
-		metadata,
-		actions,
-		badge,
-		class: className = '',
-	}: Props = $props();
-
-	const variantClasses: Record<CardVariant, string> = {
-		default: 'bg-menu border border-theme',
-		elevated: 'bg-menu border border-theme shadow-md',
-		outlined: 'bg-transparent border-2 border-theme',
-		ghost: 'bg-transparent border-transparent hover:bg-menu-hover',
-	};
-
-	const isClickable = $derived(interactive || !!onclick);
+	let { label, value, hint, change, trend, icon }: Props = $props();
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<div
-	class="data-card rounded-xl p-4 transition-colors {variantClasses[variant]} {isClickable
-		? 'cursor-pointer hover:bg-menu-hover'
-		: ''} {className}"
-	{onclick}
-	onkeydown={(e) => {
-		if (isClickable && onclick && (e.key === 'Enter' || e.key === ' ')) {
-			e.preventDefault();
-			onclick();
-		}
-	}}
-	role={isClickable ? 'button' : undefined}
-	tabindex={isClickable ? 0 : undefined}
->
-	<div class="flex items-start gap-3">
-		<!-- Icon/Thumbnail -->
-		{#if icon}
-			<div class="data-card__icon flex-shrink-0">
-				{@render icon()}
-			</div>
-		{/if}
-
-		<!-- Content -->
-		<div class="data-card__content flex-1 min-w-0">
-			<div class="flex items-start justify-between gap-2">
-				<div class="min-w-0">
-					<!-- Title -->
-					<Text variant="body" weight="semibold" class="truncate">
-						{title}
-					</Text>
-
-					<!-- Description -->
-					{#if description}
-						<Text variant="muted" class="mt-1 line-clamp-2">
-							{description}
-						</Text>
+<article class="data-card">
+	<header class="head">
+		<span class="label">{label}</span>
+		{#if icon}<span class="icon-slot">{@render icon()}</span>{/if}
+	</header>
+	<p class="value">{value}</p>
+	{#if change || hint}
+		<footer class="foot">
+			{#if change}
+				<span class="change trend-{trend ?? 'flat'}">
+					{#if trend === 'up'}
+						<DynamicIcon name="caret-up" size="xs" />
+					{:else if trend === 'down'}
+						<DynamicIcon name="caret-down" size="xs" />
 					{/if}
-				</div>
-
-				<!-- Badge -->
-				{#if badge}
-					<div class="data-card__badge flex-shrink-0">
-						{@render badge()}
-					</div>
-				{/if}
-			</div>
-
-			<!-- Metadata -->
-			{#if metadata}
-				<div class="data-card__metadata mt-2 flex items-center gap-2 text-sm text-theme-secondary">
-					{@render metadata()}
-				</div>
+					{change}
+				</span>
 			{/if}
-		</div>
-
-		<!-- Actions -->
-		{#if actions}
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
-				class="data-card__actions flex-shrink-0 flex items-center gap-1"
-				onclick={(e) => e.stopPropagation()}
-				role="none"
-			>
-				{@render actions()}
-			</div>
-		{/if}
-	</div>
-</div>
+			{#if hint}<span class="hint">{hint}</span>{/if}
+		</footer>
+	{/if}
+</article>
 
 <style>
-	.line-clamp-2 {
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
+	.data-card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1rem 1.125rem;
+		background: hsl(var(--color-surface));
+		border: 1px solid hsl(var(--color-border));
+		border-radius: 0.625rem;
+		font-family: inherit;
+	}
+
+	.head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.label {
+		font-size: 0.8125rem;
+		color: hsl(var(--color-muted-foreground));
+		font-weight: 500;
+	}
+
+	.icon-slot {
+		color: hsl(var(--color-muted-foreground));
+		display: inline-flex;
+	}
+
+	.value {
+		margin: 0;
+		font-size: 1.875rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: hsl(var(--color-foreground));
+		line-height: 1.1;
+	}
+
+	.foot {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+	}
+
+	.change {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.125rem;
+		font-weight: 500;
+	}
+
+	.trend-up {
+		color: hsl(var(--color-success));
+	}
+	.trend-down {
+		color: hsl(var(--color-error));
+	}
+	.trend-flat {
+		color: hsl(var(--color-muted-foreground));
+	}
+
+	.hint {
+		color: hsl(var(--color-muted-foreground));
 	}
 </style>

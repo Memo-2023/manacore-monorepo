@@ -301,7 +301,7 @@
 
 	/* Solid theme-tokened pill (formerly the "glass" frosted pill). */
 	.glass-pill {
-		background: hsl(var(--color-card));
+		background: hsl(var(--color-surface));
 		border: 1px solid hsl(var(--color-border));
 		box-shadow:
 			0 1px 2px hsl(0 0% 0% / 0.05),
@@ -311,7 +311,7 @@
 
 	.glass-pill:hover {
 		background: hsl(var(--color-surface-hover));
-		border-color: hsl(var(--color-border-strong, var(--color-border)));
+		border-color: hsl(var(--color-border));
 		box-shadow:
 			0 6px 12px hsl(0 0% 0% / 0.08),
 			0 2px 4px hsl(0 0% 0% / 0.05);
@@ -593,7 +593,7 @@
 	}
 
 	.fav-icon.is-fav {
-		color: #eab308;
+		color: hsl(var(--color-warning));
 	}
 
 	/* Empty state */

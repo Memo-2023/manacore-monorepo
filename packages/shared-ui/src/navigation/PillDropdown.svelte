@@ -1,28 +1,52 @@
+<script lang="ts" module>
+	export interface PillDropdownItem {
+		id: string;
+		label: string;
+		/** Inline SVG path string (16×16 viewBox). Optional. */
+		iconSvg?: string;
+		/** Optional image URL (used for app/avatar icons). */
+		imageUrl?: string;
+		onClick?: (event?: MouseEvent) => void;
+		disabled?: boolean;
+		danger?: boolean;
+		primary?: boolean;
+		active?: boolean;
+		divider?: boolean;
+		submenu?: PillDropdownItem[];
+		showSplitButton?: boolean;
+		onSplitClick?: () => void;
+		/** Group ID — items sharing the same group render as a segmented toggle pill in PillDropdownBar. */
+		group?: string;
+		/** Progress value 0–1. When set, PillDropdownBar renders a progress ring instead of the icon. */
+		progress?: number;
+		/** v0.1.x-Compat: Phosphor-Icon-Name-String oder Component. Wird heute ignoriert; nutze iconSvg. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		icon?: any;
+	}
+</script>
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { PillDropdownItem } from './types';
-	import { Columns } from '@mana/shared-icons';
+	import DynamicIcon from '../atoms/DynamicIcon.svelte';
 
 	interface Props {
 		items: PillDropdownItem[];
-		direction?: 'up' | 'down';
 		label: string;
-		icon?: 'globe' | 'language' | 'chevronDown' | 'check' | string;
+		/** Inline SVG path for the trigger icon. */
+		iconSvg?: string;
+		direction?: 'up' | 'down';
 		isOpen?: boolean;
 		onToggle?: (open: boolean) => void;
-		/** Optional header content (e.g., mode selector) */
 		header?: Snippet;
-		/** Optional footer content (e.g., a11y toggles) */
 		footer?: Snippet;
-		/** Show only the icon without label */
 		iconOnly?: boolean;
 	}
 
 	let {
 		items,
-		direction = 'down',
 		label,
-		icon,
+		iconSvg,
+		direction = 'down',
 		isOpen = false,
 		onToggle,
 		header,
@@ -31,7 +55,7 @@
 	}: Props = $props();
 
 	let internalOpen = $state(false);
-	let triggerButton: HTMLButtonElement;
+	let triggerButton: HTMLButtonElement | undefined = $state();
 	let dropdownPosition = $state({ top: 0, left: 0 });
 	let openSubmenuId = $state<string | null>(null);
 
@@ -40,33 +64,19 @@
 	function toggle() {
 		if (triggerButton) {
 			const rect = triggerButton.getBoundingClientRect();
-			if (direction === 'down') {
-				dropdownPosition = {
-					top: rect.bottom + 8,
-					left: rect.left,
-				};
-			} else {
-				dropdownPosition = {
-					top: rect.top - 8,
-					left: rect.left,
-				};
-			}
+			dropdownPosition =
+				direction === 'down'
+					? { top: rect.bottom + 8, left: rect.left }
+					: { top: rect.top - 8, left: rect.left };
 		}
-
-		if (onToggle) {
-			onToggle(!isOpen);
-		} else {
-			internalOpen = !internalOpen;
-		}
+		if (onToggle) onToggle(!isOpen);
+		else internalOpen = !internalOpen;
 	}
 
 	function close() {
 		openSubmenuId = null;
-		if (onToggle) {
-			onToggle(false);
-		} else {
-			internalOpen = false;
-		}
+		if (onToggle) onToggle(false);
+		else internalOpen = false;
 	}
 
 	function toggleSubmenu(itemId: string) {
@@ -78,126 +88,61 @@
 			toggleSubmenu(item.id);
 			return;
 		}
-		if (item.onClick) {
-			item.onClick(event);
-		}
+		if (item.onClick) item.onClick(event);
 		close();
 	}
 
 	function handleSplitClick(item: PillDropdownItem, event: MouseEvent) {
 		event.stopPropagation();
-		if (item.onSplitClick) {
-			item.onSplitClick();
-		}
+		if (item.onSplitClick) item.onSplitClick();
 		close();
 	}
 
 	function handleSubmenuItemClick(item: PillDropdownItem) {
-		if (item.onClick) {
-			item.onClick();
-		}
+		if (item.onClick) item.onClick();
 		close();
-	}
-
-	const iconPaths: Record<string, string> = {
-		language:
-			'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
-		check: 'M5 13l4 4L19 7',
-		chevronDown: 'M19 9l-7 7-7-7',
-		chevronRight: 'M9 5l7 7-7 7',
-		globe:
-			'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
-		palette:
-			'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
-		// Theme icons (Phosphor-style)
-		sparkle:
-			'M12 2L13.09 8.26L18 6L15.74 10.91L22 12L15.74 13.09L18 18L13.09 15.74L12 22L10.91 15.74L6 18L8.26 13.09L2 12L8.26 10.91L6 6L10.91 8.26L12 2Z',
-		leaf: 'M6.5 21.5C3.5 18.5 3.5 12.5 6.5 8.5C9.5 4.5 15 3 20 3C20 8 18.5 13.5 14.5 16.5C10.5 19.5 4.5 19.5 4.5 19.5M6.5 21.5L4.5 19.5M6.5 21.5C6.5 21.5 12 18 14.5 16.5',
-		hexagon: 'M12 2L21.5 7.5V16.5L12 22L2.5 16.5V7.5L12 2Z',
-		waves:
-			'M2 12C2 12 5 8 9 8C13 8 15 12 15 12C15 12 17 16 21 16M2 17C2 17 5 13 9 13C13 13 15 17 15 17C15 17 17 21 21 21M2 7C2 7 5 3 9 3C13 3 15 7 15 7C15 7 17 11 21 11',
-		// User menu icons
-		user: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-		settings:
-			'M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93s.844.083 1.16-.175l.713-.57a1.125 1.125 0 011.578.112l.773.773a1.125 1.125 0 01.112 1.578l-.57.713c-.258.316-.29.756-.175 1.16s.506.71.93.78l.894.15c.542.09.94.56.94 1.109v1.094c0 .55-.398 1.02-.94 1.11l-.894.149c-.424.07-.764.384-.93.78s-.083.844.175 1.16l.57.713a1.125 1.125 0 01-.112 1.578l-.773.773a1.125 1.125 0 01-1.578.112l-.713-.57c-.316-.258-.756-.29-1.16-.175s-.71.506-.78.93l-.15.894c-.09.542-.56.94-1.109.94h-1.094c-.55 0-1.02-.398-1.11-.94l-.149-.894c-.07-.424-.384-.764-.78-.93s-.844-.083-1.16.175l-.713.57a1.125 1.125 0 01-1.578-.112l-.773-.773a1.125 1.125 0 01-.112-1.578l.57-.713c.258-.316.29-.756.175-1.16s-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.764-.384.93-.78s.083-.844-.175-1.16l-.57-.713a1.125 1.125 0 01.112-1.578l.773-.773a1.125 1.125 0 011.578-.112l.713.57c.316.258.756.29 1.16.175s.71-.506.78-.93l.15-.894zM15 12a3 3 0 11-6 0 3 3 0 016 0z',
-		logout:
-			'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1',
-		// App icons
-		grid: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z',
-		// Help icon (question mark circle)
-		help: 'M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645A3.502 3.502 0 0012 6.5 3.501 3.501 0 008.645 9h2.012A1.5 1.5 0 0112 8.5c.828 0 1.5.672 1.5 1.5 0 .828-.672 1.5-1.5 1.5a1 1 0 00-1 1V14h2v-.645z',
-		// Mana icon (water drop)
-		mana: 'M12.3 1c.03.05 7.3 9.67 7.3 13.7 0 4.03-3.27 7.3-7.3 7.3S5 18.73 5 14.7C5 10.66 12.3 1 12.3 1zm0 6.4c-.02.03-3.65 4.83-3.65 6.84 0 2.02 1.64 3.65 3.65 3.65s3.65-1.64 3.65-3.65c0-2.01-3.62-6.81-3.65-6.84z',
-		// Compute / AI tier icons
-		cpu: 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z',
-		server:
-			'M5 12V7a2 2 0 012-2h10a2 2 0 012 2v5M5 12h14M5 12v5a2 2 0 002 2h10a2 2 0 002-2v-5M9 8h.01M9 16h.01',
-		cloud:
-			'M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z',
-		power: 'M12 3v9m6.364-6.364a9 9 0 11-12.728 0',
-		download: 'M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3',
-		creditCard: 'M3 10h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2zM7 15h2',
-		spiral: 'M12 4a8 8 0 108 8 6 6 0 00-6-6 4 4 0 00-4 4 2 2 0 002 2 1 1 0 001-1',
-	};
-
-	function getIcon(iconName: string) {
-		return iconPaths[iconName] || iconName;
 	}
 </script>
 
 <div class="pill-dropdown">
-	<!-- Trigger Button -->
 	<button
 		bind:this={triggerButton}
+		type="button"
 		onclick={toggle}
-		class="pill glass-pill trigger-button"
+		class="pill trigger"
 		class:icon-only={iconOnly}
+		aria-expanded={open}
+		aria-haspopup="menu"
 	>
-		{#if icon}
-			<svg class="pill-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getIcon(icon)} />
-			</svg>
+		{#if iconSvg}
+			<span class="pill-icon"><DynamicIcon {iconSvg} size="md" /></span>
 		{/if}
 		{#if !iconOnly}
 			<span class="pill-label">{label}</span>
 		{/if}
-		<svg
-			class="chevron-icon"
-			class:rotated={open}
-			fill="none"
-			stroke="currentColor"
-			viewBox="0 0 24 24"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d={getIcon('chevronDown')}
-			/>
-		</svg>
+		<span class="chevron" class:rotated={open}>
+			<DynamicIcon name="caret-down" size="xs" />
+		</span>
 	</button>
 
 	{#if open}
-		<!-- Backdrop -->
 		<button
 			class="menu-backdrop"
+			type="button"
 			onclick={close}
 			onkeydown={(e) => e.key === 'Escape' && close()}
-			aria-label="Close dropdown"
+			aria-label="Menü schließen"
 		></button>
 
-		<!-- Dropdown items -->
 		<div
 			class="fan-container"
 			class:fan-up={direction === 'up'}
 			class:fan-down={direction === 'down'}
 			style="top: {dropdownPosition.top}px; left: {dropdownPosition.left}px;"
+			role="menu"
 		>
-			<!-- Optional header (e.g., mode selector) -->
 			{#if header}
-				<div class="dropdown-header">
-					{@render header()}
-				</div>
+				<div class="dropdown-header">{@render header()}</div>
 			{/if}
 
 			{#each items.filter((i) => !i.disabled) as item, i (item.id)}
@@ -213,87 +158,61 @@
 						style="animation-delay: {(header ? i + 1 : i) * 15}ms"
 					>
 						<button
+							type="button"
 							onclick={(e) => handleItemClick(item, e)}
-							class="pill glass-pill fan-pill"
+							class="pill fan-pill"
 							class:danger-pill={item.danger}
 							class:primary-pill={item.primary}
 							class:active-pill={item.active}
 							class:has-submenu={item.submenu && item.submenu.length > 0}
 							class:submenu-open={openSubmenuId === item.id}
+							role="menuitem"
 						>
 							{#if item.imageUrl}
 								<img src={item.imageUrl} alt="" class="pill-image-icon" />
-							{:else if item.icon === 'mana'}
-								<svg class="pill-icon" viewBox="0 0 24 24" fill="currentColor">
-									<path d={getIcon('mana')} />
-								</svg>
-							{:else if item.icon}
-								<svg class="pill-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d={getIcon(item.icon)}
-									/>
-								</svg>
+							{:else if item.iconSvg}
+								<span class="pill-icon"><DynamicIcon iconSvg={item.iconSvg} size="md" /></span>
 							{/if}
 							<span class="pill-label">{item.label}</span>
 							{#if item.active}
-								<svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d={getIcon('check')}
-									/>
-								</svg>
+								<span class="check-icon">
+									<DynamicIcon name="check" size="sm" />
+								</span>
 							{:else if item.submenu && item.submenu.length > 0}
-								<svg
-									class="chevron-submenu"
-									class:rotated={openSubmenuId === item.id}
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d={getIcon('chevronDown')}
-									/>
-								</svg>
+								<span class="chevron-submenu" class:rotated={openSubmenuId === item.id}>
+									<DynamicIcon name="caret-down" size="xs" />
+								</span>
 							{/if}
 						</button>
 						{#if item.showSplitButton && item.onSplitClick}
 							<button
+								type="button"
 								onclick={(e) => handleSplitClick(item, e)}
-								class="split-button glass-pill"
+								class="split-button"
+								aria-label="In Split-Panel öffnen"
 								title="Open in split panel (Ctrl/Cmd+Click)"
 							>
-								<Columns size={20} class="split-icon" />
+								<DynamicIcon name="external" size="sm" />
 							</button>
 						{/if}
 					</div>
-					<!-- Submenu items -->
+
 					{#if item.submenu && item.submenu.length > 0 && openSubmenuId === item.id}
-						<div class="submenu-container">
+						<div class="submenu-container" role="menu">
 							{#each item.submenu.filter((si) => !si.disabled) as subitem, si (subitem.id)}
 								<button
+									type="button"
 									onclick={() => handleSubmenuItemClick(subitem)}
-									class="pill glass-pill fan-pill submenu-item"
+									class="pill fan-pill submenu-item"
 									class:active-pill={subitem.active}
 									style="animation-delay: {si * 15}ms"
+									role="menuitem"
 								>
 									<span class="pill-label">{subitem.label}</span>
 									{#if subitem.active}
-										<svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d={getIcon('check')}
-											/>
-										</svg>
+										<span class="check-icon">
+											<DynamicIcon name="check" size="sm" />
+										</span>
 									{/if}
 								</button>
 							{/each}
@@ -302,11 +221,8 @@
 				{/if}
 			{/each}
 
-			<!-- Optional footer (e.g., a11y toggles) -->
 			{#if footer}
-				<div class="dropdown-footer">
-					{@render footer()}
-				</div>
+				<div class="dropdown-footer">{@render footer()}</div>
 			{/if}
 		</div>
 	{/if}
@@ -322,23 +238,26 @@
 		z-index: 10000;
 	}
 
-	.trigger-button {
+	.trigger {
 		position: relative;
 		z-index: 10;
 	}
 
-	.trigger-button.icon-only {
+	.trigger.icon-only {
 		padding: 0.5rem 0.625rem;
 	}
 
-	.chevron-icon {
+	.chevron {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		width: 0.75rem;
 		height: 0.75rem;
-		transition: transform 0.2s;
 		margin-left: 0.25rem;
+		transition: transform 200ms;
 	}
 
-	.chevron-icon.rotated {
+	.chevron.rotated {
 		transform: rotate(180deg);
 	}
 
@@ -360,7 +279,7 @@
 	}
 
 	.fan-pill {
-		animation: fanIn 0.15s ease-out forwards;
+		animation: fanIn 150ms ease-out forwards;
 		opacity: 0;
 		transform: translateY(10px);
 	}
@@ -386,73 +305,64 @@
 		font-weight: 500;
 		white-space: nowrap;
 		text-decoration: none;
-		transition: all 0.2s;
-		border: none;
-		cursor: pointer;
-	}
-
-	/* Solid theme-tokened pill (formerly the "glass" frosted pill).
-	   Class name kept for backwards compatibility. */
-	.glass-pill,
-	:global(.fan-container .glass-pill) {
-		background: hsl(var(--color-card));
+		transition:
+			background-color 200ms,
+			border-color 200ms,
+			color 200ms,
+			transform 200ms;
+		background: hsl(var(--color-surface));
 		border: 1px solid hsl(var(--color-border));
-		box-shadow:
-			0 1px 2px hsl(0 0% 0% / 0.05),
-			0 2px 6px hsl(0 0% 0% / 0.04);
 		color: hsl(var(--color-foreground));
+		cursor: pointer;
+		font-family: inherit;
 	}
 
-	.glass-pill:hover {
+	.pill:hover {
 		background: hsl(var(--color-surface-hover));
-		border-color: hsl(var(--color-border-strong, var(--color-border)));
 		transform: translateY(-2px);
-		box-shadow:
-			0 6px 12px hsl(0 0% 0% / 0.08),
-			0 2px 4px hsl(0 0% 0% / 0.05);
+	}
+
+	.pill:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
 	}
 
 	.active-pill {
-		background: var(--color-primary-100, rgba(248, 214, 43, 0.2));
-		border-color: var(--color-primary-200, rgba(248, 214, 43, 0.3));
+		background: hsl(var(--color-primary) / 0.12);
+		border-color: hsl(var(--color-primary) / 0.4);
+		color: hsl(var(--color-primary));
 	}
 
-	:global(.dark) .active-pill {
-		background: var(--color-primary-900, rgba(248, 214, 43, 0.15));
-		border-color: var(--color-primary-800, rgba(248, 214, 43, 0.25));
+	.active-pill:hover {
+		background: hsl(var(--color-primary) / 0.18);
 	}
 
 	.danger-pill {
-		color: #dc2626;
-	}
-
-	:global(.dark) .danger-pill {
-		color: #ef4444;
+		color: hsl(var(--color-error));
 	}
 
 	.danger-pill:hover {
-		background: rgba(220, 38, 38, 0.15);
-		border-color: rgba(220, 38, 38, 0.3);
+		background: hsl(var(--color-error) / 0.12);
+		border-color: hsl(var(--color-error) / 0.4);
 	}
 
-	/* Primary CTA pill — used for the guest "Anmelden" entry */
 	.primary-pill {
 		background: hsl(var(--color-primary));
 		border-color: hsl(var(--color-primary));
-		color: hsl(var(--color-primary-foreground, 0 0% 100%));
+		color: hsl(var(--color-primary-foreground));
 		font-weight: 600;
 	}
 
 	.primary-pill:hover {
 		background: hsl(var(--color-primary) / 0.92);
 		border-color: hsl(var(--color-primary) / 0.92);
-		color: hsl(var(--color-primary-foreground, 0 0% 100%));
-		box-shadow:
-			0 6px 14px hsl(var(--color-primary) / 0.3),
-			0 2px 4px hsl(0 0% 0% / 0.06);
+		color: hsl(var(--color-primary-foreground));
 	}
 
 	.pill-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		width: 1rem;
 		height: 1rem;
 		flex-shrink: 0;
@@ -467,10 +377,11 @@
 	}
 
 	.check-icon {
-		width: 0.875rem;
-		height: 0.875rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		margin-left: 0.25rem;
-		color: var(--color-primary-500, #f8d62b);
+		color: hsl(var(--color-primary));
 	}
 
 	.pill-label {
@@ -484,11 +395,11 @@
 		background: transparent;
 		border: none;
 		cursor: default;
+		padding: 0;
 	}
 
-	/* Header for custom content (e.g., mode selector) */
 	.dropdown-header {
-		animation: fanIn 0.15s ease-out forwards;
+		animation: fanIn 150ms ease-out forwards;
 		opacity: 0;
 		transform: translateY(10px);
 		position: relative;
@@ -499,25 +410,22 @@
 		transform: translateY(-10px);
 	}
 
-	/* Divider in dropdown */
 	.dropdown-divider {
 		height: 1px;
-		background: rgba(0, 0, 0, 0.1);
+		background: hsl(var(--color-border));
 		margin: 0.25rem 0.5rem;
-		animation: fanIn 0.15s ease-out forwards;
+		animation: fanIn 150ms ease-out forwards;
 		opacity: 0;
 	}
 
-	:global(.dark) .dropdown-divider {
-		background: rgba(255, 255, 255, 0.15);
-	}
-
-	/* Submenu styles */
 	.chevron-submenu {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		width: 0.75rem;
 		height: 0.75rem;
 		margin-left: auto;
-		transition: transform 0.2s;
+		transition: transform 200ms;
 	}
 
 	.chevron-submenu.rotated {
@@ -529,25 +437,19 @@
 	}
 
 	.submenu-open {
-		background: rgba(0, 0, 0, 0.05);
-	}
-
-	:global(.dark) .submenu-open {
-		background: rgba(255, 255, 255, 0.1);
+		background: hsl(var(--color-surface-hover));
 	}
 
 	.submenu-container {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		margin-top: 0;
-		margin-bottom: 0;
 	}
 
 	.submenu-item {
 		padding: 0.5rem 0.875rem;
 		font-size: 0.875rem;
-		animation: fanIn 0.15s ease-out forwards;
+		animation: fanIn 150ms ease-out forwards;
 		opacity: 0;
 		justify-content: flex-start;
 	}
@@ -557,12 +459,11 @@
 		text-align: left;
 	}
 
-	/* Split button wrapper */
 	.fan-pill-wrapper {
 		display: flex;
 		align-items: stretch;
 		gap: 2px;
-		animation: fanIn 0.15s ease-out forwards;
+		animation: fanIn 150ms ease-out forwards;
 		opacity: 0;
 		transform: translateY(10px);
 	}
@@ -592,35 +493,34 @@
 		border-bottom-left-radius: 0;
 		border-top-right-radius: 9999px;
 		border-bottom-right-radius: 9999px;
+		background: hsl(var(--color-surface));
+		border: 1px solid hsl(var(--color-border));
+		color: hsl(var(--color-foreground));
 		cursor: pointer;
-		border: none;
-		transition: all 0.2s;
+		transition:
+			background-color 200ms,
+			color 200ms;
 	}
 
 	.split-button:hover {
-		background: var(--color-primary-100, rgba(59, 130, 246, 0.15));
-		border-color: var(--color-primary-200, rgba(59, 130, 246, 0.3));
+		background: hsl(var(--color-primary) / 0.12);
+		color: hsl(var(--color-primary));
 	}
 
-	:global(.dark) .split-button:hover {
-		background: var(--color-primary-900, rgba(59, 130, 246, 0.2));
-		border-color: var(--color-primary-800, rgba(59, 130, 246, 0.4));
+	.split-button:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
 	}
 
-	/* Footer for custom content (e.g., a11y toggles) */
 	.dropdown-footer {
-		animation: fanIn 0.15s ease-out forwards;
+		animation: fanIn 150ms ease-out forwards;
 		opacity: 0;
 		transform: translateY(10px);
 		position: relative;
 		z-index: 1;
 		margin-top: 0.25rem;
 		padding-top: 0.5rem;
-		border-top: 1px solid rgba(0, 0, 0, 0.1);
-	}
-
-	:global(.dark) .dropdown-footer {
-		border-top-color: rgba(255, 255, 255, 0.15);
+		border-top: 1px solid hsl(var(--color-border));
 	}
 
 	.fan-up .dropdown-footer {
@@ -630,14 +530,9 @@
 		padding-top: 0;
 		padding-bottom: 0.5rem;
 		border-top: none;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		border-bottom: 1px solid hsl(var(--color-border));
 	}
 
-	:global(.dark) .fan-up .dropdown-footer {
-		border-bottom-color: rgba(255, 255, 255, 0.15);
-	}
-
-	/* Mobile: bottom sheet */
 	@media (max-width: 640px) {
 		.fan-container {
 			position: fixed;
@@ -650,19 +545,11 @@
 			overflow-y: auto;
 			padding: 1rem;
 			padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-			background: rgba(255, 255, 255, 0.95);
-			backdrop-filter: blur(20px);
-			-webkit-backdrop-filter: blur(20px);
-			border-top: 1px solid rgba(0, 0, 0, 0.1);
+			background: hsl(var(--color-background));
+			border-top: 1px solid hsl(var(--color-border));
 			border-radius: 1rem 1rem 0 0;
-			box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.15);
 			transform: none;
-			animation: pillSheetUp 0.2s ease-out;
-		}
-
-		:global(.dark) .fan-container {
-			background: rgba(30, 30, 35, 0.95);
-			border-top-color: rgba(255, 255, 255, 0.12);
+			animation: pillSheetUp 200ms ease-out;
 		}
 
 		.fan-up {
@@ -677,7 +564,7 @@
 		}
 
 		.menu-backdrop {
-			background: rgba(0, 0, 0, 0.3);
+			background: hsl(var(--color-foreground) / 0.3);
 		}
 	}
 

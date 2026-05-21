@@ -1,64 +1,19 @@
-export { default as Toggle } from './Toggle.svelte';
 export { default as Input } from './Input.svelte';
-export { default as Select } from './Select.svelte';
 export { default as Textarea } from './Textarea.svelte';
+export { default as Select } from './Select.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
-export { default as FilterDropdown } from './FilterDropdown.svelte';
-export { default as FavoriteButton } from './FavoriteButton.svelte';
-export { default as ColorPicker } from './ColorPicker.svelte';
-export { COLORS_12, COLORS_16, DEFAULT_COLOR, getRandomColor } from './ColorPicker.constants';
-export { default as IconPicker } from './IconPicker.svelte';
-export { DEFAULT_ICON } from './IconPicker.constants';
-export { default as ReminderPicker } from './ReminderPicker.svelte';
-export type { SelectOption } from './Select.types';
-export type { FilterDropdownOption } from './FilterDropdown.types';
-
-// Stats components
-export { GlassCard, StatRow } from './stats';
-
-// Tag components
-export {
-	TagBadge,
-	TagChip,
-	TagColorPicker,
-	TagEditModal,
-	TagSelector,
-	TagField,
-	TagList,
-	TAG_COLORS,
-	DEFAULT_TAG_COLOR,
-	getRandomTagColor,
-	getTagColorByName,
-} from './tags';
-export type { Tag, TagData, TagColorName, TagColorHex } from './tags';
-
-// Media components
-export { AudioPlayer } from './media';
-
-// Loading components
-export {
-	SkeletonBox,
-	SkeletonText,
-	SkeletonAvatar,
-	SkeletonRow,
-	SkeletonList,
-	SkeletonCard,
-	SkeletonGrid,
-	AppLoadingSkeleton,
-	calculateFadeOpacity,
-} from './loaders';
-
-// Feedback components
-export { EmptyState } from './feedback';
-
-// Contact components
-export { ContactAvatar, ContactBadge, ContactSelector } from './contacts';
-
-// Layout components
-export { default as ModalFooter } from './ModalFooter.svelte';
-export { default as DataCard } from './DataCard.svelte';
+export { default as Toggle } from './Toggle.svelte';
+export { default as ContactAvatar } from './ContactAvatar.svelte';
+export { default as TagBadge } from './TagBadge.svelte';
+export { default as TagChip } from './TagChip.svelte';
+export { default as TagSelector } from './TagSelector.svelte';
+export type { Tag } from './TagSelector.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
-export { default as KeyboardShortcutsPanel } from './KeyboardShortcutsPanel.svelte';
-
-// Confirmation
-export { default as ConfirmationPopover } from './ConfirmationPopover.svelte';
+export { default as DataCard } from './DataCard.svelte';
+export { default as FavoriteButton } from './FavoriteButton.svelte';
+export { default as ReminderPicker } from './ReminderPicker.svelte';
+export type { ReminderOption } from './ReminderPicker.svelte';
+export { default as TagField } from './TagField.svelte';
+export { default as IconPicker } from './IconPicker.svelte';
+export type { IconSlot } from './IconPicker.svelte';
+export { default as EmptyState } from './EmptyState.svelte';

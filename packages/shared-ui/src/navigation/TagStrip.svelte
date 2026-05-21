@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { dragSource } from '../dnd/drag-source';
 	import { passiveDropZone } from '../dnd/passive-drop';
 	import type { DragPayload, DragType } from '../dnd/types';
@@ -12,30 +11,27 @@
 	}
 
 	interface Props {
-		/** Available tags to display */
 		tags: TagItem[];
-		/** Currently selected tag IDs */
 		selectedIds: string[];
-		/** Called when a tag is toggled */
 		onToggle: (tagId: string) => void;
-		/** Called when filter is cleared */
 		onClear: () => void;
+		/** Called to navigate (e.g. SvelteKit's `goto`). Required if managementHref/createHref are clicked. */
+		onNavigate?: (href: string) => void;
 		/** Called when an item (task, card, etc.) is dropped on a tag pill */
 		onTagDrop?: (tagId: string, payload: DragPayload) => void;
-		/** Drag types accepted for drop-on-tag (default: ['task']) */
 		dropAccepts?: DragType[];
-		/** Link for "Tags verwalten" pill */
 		managementHref?: string;
-		/** Loading state */
 		loading?: boolean;
-		/** Whether to show the "+ Neuer Tag" button */
 		showCreateButton?: boolean;
-		/** Link for "+ Neuer Tag" pill */
 		createHref?: string;
-		/** Whether the filter strip below is visible (adjusts bottom position) */
 		aboveFilterStrip?: boolean;
 		/** Use 'static' when inside a flex container (bottom-stack pattern). Default: 'fixed'. */
 		positioning?: 'fixed' | 'static';
+		manageLabel?: string;
+		filterLabel?: string;
+		createLabel?: string;
+		emptyLabel?: string;
+		loadingLabel?: string;
 	}
 
 	let {
@@ -43,6 +39,7 @@
 		selectedIds,
 		onToggle,
 		onClear,
+		onNavigate,
 		onTagDrop,
 		dropAccepts = ['task'],
 		managementHref = '/tags',
@@ -51,18 +48,28 @@
 		createHref,
 		aboveFilterStrip = false,
 		positioning = 'fixed',
+		manageLabel = 'Tags verwalten',
+		filterLabel = 'Filter',
+		createLabel = 'Neuer Tag',
+		emptyLabel = 'Keine Tags vorhanden — + Erstellen',
+		loadingLabel = 'Lädt …',
 	}: Props = $props();
 
 	const resolvedCreateHref = $derived(createHref ?? managementHref + '?new=true');
 	const hasSelectedTags = $derived(selectedIds.length > 0);
 	const hasTags = $derived(tags.length > 0);
 
-	const sortedTags = $derived.by(() => {
-		return [...tags].sort((a, b) => a.name.localeCompare(b.name, 'de'));
-	});
+	const sortedTags = $derived.by(() =>
+		[...tags].sort((a, b) => a.name.localeCompare(b.name, 'de'))
+	);
 
 	function isTagSelected(tagId: string): boolean {
 		return selectedIds.includes(tagId);
+	}
+
+	function navigate(href: string) {
+		if (onNavigate) onNavigate(href);
+		else window.location.assign(href);
 	}
 </script>
 
@@ -72,33 +79,24 @@
 	class:tag-strip-static={positioning === 'static'}
 >
 	<div class="tag-strip-container">
-		<!-- Clear Filter Button (always rendered to prevent layout shift) -->
 		<div class:hidden={!hasSelectedTags} class="filter-slot">
-			<Pill
-				icon="x"
-				label="Filter"
-				danger
-				onclick={() => onClear()}
-				title="Filter löschen"
-				disabled={!hasSelectedTags}
-			/>
+			<Pill danger onclick={() => onClear()} title="Filter löschen" disabled={!hasSelectedTags}>
+				{filterLabel}
+			</Pill>
 		</div>
 
-		<!-- Tags verwalten Pill -->
-		<Pill
-			icon="tag"
-			label="Tags verwalten"
-			onclick={() => goto(managementHref)}
-			title="Tags verwalten"
-		/>
+		<Pill onclick={() => navigate(managementHref)} title={manageLabel}>
+			{manageLabel}
+		</Pill>
 
 		{#if loading}
-			<div class="loading-state">Lädt...</div>
+			<div class="loading-state">{loadingLabel}</div>
 		{:else if !hasTags}
-			<Pill label="Keine Tags vorhanden — + Erstellen" onclick={() => goto(managementHref)} />
+			<Pill onclick={() => navigate(managementHref)}>{emptyLabel}</Pill>
 		{:else}
 			{#each sortedTags as tag (tag.id)}
 				<button
+					type="button"
 					class="tag-pill"
 					class:selected={isTagSelected(tag.id)}
 					onclick={() => onToggle(tag.id)}
@@ -120,15 +118,10 @@
 				</button>
 			{/each}
 
-			<!-- Create Tag Button -->
 			{#if showCreateButton}
-				<Pill
-					icon="plus"
-					label="Neuer Tag"
-					primary
-					onclick={() => goto(resolvedCreateHref)}
-					title="Neuer Tag"
-				/>
+				<Pill primary onclick={() => navigate(resolvedCreateHref)} title={createLabel}>
+					{createLabel}
+				</Pill>
 			{/if}
 		{/if}
 	</div>
@@ -152,12 +145,10 @@
 		align-items: stretch;
 		justify-content: center;
 		pointer-events: none;
-		transition: bottom 0.2s ease;
-		/* Tight wrapper around 44px pills (see bottomChromeHeight in (app)/+layout.svelte). */
+		transition: bottom 200ms ease;
 		height: 64px;
 	}
 
-	/* When filter strip is also visible, stack above it */
 	.tag-strip-wrapper.above-filter-strip {
 		bottom: calc(110px + env(safe-area-inset-bottom, 0px));
 	}
@@ -182,7 +173,6 @@
 		display: none;
 	}
 
-	/* Tag pill — matches Pill base, with drag-source and colored dot. */
 	.tag-pill {
 		display: inline-flex;
 		align-items: center;
@@ -194,31 +184,38 @@
 		font-weight: 500;
 		white-space: nowrap;
 		border: 1px solid hsl(var(--color-border));
-		background: hsl(var(--color-card));
+		background: hsl(var(--color-surface));
 		color: hsl(var(--color-foreground));
-		box-shadow:
-			0 1px 2px hsl(0 0% 0% / 0.05),
-			0 2px 6px hsl(0 0% 0% / 0.04);
 		cursor: pointer;
 		flex-shrink: 0;
-		transition: all 0.15s ease;
+		transition:
+			background-color 150ms ease,
+			border-color 150ms ease,
+			transform 150ms ease;
+		font-family: inherit;
 	}
 
 	.tag-pill:hover {
-		background: hsl(var(--color-surface-hover, var(--color-card)));
+		background: hsl(var(--color-surface-hover));
+	}
+
+	.tag-pill:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: 2px;
 	}
 
 	.tag-pill.selected {
 		background: var(--tag-color) !important;
 		border-color: var(--tag-color) !important;
+		color: hsl(var(--color-primary-foreground));
 	}
 
 	.tag-pill.selected .tag-dot {
-		background-color: white;
+		background-color: currentColor;
 	}
 
 	.tag-pill.selected .tag-name {
-		color: white;
+		color: inherit;
 	}
 
 	.filter-slot.hidden {
@@ -241,12 +238,8 @@
 	.tag-name {
 		font-size: 0.875rem;
 		font-weight: 500;
-		color: #374151;
+		color: hsl(var(--color-foreground));
 		white-space: nowrap;
-	}
-
-	:global(.dark) .tag-name {
-		color: #f3f4f6;
 	}
 
 	.loading-state {
@@ -255,13 +248,11 @@
 		padding: 0.5rem;
 	}
 
-	/* DnD: Tag is being dragged */
 	:global(.tag-pill.mana-drag-source-active) {
 		opacity: 0.5;
 		transform: scale(0.95) !important;
 	}
 
-	/* DnD: Success flash after drop */
 	:global(.tag-pill.mana-passive-zone-success) {
 		animation: tag-drop-success 400ms ease-out;
 	}
@@ -278,7 +269,6 @@
 		}
 	}
 
-	/* Responsive */
 	@media (max-width: 640px) {
 		.tag-strip-wrapper {
 			left: 0;

@@ -1,159 +1,174 @@
 <script lang="ts">
-	import type { SelectOption } from './Select.types';
-	import { CaretDown } from '@mana/shared-icons';
+	type Size = 'sm' | 'md' | 'lg';
+
+	interface Option {
+		value: string;
+		label: string;
+		disabled?: boolean;
+	}
 
 	interface Props {
-		/** Current selected value */
-		value: string;
-		/** Available options */
-		options: SelectOption[];
-		/** Called when selection changes */
-		onchange?: (value: string) => void;
-		/** Label text */
+		value?: string;
+		options: Option[];
 		label?: string;
-		/** Placeholder text (shown as first disabled option) */
 		placeholder?: string;
-		/** Error message */
+		hint?: string;
 		error?: string;
-		/** Disable the select */
 		disabled?: boolean;
-		/** Mark as required */
 		required?: boolean;
-		/** Additional CSS classes */
-		class?: string;
-		/** Unique ID for accessibility */
+		size?: Size;
 		id?: string;
+		name?: string;
+		ariaLabel?: string;
+		onchange?: (e: Event) => void;
 	}
 
 	let {
-		value = $bindable(),
+		value = $bindable(''),
 		options,
-		onchange,
 		label,
 		placeholder,
+		hint,
 		error,
 		disabled = false,
 		required = false,
-		class: className = '',
-		id = `select-${Math.random().toString(36).slice(2, 9)}`,
+		size = 'md',
+		id,
+		name,
+		ariaLabel,
+		onchange,
 	}: Props = $props();
 
-	function handleChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		value = target.value;
-		onchange?.(target.value);
-	}
+	const inputId = $derived(id ?? `select-${Math.random().toString(36).slice(2, 9)}`);
+	const hintId = $derived(hint || error ? `${inputId}-hint` : undefined);
 </script>
 
-<div class="select-wrapper {className}">
+<div class="field">
 	{#if label}
-		<label for={id} class="select-label">
+		<label for={inputId}>
 			{label}
-			{#if required}
-				<span class="select-required">*</span>
-			{/if}
+			{#if required}<span class="required" aria-hidden="true">*</span>{/if}
 		</label>
 	{/if}
-
-	<div class="select-container">
+	<div class="wrap size-{size}" class:disabled class:has-error={!!error}>
 		<select
-			{id}
-			{value}
+			id={inputId}
+			{name}
 			{disabled}
 			{required}
-			onchange={handleChange}
-			class="select-input {error ? 'select-input--error' : ''}"
+			aria-label={ariaLabel}
+			aria-invalid={error ? 'true' : undefined}
+			aria-describedby={hintId}
+			bind:value
+			{onchange}
 		>
 			{#if placeholder}
-				<option value="" disabled selected={!value}>{placeholder}</option>
+				<option value="" disabled selected hidden>{placeholder}</option>
 			{/if}
-			{#each options as option}
-				<option value={option.value} disabled={option.disabled}>
-					{option.label}
-				</option>
+			{#each options as opt}
+				<option value={opt.value} disabled={opt.disabled}>{opt.label}</option>
 			{/each}
 		</select>
-		<div class="select-icon">
-			<CaretDown size={16} />
-		</div>
+		<span class="caret" aria-hidden="true">▾</span>
 	</div>
-
 	{#if error}
-		<p class="select-error">{error}</p>
+		<p class="hint error" id={hintId} role="alert">{error}</p>
+	{:else if hint}
+		<p class="hint" id={hintId}>{hint}</p>
 	{/if}
 </div>
 
 <style>
-	.select-wrapper {
+	.field {
 		display: flex;
 		flex-direction: column;
 		gap: 0.375rem;
 	}
 
-	.select-label {
+	label {
 		font-size: 0.875rem;
 		font-weight: 500;
 		color: hsl(var(--color-foreground));
 	}
 
-	.select-required {
+	.required {
 		color: hsl(var(--color-error));
 		margin-left: 0.125rem;
 	}
 
-	.select-container {
+	.wrap {
 		position: relative;
-	}
-
-	.select-input {
-		width: 100%;
-		appearance: none;
-		padding: 0.625rem 2.5rem 0.625rem 1rem;
-		font-size: 0.875rem;
-		color: hsl(var(--color-foreground));
-		background-color: hsl(var(--color-surface));
+		display: flex;
+		align-items: center;
+		background: hsl(var(--color-surface));
 		border: 1px solid hsl(var(--color-border));
 		border-radius: 0.5rem;
-		cursor: pointer;
-		transition: all 0.15s ease;
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
 	}
 
-	.select-input:hover:not(:disabled) {
-		border-color: hsl(var(--color-border-strong));
-	}
-
-	.select-input:focus {
-		outline: none;
+	.wrap:focus-within {
 		border-color: hsl(var(--color-primary));
-		box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
+		box-shadow: 0 0 0 2px hsl(var(--color-primary) / 0.2);
 	}
 
-	.select-input:disabled {
-		opacity: 0.5;
+	.wrap.disabled {
+		opacity: 0.6;
+		background: hsl(var(--color-muted));
+	}
+
+	.wrap.has-error {
+		border-color: hsl(var(--color-error));
+	}
+
+	.size-sm select {
+		padding: 0.25rem 2rem 0.25rem 0.625rem;
+	}
+	.size-md select {
+		padding: 0.5rem 2rem 0.5rem 0.75rem;
+	}
+	.size-lg select {
+		padding: 0.625rem 2rem 0.625rem 0.875rem;
+	}
+
+	select {
+		appearance: none;
+		flex: 1;
+		min-width: 0;
+		border: none;
+		background: transparent;
+		color: hsl(var(--color-foreground));
+		font: inherit;
+		outline: none;
+		cursor: pointer;
+	}
+
+	select:disabled {
 		cursor: not-allowed;
 	}
 
-	.select-input--error {
-		border-color: hsl(var(--color-error));
-	}
-
-	.select-input--error:focus {
-		border-color: hsl(var(--color-error));
-		box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.1);
-	}
-
-	.select-icon {
+	.caret {
 		position: absolute;
-		right: 0.75rem;
-		top: 50%;
-		transform: translateY(-50%);
+		right: 0.625rem;
 		pointer-events: none;
+		color: hsl(var(--color-muted-foreground));
+		font-size: 0.875rem;
+	}
+
+	.hint {
+		margin: 0;
+		font-size: 0.8125rem;
 		color: hsl(var(--color-muted-foreground));
 	}
 
-	.select-error {
-		font-size: 0.75rem;
+	.hint.error {
 		color: hsl(var(--color-error));
-		margin: 0;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.wrap {
+			transition: none;
+		}
 	}
 </style>

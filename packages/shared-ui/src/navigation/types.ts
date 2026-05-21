@@ -1,296 +1,82 @@
-import type { Snippet } from 'svelte';
+/**
+ * Shared navigation types — re-export from individual components +
+ * extras for PillNavigation / GlobalSpotlight that don't yet have a
+ * portable Svelte component.
+ */
 
-export interface KeyboardShortcut {
-	/** Key combination (e.g., ['Ctrl', 'S'] or ['Cmd', 'Shift', 'P']) */
-	keys: string[];
-	/** Description of what the shortcut does */
-	label: string;
-	/** Category for grouping (optional) */
-	category?: string;
-}
+import type { PillDropdownItem } from './PillDropdown.svelte';
 
-// ============ Pill Navigation Types ============
+export type { PillDropdownItem };
+export type { PillTabOption } from './PillTabGroup.svelte';
 
 export interface PillNavItem {
-	/** Display label for the navigation item */
 	label: string;
-	/** URL to navigate to (ignored if onClick is provided) */
 	href: string;
-	/** Icon name (predefined) or 'mana' for special mana icon */
-	icon?: string;
-	/** Custom SVG icon HTML (for custom icons) */
+	/** Inline SVG path string (16×16 viewBox). */
 	iconSvg?: string;
-	/** Click handler - if provided, prevents navigation and calls this instead */
+	/** v0.1.x-Compat: Icon-Namen-String oder 'mana'. Wird intern auf iconSvg gemappt wo möglich. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	icon?: any;
 	onClick?: () => void;
-	/** Whether this item is currently active/selected (for toggle buttons) */
 	active?: boolean;
-	/** Right-click handler for context menu */
 	onContextMenu?: (e: MouseEvent) => void;
-	/** Show only the icon (hide the label). Label is still used for aria-label/title. */
 	iconOnly?: boolean;
 }
 
 /** Config passed when a PillNavigation dropdown should surface as a bar
  *  in the host's bottom stack instead of an in-place popover. */
 export interface PillBarConfig {
-	/** Stable id (e.g. 'theme', 'ai', 'sync', 'user') */
 	id: string;
-	/** Title shown at the start of the bar */
 	label: string;
-	/** Icon name shown next to the title */
-	icon?: string;
-	/** Items to render as pills */
+	iconSvg?: string;
+	/** v0.1.x-Compat: Icon-Namen-String. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	icon?: any;
 	items: PillDropdownItem[];
-	/** Progress value 0–1. When set, a progress ring is shown on the trigger pill. */
 	progress?: number;
-}
-
-export interface PillDropdownItem {
-	/** Unique identifier */
-	id: string;
-	/** Display label */
-	label: string;
-	/** Icon name (SVG path) */
-	icon?: string;
-	/** Image URL for icon (data URL or regular URL) */
-	imageUrl?: string;
-	/** Click handler (receives optional MouseEvent for modifier key detection) */
-	onClick?: (event?: MouseEvent) => void;
-	/** Whether item is disabled */
-	disabled?: boolean;
-	/** Whether item should be styled as danger/destructive */
-	danger?: boolean;
-	/** Whether item should be styled prominently with the primary color */
-	primary?: boolean;
-	/** Whether this item is currently active/selected */
-	active?: boolean;
-	/** Whether this item is a divider */
-	divider?: boolean;
-	/** Nested submenu items */
-	submenu?: PillDropdownItem[];
-	/** Group id — items sharing the same group are rendered as a segmented toggle pill */
-	group?: string;
-	/** Progress value 0–1. When set, a circular progress ring is rendered around the icon. */
-	progress?: number;
-	/** Whether to show a split button for opening in panel */
-	showSplitButton?: boolean;
-	/** Click handler for split button */
-	onSplitClick?: () => void;
 }
 
 export interface PillAppItem {
-	/** Unique identifier (app id) */
 	id: string;
-	/** App display name */
 	name: string;
-	/** App URL */
 	url: string;
-	/** App icon (data URL or regular URL) */
 	icon?: string;
-	/** App brand color */
 	color?: string;
-	/** Whether this is the current app */
 	isCurrent?: boolean;
 }
 
-// ============ Pill Tab Group Types ============
-
-export interface PillTabOption {
-	/** Unique identifier for the tab */
-	id: string;
-	/** Icon name (predefined) */
-	icon?: string;
-	/** Custom SVG icon HTML */
-	iconSvg?: string;
-	/** Optional label (shown in sidebar mode) */
-	label?: string;
-	/** Tooltip text */
-	title?: string;
-	/** Whether this option is disabled */
-	disabled?: boolean;
-}
-
-export interface PillTabGroupConfig {
-	/** Discriminator for type checking */
-	type: 'tabs';
-	/** Tab options */
-	options: PillTabOption[];
-	/** Currently selected tab id */
-	value: string;
-	/** Called when selection changes */
-	onChange: (id: string) => void;
-	/** Optional section label (shown above in sidebar mode) */
-	sectionLabel?: string;
-	/** Called on right-click (context menu) - receives click coordinates */
-	onContextMenu?: (x: number, y: number) => void;
-}
-
 export interface PillDivider {
-	/** Discriminator for type checking */
 	type: 'divider';
 }
 
 export interface PillTagItem {
-	/** Unique tag identifier */
 	id: string;
-	/** Tag display name */
 	name: string;
-	/** Tag color (hex) */
 	color: string;
 }
 
 export interface PillTagSelectorConfig {
-	/** Discriminator for type checking */
 	type: 'tag-selector';
-	/** Available tags */
 	tags: PillTagItem[];
-	/** Currently selected tag IDs */
 	selectedIds: string[];
-	/** Called when a tag is toggled */
 	onToggle: (tagId: string) => void;
-	/** Called when selection is cleared */
 	onClear: () => void;
-	/** Called when "New Tag" is clicked (optional) */
 	onCreate?: () => void;
-	/** Loading state */
 	loading?: boolean;
-	/** Label for the selector button */
 	label?: string;
+}
+
+export interface PillTabGroupConfig {
+	type: 'tabs';
+	options: import('./PillTabGroup.svelte').PillTabOption[];
+	value: string;
+	onChange: (id: string) => void;
+	sectionLabel?: string;
+	onContextMenu?: (x: number, y: number) => void;
 }
 
 /** Union type for all elements that can appear in PillNavigation */
 export type PillNavElement = PillNavItem | PillTabGroupConfig | PillDivider | PillTagSelectorConfig;
-
-export interface PillNavigationProps {
-	/** Navigation items */
-	items: PillNavItem[];
-	/** Current active path */
-	currentPath?: string;
-	/** Logo snippet */
-	logo?: Snippet;
-	/** App name */
-	appName?: string;
-	/** Home/default route */
-	homeRoute?: string;
-	/** Called when logout is clicked */
-	onLogout?: () => void;
-	/** Called when theme toggle is clicked */
-	onToggleTheme?: () => void;
-	/** Whether dark mode is active */
-	isDark?: boolean;
-	/** Whether navigation is collapsed (controlled) */
-	isCollapsed?: boolean;
-	/** Called when collapsed state changes */
-	onCollapsedChange?: (isCollapsed: boolean) => void;
-	/** Language dropdown items */
-	languageItems?: PillDropdownItem[];
-	/** Current language label */
-	currentLanguageLabel?: string;
-	/** Show language switcher */
-	showLanguageSwitcher?: boolean;
-	/** Show theme toggle */
-	showThemeToggle?: boolean;
-	/** Show AI tier selector dropdown */
-	showAiTierSelector?: boolean;
-	/** AI tier dropdown items (each representing a toggleable tier) */
-	aiTierItems?: PillDropdownItem[];
-	/** Current AI tier label, e.g. "Browser" or "Server" */
-	currentAiTierLabel?: string;
-	/** Primary color for active state */
-	primaryColor?: string;
-	/** Elements to prepend before nav items (tab groups, dividers, nav items) */
-	prependElements?: PillNavElement[];
-	/** Additional elements to show after nav items (tab groups, dividers) */
-	elements?: PillNavElement[];
-	/**
-	 * Snippet rendered at the very start of the pill bar, before the app
-	 * switcher and any prepend elements. Lets the host drop an arbitrary
-	 * Svelte component (e.g. a Space switcher) into the bar without
-	 * adding another dedicated prop surface. Keep the rendered content
-	 * short — it's first-in-line real estate.
-	 */
-	startSlot?: Snippet;
-	/** Bottom offset from viewport bottom (default: '0px'). Use to position above other fixed bars. */
-	bottomOffset?: string;
-}
-
-export interface NavItem {
-	/** Display label for the navigation item */
-	label: string;
-	/** URL to navigate to */
-	href: string;
-	/** Icon - can be emoji, SVG path, or component name */
-	icon?: string;
-	/** Whether this item is currently active */
-	active?: boolean;
-	/** Badge text (e.g., notification count) */
-	badge?: string | number;
-	/** Whether the item is disabled */
-	disabled?: boolean;
-	/** Keyboard shortcut hint */
-	shortcut?: string;
-}
-
-export interface NavbarProps {
-	/** Navigation items to display */
-	items: NavItem[];
-	/** Logo snippet or component */
-	logo?: Snippet;
-	/** App name to display next to logo */
-	appName?: string;
-	/** Current pathname for active state detection */
-	currentPath?: string;
-	/** User email to display */
-	userEmail?: string;
-	/** Show mobile menu */
-	showMobile?: boolean;
-	/** Called when sign out is clicked */
-	onSignOut?: () => void;
-	/** Additional CSS classes */
-	class?: string;
-}
-
-export interface SidebarProps {
-	/** Navigation items to display */
-	items: NavItem[];
-	/** Logo snippet or component */
-	logo?: Snippet;
-	/** App name to display */
-	appName?: string;
-	/** Current pathname for active state detection */
-	currentPath?: string;
-	/** Whether sidebar is minimized/collapsed */
-	minimized?: boolean;
-	/** Called when minimize toggle is clicked */
-	onToggleMinimize?: () => void;
-	/** User email to display */
-	userEmail?: string;
-	/** Called when sign out is clicked */
-	onSignOut?: () => void;
-	/** Show theme toggle */
-	showThemeToggle?: boolean;
-	/** Called when theme toggle is clicked */
-	onToggleTheme?: () => void;
-	/** Current theme mode (for icon display) */
-	isDark?: boolean;
-	/** Additional CSS classes */
-	class?: string;
-	/** Footer items (shortcuts, etc.) */
-	footerItems?: NavItem[];
-}
-
-export interface NavLinkProps {
-	/** Navigation item data */
-	item: NavItem;
-	/** Whether the link is active */
-	active?: boolean;
-	/** Display variant */
-	variant?: 'default' | 'sidebar' | 'mobile' | 'pill';
-	/** Whether in minimized sidebar mode (show tooltip) */
-	minimized?: boolean;
-	/** Additional CSS classes */
-	class?: string;
-}
 
 // ============ Global Spotlight Types ============
 
@@ -298,7 +84,10 @@ export interface SpotlightAction {
 	id: string;
 	label: string;
 	description?: string;
-	icon?: string;
+	iconSvg?: string;
+	/** v0.1.x-Compat: Phosphor-Component oder Icon-Namen. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	icon?: any;
 	shortcut?: string;
 	category?: string;
 	onExecute: () => void;
@@ -326,3 +115,11 @@ export interface ContentSearchGroup {
 }
 
 export type ContentSearcher = (query: string, signal: AbortSignal) => Promise<ContentSearchGroup[]>;
+
+// ============ Keyboard Shortcuts ============
+
+export interface KeyboardShortcut {
+	keys: string[];
+	label: string;
+	category?: string;
+}
