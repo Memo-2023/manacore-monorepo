@@ -34,16 +34,31 @@
 		e.stopPropagation();
 		onRemove?.();
 	}
+
+	// Outer kann nicht `<button>` sein wenn innen ein Remove-`<button>`
+	// liegt — verschachtelte interaktive Elemente sind invalid HTML
+	// (svelte-check fail-on-warnings). Lösung: outer als `<span
+	// role="button">` mit Keyboard-Handler, damit der ganze Chip
+	// klickbar bleibt und der Remove-Button sein eigener interaktiver
+	// Bereich ist.
+	function handleChipKey(e: KeyboardEvent) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			onclick?.(e as unknown as MouseEvent);
+		}
+	}
 </script>
 
 {#if onclick}
-	<button
-		type="button"
-		class="chip size-{size}"
+	<span
+		role="button"
+		tabindex="0"
+		class="chip chip-interactive size-{size}"
 		class:active
 		class:has-color={!!color}
 		style:--tag-color={color || null}
 		{onclick}
+		onkeydown={handleChipKey}
 	>
 		{#if color}
 			<span class="dot" aria-hidden="true"></span>
@@ -54,7 +69,7 @@
 				<DynamicIcon name="x" size="xs" />
 			</button>
 		{/if}
-	</button>
+	</span>
 {:else}
 	<span
 		class="chip size-{size}"
@@ -91,19 +106,19 @@
 		cursor: default;
 	}
 
-	button.chip {
+	.chip-interactive {
 		cursor: pointer;
 		transition:
 			background-color 0.15s ease,
 			border-color 0.15s ease;
 	}
 
-	button.chip:hover {
+	.chip-interactive:hover {
 		background: hsl(var(--color-surface-hover));
 		border-color: hsl(var(--color-primary) / 0.4);
 	}
 
-	button.chip:focus-visible {
+	.chip-interactive:focus-visible {
 		outline: 2px solid hsl(var(--color-primary));
 		outline-offset: 2px;
 	}
@@ -162,7 +177,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		button.chip {
+		.chip-interactive {
 			transition: none;
 		}
 	}

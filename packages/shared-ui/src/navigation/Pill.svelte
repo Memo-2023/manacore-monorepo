@@ -55,11 +55,18 @@
 	}: Props = $props();
 
 	const tag = $derived(href ? 'a' : 'button');
+	// svelte-check `--fail-on-warnings` will an Dynamic-Elementen mit
+	// click/context-handler explizit eine ARIA-Rolle sehen, weil der
+	// statische Analyser nicht weiß, dass `<button>`/`<a>` schon
+	// inhärent interaktiv sind. Für button reicht `button`, für a
+	// (Link) ist `link` die korrekte Rolle.
+	const explicitRole = $derived(tag === 'a' ? 'link' : 'button');
 </script>
 
 <svelte:element
 	this={tag}
 	bind:this={element}
+	role={explicitRole}
 	class="pill size-{size} {className}"
 	class:active
 	class:disabled
