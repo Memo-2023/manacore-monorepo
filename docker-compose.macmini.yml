@@ -149,7 +149,11 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
-      MINIO_API_CORS_ALLOW_ORIGIN: https://music.mana.how,https://mana.how,https://picture.mana.how,https://storage.mana.how,https://contacts.mana.how,https://chat.mana.how,https://photos.mana.how
+      # Browser-Origins die direkt zu MinIO sprechen dürfen (für
+      # presigned PUTs / GETs via s3.mana.how). memoro-app braucht es
+      # seit Multipart-Upload für Files >100 MB (Cloudflare-Cap-Umgehung).
+      # Server-Drift-Stand (`food`/`plants` ergänzt) gleichzeitig synct.
+      MINIO_API_CORS_ALLOW_ORIGIN: https://music.mana.how,https://mana.how,https://picture.mana.how,https://storage.mana.how,https://plants.mana.how,https://contacts.mana.how,https://chat.mana.how,https://food.mana.how,https://photos.mana.how,https://memoro-app.mana.how
     volumes:
       - /Volumes/ManaData/minio:/data
     ports:
