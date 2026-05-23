@@ -78,6 +78,9 @@ db_user_for_container() {
         pageta-postgres)           echo "pageta" ;;
         uload-postgres)            echo "uload" ;;
         comicello-postgres)        echo "comicello" ;;
+        kreisel-postgres)          echo "kreisel" ;;
+        mukke-postgres)            echo "mukke" ;;
+        viadocu-postgres)          echo "viadocu" ;;
         mana-infra-postgres)       echo "postgres" ;;
         *)                         echo "postgres" ;;
     esac
