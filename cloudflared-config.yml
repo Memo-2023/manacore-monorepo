@@ -96,8 +96,10 @@ ingress:
   # wordeck.com — Cards-Rebrand (siehe mana/docs/playbooks/WORDECK_REBRAND.md, 2026-05-17).
   # Zeigt auf denselben cards-web-Container wie cardecky.mana.how (port 5181).
   - hostname: wordeck.com
-    service: http://localhost:5181
+    service: http://localhost:3202
   - hostname: www.wordeck.com
+    service: http://localhost:3202
+  - hostname: app.wordeck.com
     service: http://localhost:5181
   - hostname: storage.mana.how
     service: http://localhost:5000
@@ -107,6 +109,8 @@ ingress:
     service: http://localhost:5000
   - hostname: mukke.mana.how
     service: http://localhost:5000
+  - hostname: mukke-api.mana.how
+    service: http://localhost:3113
   - hostname: picture.mana.how
     service: http://localhost:5000
   - hostname: calc.mana.how
@@ -222,6 +226,13 @@ ingress:
   # Mini bleibt Single-Source.
   - hostname: npm.mana.how
     service: http://localhost:4873
+
+  # MinIO S3-Endpoint. Backs presigned-URL signing for memoro audio so
+  # browser can fetch over HTTPS (signed against this public host
+  # rather than the internal `mana-infra-minio:9000`). Bucket access is
+  # auth-only (signature required); raw GET without signature → 403.
+  - hostname: s3.mana.how
+    service: http://localhost:9000
 
   # ============================================
   # Memoro (Code/memoro, separate repo)
@@ -353,6 +364,8 @@ ingress:
   - hostname: pageta-api.mana.how
     service: http://localhost:3099
   - hostname: pageta.com
+    service: http://localhost:3201
+  - hostname: app.pageta.com
     service: http://localhost:3100
   - hostname: api.pageta.com
     service: http://localhost:3099
@@ -415,6 +428,8 @@ ingress:
   # auf 3101. Service-interne Ports bleiben 3101+3000 per PORTS.md.
   # 2026-05-20 Primary-Switch auf herbatrium.com (.mana.how abgeschaltet).
   - hostname: herbatrium.com
+    service: http://localhost:3204
+  - hostname: app.herbatrium.com
     service: http://localhost:3104
   - hostname: api.herbatrium.com
     service: http://localhost:3103
@@ -441,5 +456,31 @@ ingress:
     service: http://localhost:3116
   - hostname: kreisel-api.mana.how
     service: http://localhost:3115
+
+  # Mukke Vocal-Studio Plattform-Services (2026-05-21).
+  # mana-pitch + mana-mix laufen lokal auf dem Mac Mini.
+  # mana-stems + mana-music-gen laufen auf der GPU-Box und werden
+  # vom eigenen mana-gpu-server-Tunnel gerouted; die Routes hier sind
+  # NUR Mac-Mini-Services.
+  # GPU-Box services (mana-stems + mana-music-gen) — wir routen sie
+  # über den Mac-Mini-Tunnel an die LAN-IP der GPU-Box (Mirrored-WSL).
+  # Damit brauchen wir keine Tunnel-Routes im mana-gpu-server-Tunnel
+  # (der hätte Token-Auth, kein API-Edit).
+  - hostname: stems.mana.how
+    service: http://localhost:13120
+  - hostname: music-gen.mana.how
+    service: http://localhost:13121
+  - hostname: pitch.mana.how
+    service: http://localhost:3122
+  - hostname: mix.mana.how
+    service: http://localhost:3123
+
+  # ============================================
+  # Chorplattform (Chor-Verwaltungs-MVP, Code/chorplattform).
+  # ~/projects/chorplattform/ auf dem Mac Mini. Host-Port 3091 (App-Container).
+  # Schnellfix-Hostname; Ziel-Domain ist langfristig chorportal-tg.ch (siehe MAC_MINI_DEPLOY.md).
+  # ============================================
+  - hostname: chor.mana.how
+    service: http://localhost:3091
 
   - service: http_status:404
