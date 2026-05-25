@@ -34,6 +34,79 @@ LOG_FILE="/tmp/mana-backup.log"
 DATE=$(date +%Y-%m-%d)
 DAY_OF_WEEK=$(date +%u)  # 1=Monday, 7=Sunday
 
+# ─── Off-Site-/Zweitkopie auf die GPU-Box (LAN) ─────────────────────────
+# Spiegelt die heutigen Dumps verschlüsselt (AES-256 via openssl) auf die
+# GPU-Box. Das ist eine ZWEITKOPIE auf einer zweiten Maschine/Disk
+# (schützt gegen Mac-Mini-Disk-/Hardware-Ausfall) — KEIN echtes Off-Site
+# (gleicher Standort/Strom/LAN). Echtes Off-Site (Cloud) bleibt Phase 2.
+# Non-blocking: ein Push-Fehler kippt NIE das lokale Backup, nur Notify.
+OFFSITE_ENABLE="${OFFSITE_ENABLE:-1}"
+OFFSITE_HOST="${OFFSITE_HOST:-tills@192.168.178.11}"
+# Zielordner auf der GPU-Box. Beim Anschluss der externen SSD nur diese
+# Zeile auf den SSD-Pfad umbiegen (z.B. D:/ManaData/backups/postgres).
+OFFSITE_DIR="${OFFSITE_DIR:-C:/mana/backups/postgres}"
+OFFSITE_ENCRYPT="${OFFSITE_ENCRYPT:-1}"
+OFFSITE_PASSFILE="${OFFSITE_PASSFILE:-/Users/mana/.config/mana-backup-offsite.pass}"
+
+# Spiegelt $BACKUP_DIR/daily/*_${DATE}.sql.gz auf die GPU-Box. Immer
+# `return 0` — das lokale Backup darf hieran nie scheitern.
+offsite_mirror() {
+    [ "$OFFSITE_ENABLE" = "1" ] || { log "Off-Site: deaktiviert (OFFSITE_ENABLE=0)"; return 0; }
+
+    local today_files
+    today_files=$(ls "$BACKUP_DIR/daily/"*"_${DATE}.sql.gz" 2>/dev/null || true)
+    if [ -z "$today_files" ]; then
+        log "Off-Site: keine heutigen Dumps gefunden — übersprungen"
+        return 0
+    fi
+
+    # Box evtl. aus / Key (noch) nicht autorisiert → sauber überspringen
+    if ! ssh -o BatchMode=yes -o ConnectTimeout=8 "$OFFSITE_HOST" "exit" >/dev/null 2>&1; then
+        log "Off-Site: GPU-Box ($OFFSITE_HOST) nicht erreichbar/autorisiert — übersprungen (lokales Backup ist sicher)"
+        send_notification "ℹ️ Off-Site-Spiegelung übersprungen: GPU-Box nicht erreichbar" "default"
+        return 0
+    fi
+
+    # Verschlüsselung gewünscht, aber Passfile fehlt → lieber unverschlüsselt
+    # spiegeln als gar nicht, aber laut warnen.
+    local encrypt="$OFFSITE_ENCRYPT"
+    if [ "$encrypt" = "1" ] && [ ! -f "$OFFSITE_PASSFILE" ]; then
+        log "Off-Site: WARNUNG — Passfile $OFFSITE_PASSFILE fehlt, spiegele UNVERSCHLÜSSELT"
+        send_notification "⚠️ Off-Site-Passfile fehlt — Spiegelung unverschlüsselt" "high"
+        encrypt=0
+    fi
+
+    local staging="" pushed=0 failed=0 f base
+    [ "$encrypt" = "1" ] && staging=$(mktemp -d)
+
+    for f in $today_files; do
+        base=$(basename "$f")
+        if [ "$encrypt" = "1" ]; then
+            if openssl enc -aes-256-cbc -salt -pbkdf2 -in "$f" -out "$staging/$base.enc" -pass "file:$OFFSITE_PASSFILE" 2>/dev/null \
+                && scp -q -o BatchMode=yes -o ConnectTimeout=30 "$staging/$base.enc" "$OFFSITE_HOST:$OFFSITE_DIR/$base.enc" >/dev/null 2>&1; then
+                pushed=$((pushed + 1))
+            else
+                failed=$((failed + 1))
+            fi
+        else
+            if scp -q -o BatchMode=yes -o ConnectTimeout=30 "$f" "$OFFSITE_HOST:$OFFSITE_DIR/$base" >/dev/null 2>&1; then
+                pushed=$((pushed + 1))
+            else
+                failed=$((failed + 1))
+            fi
+        fi
+    done
+    [ -n "$staging" ] && rm -rf "$staging"
+
+    if [ "$failed" -eq 0 ]; then
+        log "Off-Site: $pushed Dump(s) auf GPU-Box gespiegelt ($OFFSITE_DIR, encrypt=$encrypt)"
+    else
+        log "Off-Site: $pushed ok, $failed FEHLGESCHLAGEN beim Push auf GPU-Box"
+        send_notification "⚠️ Off-Site-Spiegelung: $failed Dump(s) nicht auf GPU-Box gepusht" "high"
+    fi
+    return 0
+}
+
 # .env.macmini ist im DOTENV-Format (Werte enthalten Spaces, BEGIN/END-
 # Marker etc.) — kann nicht via `source` in bash geladen werden. Wir
 # brauchen aus diesem File auch nichts; Telegram-Tokens kommen aus
@@ -166,6 +239,8 @@ if [ -n "$FAILED_DBS" ]; then
     exit 1
 else
     log "All backups successful!"
+    # Zweitkopie auf die GPU-Box spiegeln (non-blocking)
+    offsite_mirror
     # Only send notification on Sundays (weekly summary)
     if [ "$DAY_OF_WEEK" -eq 7 ]; then
         send_notification "💾 <b>Weekly Backup Complete</b>\n\n$BACKUP_COUNT databases backed up\nTotal size: $TOTAL_SIZE"
