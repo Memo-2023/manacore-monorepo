@@ -189,7 +189,7 @@ ingress:
   - hostname: sync.mana.how
     service: http://localhost:3010
   - hostname: credits.mana.how
-    service: http://localhost:3002
+    service: http://localhost:3061
   - hostname: subscriptions.mana.how
     service: http://localhost:3063
   - hostname: events.mana.how

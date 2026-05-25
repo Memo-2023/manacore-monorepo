@@ -539,7 +539,7 @@ services:
       CORS_ORIGINS: https://mana.how,https://chat.mana.how,https://research.mana.how
       # Cross-LAN service deps
       MANA_AUTH_URL: http://192.168.178.131:3001
-      MANA_CREDITS_URL: http://192.168.178.131:3002
+      MANA_CREDITS_URL: http://192.168.178.131:3061
       MANA_LLM_URL: http://192.168.178.131:3025
       MANA_SEARCH_URL: http://192.168.178.131:3012
       MANA_SERVICE_KEY: ${MANA_SERVICE_KEY}
