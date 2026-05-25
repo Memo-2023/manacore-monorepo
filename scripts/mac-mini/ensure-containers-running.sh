@@ -67,6 +67,45 @@ send_notification() {
     fi
 }
 
+# --- colima-VM-Liveness-Guard ---------------------------------------------
+# Wenn die colima-VM im laufenden Betrieb stirbt (Crash/OOM), bringt sonst
+# nichts sie zurueck — startup.sh laeuft nur beim Boot. Dieser Guard heilt
+# einen Mid-Run-Crash. Schutz vor ungewollten Starts in bewussten Wartungs-/
+# Debug-Stopps (colima restart/stop gegen die egress-/ssh-mux-Bugs): das
+# Lock-File pausiert den Guard. Backoff verhindert Endlos-Haemmern, wenn
+# colima nicht hochkommt (z.B. stale in_use_by-Symlink auf der ManaData-Disk).
+COLIMA_MAINT_LOCK="/tmp/mana-colima-maintenance"   # `touch` = Guard pausiert
+COLIMA_FAIL_TRACKER="/tmp/mana-colima-start-fails"
+COLIMA_MAX_FAILS=3
+
+if ! colima status >/dev/null 2>&1; then
+    if [ -f "$COLIMA_MAINT_LOCK" ]; then
+        log "colima-Guard: VM down, aber Wartungs-Lock aktiv ($COLIMA_MAINT_LOCK) — kein Auto-Start"
+        exit 0
+    fi
+    FAILS=$(cat "$COLIMA_FAIL_TRACKER" 2>/dev/null || echo 0)
+    case "$FAILS" in '' | *[!0-9]*) FAILS=0 ;; esac
+    if [ "$FAILS" -ge "$COLIMA_MAX_FAILS" ]; then
+        log "colima-Guard: VM down + bereits $FAILS Fehlstarts — KEIN weiterer Auto-Start, manueller Eingriff noetig (z.B. in_use_by-Symlink loeschen, dann '$COLIMA_FAIL_TRACKER' entfernen)"
+        send_notification "colima-VM down + $FAILS Fehlstarts auf mana-server — manueller Eingriff noetig" "urgent"
+        exit 1
+    fi
+    log "colima-Guard: VM ist DOWN — starte colima (Versuch $((FAILS + 1))/$COLIMA_MAX_FAILS)"
+    if colima start >/dev/null 2>&1; then
+        log "colima-Guard: colima start erfolgreich — VM wieder oben"
+        send_notification "colima-VM war down, automatisch neu gestartet (mana-server)" "high"
+        rm -f "$COLIMA_FAIL_TRACKER"
+    else
+        echo $((FAILS + 1)) > "$COLIMA_FAIL_TRACKER"
+        log "colima-Guard: colima start FEHLGESCHLAGEN (Fehlstart $((FAILS + 1))/$COLIMA_MAX_FAILS)"
+        exit 1
+    fi
+else
+    # VM laeuft normal — Fehlerzaehler zuruecksetzen
+    rm -f "$COLIMA_FAIL_TRACKER" 2>/dev/null || true
+fi
+# --- Ende colima-Guard ----------------------------------------------------
+
 # Check if docker is running
 if ! docker info >/dev/null 2>&1; then
     log "ERROR: Docker is not running"
