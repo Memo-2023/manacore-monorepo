@@ -253,14 +253,15 @@ const manascoreCollection = defineCollection({
 				sharedLlm: z.boolean().optional(), // Uses @mana/shared-llm (if applicable)
 			})
 			.optional(),
-		// Analytics maturity (Umami tracking depth)
+		// Analytics maturity (tracking depth) — historische Manascore-Metrik;
+		// Web-Analytics ist Verein-weit entfernt (2026-05-26).
 		analytics: z
 			.object({
-				pageViewTracking: z.boolean(), // Umami script injected (automatic page views)
+				pageViewTracking: z.boolean(), // page-view tracking (automatic)
 				customEvents: z.boolean(), // App-specific custom events implemented
 				authTracking: z.boolean(), // Login/signup/logout tracked via shared-auth
 				landingTracking: z.boolean(), // Landing page CTA/pricing events
-				publicDashboard: z.boolean(), // Public Umami dashboard configured
+				publicDashboard: z.boolean(), // public analytics dashboard configured
 			})
 			.optional(),
 		// Score history for trend visualization

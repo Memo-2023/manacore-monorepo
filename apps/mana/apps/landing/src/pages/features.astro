@@ -304,16 +304,16 @@ const techUsps = [
 	},
 	{
 		id: 'privacy',
-		title: 'Self-Hosted, DSGVO, Umami',
+		title: 'Self-Hosted, DSGVO, kein Tracking',
 		subtitle: 'Mac Mini + Cloudflare Tunnel, kein Third-Party Tracking',
 		description:
-			'Eigene Infrastruktur auf Mac Mini (Production) via Cloudflare Tunnel. GPU-Server (RTX 3090, LAN) für STT/TTS/Image-Gen. Umami statt Google Analytics. Keine Cookies, keine Ad-Networks.',
+			'Eigene Infrastruktur auf Mac Mini (Production) via Cloudflare Tunnel. GPU-Server (RTX 3090, LAN) für STT/TTS/Image-Gen. Kein Web-Analytics, kein Google Analytics. Keine Cookies, keine Ad-Networks.',
 		icon: icons.privacy,
 		gradient: 'from-green-500 to-emerald-500',
 		details: [
 			'Mac Mini Production via ssh mana-server (Cloudflare Tunnel)',
 			'GPU-Server: Windows, RTX 3090, 192.168.178.11 (LAN)',
-			'Umami Analytics (self-hosted auf stats.mana.how)',
+			'Kein Web-Analytics — Besucher werden nicht getrackt',
 			'MinIO S3-compatible Object Storage (self-hosted)',
 		],
 	},
@@ -389,7 +389,7 @@ const techUsps = [
 			'Devlog: Astro Content Collection + Frontmatter Schema',
 			'CI: GitHub Actions (svelte-check, build, test)',
 			'CD: Self-hosted Mac Mini Runner, Docker Compose',
-			'Monitoring: Grafana, GlitchTip, Umami (self-hosted)',
+			'Monitoring: Grafana, GlitchTip (self-hosted)',
 		],
 	},
 ];

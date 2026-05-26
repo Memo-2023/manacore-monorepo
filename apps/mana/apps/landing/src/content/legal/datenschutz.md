@@ -157,14 +157,11 @@ Wir verwenden nur technisch notwendige Cookies für:
 
 ### Analytics
 
-Wir verwenden Umami als datenschutzfreundliches Analytics-Tool:
+Wir verwenden **kein** Web-Analytics — keine Tracking-Pixel, keine
+Besucher-Analyse, auch keine „nur Analytics"-Variante. Es werden keine
+Nutzungsstatistiken über Besucher:innen erhoben.
 
-- **Keine Cookies** - Umami verwendet keine Tracking-Cookies
-- **Anonymisierte Daten** - Keine persönlichen Daten werden erfasst
-- **EU-konform** - Selbst gehostet auf eigenen Servern in Deutschland
-- **Kein Cross-Site-Tracking** - Keine Weitergabe an Dritte
-
-Durch den Verzicht auf Cookies ist keine Cookie-Einwilligung erforderlich.
+Da wir keine Tracking-Cookies setzen, ist keine Cookie-Einwilligung erforderlich.
 
 ## 8. Ihre Rechte
 

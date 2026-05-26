@@ -1,8 +1,10 @@
 /**
- * Web Vitals → Umami Integration
+ * Web Vitals tracking
  *
- * Tracks Core Web Vitals (LCP, CLS, INP) and additional metrics (FCP, TTFB)
- * as Umami events. Call `trackWebVitals()` once on app startup.
+ * Misst Core Web Vitals (LCP, CLS, INP) + FCP/TTFB und reicht sie an die
+ * `trackEvent`-API weiter. Hinweis: Web-Analytics-Versand ist entfernt
+ * (2026-05-26) → die Werte gehen aktuell in einen No-op.
+ * Call `trackWebVitals()` once on app startup.
  *
  * @example
  * ```typescript

@@ -26,5 +26,5 @@ export * from './cache';
 // Natural Language Parsers
 export * from './parsers';
 
-// Umami Analytics
+// Event-API (No-op — Web-Analytics entfernt 2026-05-26)
 export * from './analytics';
