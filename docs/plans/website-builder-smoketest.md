@@ -392,11 +392,10 @@ Dann: `/etc/hosts`-Eintrag, Resolver-Cache im Hook leeren (60s TTL, oder Server 
    ```html
    <script defer data-domain="deineseite.com" src="https://plausible.io/js/script.js"></script>
    ```
-7. Wechsel zu **"Umami"**, Site-Key `abc12345-1234-…`, self-hosted URL testen
 
 **A11y-Check:** Analytics-Block hat `aria-hidden="true"` im Edit-Mode (Meta-Pill) und emittiert nur ein `<script>`-Tag im Public-Mode. Keine visuellen Artefakte für Screenreader.
 
-**Privacy-Check:** Keine Cookies im `document.cookie` nach Page-Load. Plausible + Umami sind cookieless.
+**Privacy-Check:** Keine Cookies im `document.cookie` nach Page-Load. Plausible ist cookieless.
 
 ---
 

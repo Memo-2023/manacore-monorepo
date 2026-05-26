@@ -328,13 +328,10 @@ Frontend Error Monitoring fängt Fehler ab, die im Browser des Users passieren �
 
 ### Aktueller Zustand
 
-**Umami** trackt nur:
-- Seitenaufrufe (welche Seiten werden besucht)
-- Referrer (woher kommen Besucher)
-- Browser/OS/Gerät
-- Länder/Sprachen
+Web-Analytics ist Verein-weit entfernt (2026-05-26) — es werden **keine**
+Besucher-Daten mehr erhoben (keine Seitenaufrufe, Referrer, Geräte, Länder).
 
-**Umami trackt NICHT:**
+Web-Analytics trackte ohnehin **nicht**:
 - JavaScript-Fehler
 - Netzwerk-Fehler (fehlgeschlagene API-Calls)
 - Performance-Metriken (Largest Contentful Paint, Time to Interactive)
@@ -460,6 +457,6 @@ Alle vier Maßnahmen nutzen das **Grafana-Ökosystem**, das wir bereits betreibe
      └───────────────┘
 
      GlitchTip (Backend-Errors ✅ + Frontend-Errors NEU)
-     Umami (Web Analytics ✅)
+     (kein Web-Analytics)
      Alertmanager (Alerts ✅)
 ```

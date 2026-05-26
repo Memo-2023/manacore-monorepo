@@ -689,7 +689,7 @@ const APP_CONFIGS = [
 	},
 
 	// ==========================================================
-	// Landing Pages (Astro) - Umami Website IDs
+	// Landing Pages (Astro)
 	// ==========================================================
 
 	// Chat Landing

@@ -61,7 +61,6 @@ Diese Dokumentation beschreibt Services, die die bestehende Infrastruktur sinnvo
 │  AUTOMATION & ANALYTICS                                                 │
 │  ├── n8n             Workflow-Automation (wie Zapier)                   │
 │  ├── Watchtower      Automatische Container-Updates                     │
-│  └── Umami           Privacy-freundliche Web-Analytics                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  MATRIX (DSGVO-KONFORM)                                                 │
 │  ├── Synapse         Matrix Homeserver                                  │

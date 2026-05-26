@@ -206,15 +206,15 @@ Prüft 7 Konsistenz-Kriterien der Backend-API:
 
 ### Analytics Maturity
 
-Bewertet die Tiefe der Umami-Analytics-Integration pro App:
+Bewertet die Tiefe der Analytics-Integration pro App (Web-Analytics ist seit 2026-05-26 entfernt — diese Metrik ist historisch):
 
-| Check                  | Beschreibung                                                           |
-| ---------------------- | ---------------------------------------------------------------------- |
-| **Page View Tracking** | Umami-Script via `hooks.server.ts` injiziert (automatische Page Views) |
-| **Custom Events**      | App-spezifische Events implementiert (z.B. `TodoEvents`, `ChatEvents`) |
-| **Auth Tracking**      | Login/Signup/Logout automatisch via `@mana/shared-auth` getrackt       |
-| **Landing Tracking**   | Landing Page Events (CTA-Clicks, Pricing Views) via `Analytics.astro`  |
-| **Public Dashboard**   | Öffentliches Dashboard auf `stats.mana.how` konfiguriert               |
+| Check                  | Beschreibung                                                               |
+| ---------------------- | -------------------------------------------------------------------------- |
+| **Page View Tracking** | Analytics-Script via `hooks.server.ts` injiziert (automatische Page Views) |
+| **Custom Events**      | App-spezifische Events implementiert (z.B. `TodoEvents`, `ChatEvents`)     |
+| **Auth Tracking**      | Login/Signup/Logout automatisch via `@mana/shared-auth` getrackt           |
+| **Landing Tracking**   | Landing Page Events (CTA-Clicks, Pricing Views) via `Analytics.astro`      |
+| **Public Dashboard**   | Öffentliches Dashboard auf `stats.mana.how` konfiguriert                   |
 
 Apps mit allen 5 Checks sind **analytics-mature** — sie erfassen nicht nur Page Views, sondern auch Feature-spezifische Nutzerinteraktionen, Auth-Flows und Landing-Conversions.
 

@@ -21,7 +21,7 @@ Danach kann alles Weitere (Ollama, AI-Services, Cloudflare Tunnel) per SSH erled
 ### Zusatz-Workloads neben den AI-Services
 
 Seit 2026-05-06 läuft auf der Box zusätzlich ein **WSL2-Docker-Stack** für
-nicht-zeitkritische Hilfsdienste (Monitoring, Forgejo, Glitchtip, Umami) —
+nicht-zeitkritische Hilfsdienste (Monitoring, Forgejo, Glitchtip) —
 siehe [`PLAN_OPTION_C.md`](./PLAN_OPTION_C.md). WSL2 ist auf 24 GB RAM /
 12 vCPUs / 8 GB Swap begrenzt (`C:\Users\tills\.wslconfig`), sodass die
 AI-Scheduled-Tasks bei 64 GB Host-RAM > 30 GB Reserve behalten.

@@ -53,25 +53,6 @@ This document defines the URL schema for all mana.how subdomains.
 |---------|-----|-------------|
 | **Grafana** | grafana.mana.how | Metrics dashboards |
 
-### Umami Tracking (Analytics)
-
-For web analytics, the following apps are tracked in Umami:
-
-|------------------|--------------|--------|
-| `mana-webapp` | Dashboard | mana.how |
-| `chat-webapp` | Chat | chat.mana.how |
-| `todo-webapp` | Todo | todo.mana.how |
-| `calendar-webapp` | Calendar | calendar.mana.how |
-| `clock-webapp` | Clock | clock.mana.how |
-| `contacts-webapp` | Contacts | contacts.mana.how |
-| `storage-webapp` | Storage | storage.mana.how |
-| `quotes-webapp` | Quotes | quotes.mana.how |
-| `food-webapp` | Food | food.mana.how |
-| `presi-webapp` | Presi | presi.mana.how |
-| `skilltree-webapp` | SkillTree | skilltree.mana.how |
-| `photos-webapp` | Photos | photos.mana.how |
-
----
 
 ## Short URL Redirects
 
