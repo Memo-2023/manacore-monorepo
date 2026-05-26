@@ -1,32 +1,35 @@
 #!/bin/bash
 # Mana Container Health Enforcer
-# Stellt sicher, dass alle Container, die laufen SOLLTEN, auch laufen.
+# Stellt sicher, dass Container, die laufen SOLLTEN, auch laufen.
+#
+# SICHERHEITS-LEITPRINZIP (nach dem Vorfall 2026-05-26): Recovery
+# BESTEHENDER Container NUR via `docker start`/`docker restart` — das
+# behaelt die bereits einkompilierte Container-Env. NIEMALS `docker rm`
+# + `docker compose up` zur Recovery: viele Apps setzen Secrets per
+# `${VAR}`-Interpolation aus der Deploy-Shell (nicht via env_file); der
+# launchd-Watchdog hat diese Vars NICHT -> ein compose-up wuerde LEERE
+# Secrets einkompilieren. Genau so wurde comicello-api (Postgres-PW +
+# MANA_SERVICE_KEY) am 2026-05-26 zerlegt — und frueher mana-auth (KEK,
+# 2026-04-08). Der fruehere Rewrite, der label-getrieben rm+compose-up
+# machte, ist deshalb zurueckgenommen.
 #
 # Erkennt und heilt:
-# - Exited/Created mit Restart-Policy always/unless-stopped -> recover
-# - Crash-Loop (Restarting)                                 -> recreate (Backoff)
-# - FEHLENDE mana-core-Container (gar kein Container da)     -> aus Core-Compose neu erstellen
+# - Exited/Created (restart always/unless-stopped) -> docker start
+# - Crash-Loop (Restarting)                        -> docker restart (Backoff)
+# - FEHLENDE mana-core-Container                    -> aus Core-Compose neu
+#   erstellen. Sicher, weil mana-core seine Env via `env_file:` (+ co-
+#   located .env) IM Compose-Verzeichnis traegt -> compose laedt sie
+#   unabhaengig von der Shell. Ein KOMPLETT fehlender App-Container (${VAR}-
+#   Interpolation) wird NICHT auto-neu-erstellt (Blank-Secret-Risiko) —
+#   das braucht einen echten Re-Deploy; der Watchdog flaggt es nur.
 #
-# Recovery ist LABEL-GETRIEBEN: jeder Container wird über SEIN EIGENES
-# Compose-Projekt/-Config (Docker-Labels com.docker.compose.*) wieder
-# hochgefahren. Dadurch funktioniert die Heilung projektübergreifend
-# (mana-core, managarten, sowie eigenständige App-Stacks wie nutriphi/
-# viadocu/zitare) — nicht mehr nur gegen die eine managarten-Compose.
-#
-# Bewusst gestoppte Container (Restart-Policy "no", z.B. watchtower) werden
-# NIE auto-gestartet. One-Shot-Init-Container werden übersprungen.
-#
-# Lücken-Historie (2026-05-26, project_uptime_hardening): nach einem
-# VM-Crash kam `mana-auth` (Core, fehlte komplett) nicht zurück und
-# nicht-`mana-*`-Apps (viadocu/nutriphi) wurden gar nicht abgedeckt —
-# beides fixt diese Version.
+# Bewusst gestoppte (restart=no, z.B. watchtower) + One-Shot-Init: nie
+# anfassen. DRY_RUN=1 -> loggt nur, veraendert nichts.
 #
 # Run via LaunchD alle 5 Minuten oder nach Boot.
-# DRY_RUN=1 -> loggt nur die geplanten Aktionen, führt nichts aus.
 
 set -e
 
-# Ensure PATH includes docker
 export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,21 +38,19 @@ LOG_FILE="/tmp/mana-container-health.log"
 RESTART_TRACKER="/tmp/mana-restart-tracker"
 DRY_RUN="${DRY_RUN:-0}"
 
-# mana-core (Plattform-Kern) — eigenes Compose-Projekt seit der Core-
-# Isolation (project_uptime_hardening / CORE_ISOLATION.md). Pfad ist
-# serverseitig. Gebraucht für die "fehlender Core-Container"-Reconciliation,
-# weil ein komplett fehlender Container keine Labels zum Auslesen hat.
+# mana-core (Plattform-Kern) — eigenes Compose-Projekt. Traegt seine Env via
+# env_file (+ co-located .env) im Compose-Dir, daher ist compose-up vom
+# Watchdog hier sicher. Pfad serverseitig.
 MANA_CORE_PROJECT="mana-core"
 MANA_CORE_COMPOSE="/Users/mana/projects/mana-platform/infrastructure/core/docker-compose.core.yml"
 
-# Wartungs-Lock (geteilt mit dem colima-Guard): pausiert die aggressivste
-# Aktion — das Neu-Erstellen fehlender Core-Container —, damit bewusste
-# Stop/Debug-Sessions nicht unterlaufen werden.
+# Wartungs-Lock (geteilt mit dem colima-Guard): pausiert das Neu-Erstellen
+# fehlender Core-Container, damit bewusste Stop/Debug-Sessions nicht
+# unterlaufen werden.
 MAINT_LOCK="/tmp/mana-colima-maintenance"
 
-# Container, die nach einem One-Shot-Job legitim "exited" sind — NICHT heilen
-# (sonst Log-Spam + unnötiges Re-Run des Init-Jobs alle 5 min). Zusätzlich
-# greift das Restart-Policy-Gate (One-Shots nutzen i.d.R. "no"/"on-failure").
+# Container, die nach einem One-Shot-Job legitim "exited" sind — NICHT heilen.
+# (Zusaetzlich greift das Restart-Policy-Gate: One-Shots nutzen no/on-failure.)
 ONESHOT_INIT_CONTAINERS=(
     mana-infra-minio-init
 )
@@ -62,9 +63,9 @@ is_oneshot_init() {
     return 1
 }
 
-# Soll dieser Container automatisch (wieder-)gestartet werden? Nur wenn seine
-# Restart-Policy ihn als "Dauerläufer" markiert. So fassen wir bewusst
-# gestoppte (restart=no, z.B. watchtower) und One-Shot-Jobs nie an.
+# Nur Container mit Dauerlaeufer-Restart-Policy auto-(wieder-)starten. So
+# fassen wir bewusst gestoppte (restart=no, z.B. watchtower) und One-Shot-
+# Jobs nie an.
 should_autostart() {
     local pol
     pol=$(docker inspect "$1" --format '{{.HostConfig.RestartPolicy.Name}}' 2>/dev/null || echo "")
@@ -83,11 +84,11 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Führt einen Befehl aus — oder loggt ihn nur im DRY_RUN. Bricht das Skript
+# Fuehrt einen Befehl aus — oder loggt ihn nur im DRY_RUN. Bricht das Skript
 # bei Fehler NICHT ab (Recovery soll weiterlaufen).
 run() {
     if [ "$DRY_RUN" = "1" ]; then
-        log "  [DRY_RUN] würde ausführen: $*"
+        log "  [DRY_RUN] wuerde ausfuehren: $*"
         return 0
     fi
     "$@" >>"$LOG_FILE" 2>&1 || {
@@ -100,7 +101,6 @@ send_notification() {
     local message="$1"
     local priority="${2:-default}"
 
-    # Telegram
     if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
         curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
@@ -109,7 +109,6 @@ send_notification() {
             >/dev/null 2>&1 || true
     fi
 
-    # ntfy
     if [ -n "$NTFY_TOPIC" ]; then
         curl -s -d "$message" \
             -H "Title: Mana Container Health" \
@@ -120,12 +119,8 @@ send_notification() {
 }
 
 # --- colima-VM-Liveness-Guard ---------------------------------------------
-# Wenn die colima-VM im laufenden Betrieb stirbt (Crash/OOM), bringt sonst
-# nichts sie zurueck — startup.sh laeuft nur beim Boot. Dieser Guard heilt
-# einen Mid-Run-Crash. Schutz vor ungewollten Starts in bewussten Wartungs-/
-# Debug-Stopps (colima restart/stop gegen die egress-/ssh-mux-Bugs): das
-# Lock-File pausiert den Guard. Backoff verhindert Endlos-Haemmern, wenn
-# colima nicht hochkommt (z.B. stale in_use_by-Symlink auf der ManaData-Disk).
+# Heilt einen Mid-Run-Crash der colima-VM (startup.sh laeuft nur beim Boot).
+# Wartungs-Lock pausiert; Backoff verhindert Endlos-Haemmern.
 COLIMA_FAIL_TRACKER="/tmp/mana-colima-start-fails"
 COLIMA_MAX_FAILS=3
 
@@ -152,7 +147,6 @@ if ! colima status >/dev/null 2>&1; then
         exit 1
     fi
 else
-    # VM laeuft normal — Fehlerzaehler zuruecksetzen
     rm -f "$COLIMA_FAIL_TRACKER" 2>/dev/null || true
 fi
 # --- Ende colima-Guard ----------------------------------------------------
@@ -163,9 +157,9 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-[ "$DRY_RUN" = "1" ] && log "DRY_RUN aktiv — es wird nichts verändert, nur geloggt."
+[ "$DRY_RUN" = "1" ] && log "DRY_RUN aktiv — es wird nichts veraendert, nur geloggt."
 
-# Track restart attempts to avoid infinite loops
+# Restart-Versuche tracken (Loop-Guard). DRY_RUN persistiert NICHT.
 track_restart() {
     local container="$1"
     local count_file="$RESTART_TRACKER/$container"
@@ -176,133 +170,58 @@ track_restart() {
         count=$(cat "$count_file" 2>/dev/null || echo 0)
         case "$count" in '' | *[!0-9]*) count=0 ;; esac
         age=$(($(date +%s) - $(stat -f %m "$count_file" 2>/dev/null || stat -c %Y "$count_file" 2>/dev/null)))
-        [ "$age" -gt 3600 ] && count=0 # Zaehler nach 1h zuruecksetzen
+        [ "$age" -gt 3600 ] && count=0 # nach 1h zuruecksetzen
     fi
     count=$((count + 1))
-    # Im DRY_RUN den Zaehler NICHT persistieren (Probelaeufe sollen den
-    # Loop-Guard nicht künstlich hochtreiben).
     [ "$DRY_RUN" = "1" ] || echo "$count" >"$count_file"
     echo "$count"
 }
 
-# Bringt einen Container über SEIN eigenes Compose-Projekt wieder hoch
-# (Labels). recreate=1 entfernt ihn vorher (für Crash-Loops, damit ein
-# frischer Container entsteht). Ohne Compose-Labels: docker start/restart.
-bring_up() {
-    local name="$1"
-    local recreate="${2:-0}"
-    local proj cfg svc
-    proj=$(docker inspect "$name" --format '{{index .Config.Labels "com.docker.compose.project"}}' 2>/dev/null || echo "")
-    cfg=$(docker inspect "$name" --format '{{index .Config.Labels "com.docker.compose.project.config_files"}}' 2>/dev/null || echo "")
-    svc=$(docker inspect "$name" --format '{{index .Config.Labels "com.docker.compose.service"}}' 2>/dev/null || echo "")
-    cfg="${cfg%%,*}" # bei mehreren -f das erste nehmen
+# --- mana-core Reconciliation: fehlende Core-Container neu erstellen -------
+# Nur mana-core, weil dessen Env via env_file (+ co-located .env) im
+# Compose-Dir liegt -> compose-up laedt sie sicher (keine Blank-Secrets).
+# Ein komplett fehlender Container hat keine Labels -> gegen die Core-
+# Compose abgleichen.
+reconcile_mana_core() {
+    [ -f "$MANA_CORE_COMPOSE" ] || {
+        log "core-reconcile: Compose nicht gefunden ($MANA_CORE_COMPOSE) — skip"
+        return 0
+    }
+    [ -f "$MAINT_LOCK" ] && {
+        log "core-reconcile: Wartungs-Lock aktiv — skip"
+        return 0
+    }
 
-    if [ -n "$proj" ] && [ -n "$cfg" ] && [ -n "$svc" ] && [ -f "$cfg" ]; then
-        if [ "$recreate" = "1" ]; then
-            log "  recreate $name via compose (project=$proj service=$svc)"
-            run docker rm -f "$name"
-            run docker compose -p "$proj" -f "$cfg" up -d --no-deps --no-build "$svc"
-        else
-            log "  recover $name via compose (project=$proj service=$svc)"
-            run docker compose -p "$proj" -f "$cfg" up -d --no-deps --no-build "$svc"
-        fi
-    else
-        # Kein Compose-Container (oder Config-Datei fehlt) — direkter Start.
-        log "  recover $name via docker start (keine nutzbaren Compose-Labels)"
-        run docker start "$name"
-    fi
-}
+    local services svc cid missing=""
+    services=$(docker compose -p "$MANA_CORE_PROJECT" -f "$MANA_CORE_COMPOSE" config --services 2>/dev/null || true)
+    [ -z "$services" ] && {
+        log "core-reconcile: keine Services lesbar — skip"
+        return 0
+    }
 
-# --- Reconciliation: fehlende DAUERLÄUFER-Container neu erstellen ----------
-# Ein komplett fehlender Container hat keine Labels — daher pro Compose-
-# Projekt (aus den LAUFENDEN Containern abgeleitet) gegen die Compose
-# abgleichen, welche Dauerläufer-Services (restart always/unless-stopped)
-# definiert, aber ohne Container sind, und nur die gezielt (re-)erzeugen.
-# Deckt so auch eigenständige App-Stacks (zitare/nutriphi/viadocu/…) ab,
-# nicht nur mana-core. Schutzmechanismen:
-#   - Projekte ohne laufenden Container = bewusst unten → nicht anfassen.
-#   - Mehrdeutige Projektnamen (gleicher Name, verschiedene Composes =
-#     Projekt-Kollision, z.B. manacore-monorepo/herbatrium) → übersprungen.
-#   - Nur Dauerläufer (restart-Policy via config-json + jq) → keine
-#     Job/Init/Profile-Services.
-#   - Wartungs-Lock pausiert die ganze Reconciliation.
-#   - mana-core garantiert dabei (auch wenn ausnahmsweise kein Core-
-#     Container laeuft) via hardcodiertem Pfad.
-# ALLE compose-up-Aufrufe nutzen --no-build: ein Watchdog darf NIE ein
-# Image bauen (schwergewichtig → genau das kippte am 2026-05-26 die VM in
-# den OOM-Crash). Fehlt das Image, schlaegt der Start sauber fehl + Notify.
-reconcile_project() {
-    local proj="$1" cfg_csv="$2"
-    local fargs=() f IFS_OLD="$IFS"
-    IFS=','
-    for f in $cfg_csv; do
-        [ -n "$f" ] || continue
-        if [ ! -f "$f" ]; then
-            IFS="$IFS_OLD"
-            log "reconcile: $proj — Compose-Datei fehlt ($f) — skip"
-            return 0
-        fi
-        fargs+=(-f "$f")
-    done
-    IFS="$IFS_OLD"
-    [ "${#fargs[@]}" -eq 0 ] && return 0
-
-    # Nur Dauerlaeufer — Job/Init/Profile-Services (restart no/on-failure
-    # oder profil-gated) bleiben aussen vor.
-    local longrunners
-    longrunners=$(docker compose -p "$proj" "${fargs[@]}" config --format json 2>/dev/null \
-        | jq -r '.services | to_entries[] | select((.value.restart // "") | test("always|unless-stopped")) | .key' 2>/dev/null || true)
-    [ -z "$longrunners" ] && return 0
-
-    local svc cid missing=""
-    for svc in $longrunners; do
+    for svc in $services; do
         cid=$(docker ps -a \
-            --filter "label=com.docker.compose.project=$proj" \
+            --filter "label=com.docker.compose.project=$MANA_CORE_PROJECT" \
             --filter "label=com.docker.compose.service=$svc" \
             --format '{{.ID}}' 2>/dev/null | head -1)
         [ -z "$cid" ] && missing="${missing:+$missing }$svc"
     done
 
     if [ -n "$missing" ]; then
-        log "reconcile: $proj — FEHLENDE Dauerläufer: $missing"
+        log "core-reconcile: FEHLENDE Core-Container: $missing"
         for svc in $missing; do
-            log "  (re-)erstelle $proj/$svc"
-            run docker compose -p "$proj" "${fargs[@]}" up -d --no-deps --no-build "$svc"
+            log "  (re-)erstelle Core-Service: $svc"
+            run docker compose -p "$MANA_CORE_PROJECT" -f "$MANA_CORE_COMPOSE" up -d --no-deps --no-build "$svc"
         done
-        send_notification "🔧 <b>$proj</b>\n\nFehlende Container neu erstellt: $missing" "high"
+        send_notification "🔧 <b>mana-core</b>\n\nFehlende Container neu erstellt: $missing" "high"
     fi
 }
 
-reconcile_missing() {
-    if [ -f "$MAINT_LOCK" ]; then
-        log "reconcile: Wartungs-Lock aktiv ($MAINT_LOCK) — skip"
-        return 0
-    fi
+reconcile_mana_core
 
-    # (Projekt|config_files)-Paare aus LAUFENDEN Containern + garantiert mana-core.
-    local pairs projects proj cfgs cfgcount
-    pairs=$(docker ps --format '{{.Label "com.docker.compose.project"}}|{{.Label "com.docker.compose.project.config_files"}}' 2>/dev/null | grep -v '^|' | grep -v '^$' | sort -u || true)
-    if [ -f "$MANA_CORE_COMPOSE" ]; then
-        pairs=$(printf '%s\n%s\n' "$pairs" "${MANA_CORE_PROJECT}|${MANA_CORE_COMPOSE}" | grep -v '^$' | sort -u)
-    fi
-
-    projects=$(printf '%s\n' "$pairs" | cut -d'|' -f1 | sort -u)
-    for proj in $projects; do
-        [ -z "$proj" ] && continue
-        # Alle distinct config_files-Werte fuer dieses Projekt.
-        cfgs=$(printf '%s\n' "$pairs" | awk -F'|' -v p="$proj" '$1==p{print $2}' | sort -u)
-        cfgcount=$(printf '%s\n' "$cfgs" | grep -c .)
-        if [ "$cfgcount" -ne 1 ]; then
-            log "reconcile: $proj — mehrdeutig ($cfgcount Compose-Sets) — skip"
-            continue
-        fi
-        reconcile_project "$proj" "$cfgs"
-    done
-}
-
-reconcile_missing
-
-# Nicht-laufende Container (created/exited), die laufen sollten.
+# Nicht-laufende Container (created/exited), die laufen sollten —
+# projektuebergreifend (auch nicht-mana-*). Recovery via `docker start`
+# (behaelt Env).
 STUCK_CONTAINERS=""
 for c in $(docker ps -a --filter "status=created" --filter "status=exited" --format "{{.Names}}"); do
     is_oneshot_init "$c" && continue
@@ -310,7 +229,7 @@ for c in $(docker ps -a --filter "status=created" --filter "status=exited" --for
     STUCK_CONTAINERS="${STUCK_CONTAINERS:+$STUCK_CONTAINERS$'\n'}$c"
 done
 
-# Crash-loopende Container (Restarting) — haben per Definition eine Policy.
+# Crash-loopende Container (Restarting) — projektuebergreifend.
 CRASHLOOP_CONTAINERS=$(docker ps -a --filter "status=restarting" --format "{{.Names}}" || true)
 
 if [ -z "$STUCK_CONTAINERS" ] && [ -z "$CRASHLOOP_CONTAINERS" ]; then
@@ -318,27 +237,27 @@ if [ -z "$STUCK_CONTAINERS" ] && [ -z "$CRASHLOOP_CONTAINERS" ]; then
     exit 0
 fi
 
-# Crash-Loops zuerst (kritischer) — mit Backoff, dann sauber neu erstellen.
+# Crash-Loops zuerst — `docker restart` (KEIN rm/compose-up: Env bleibt),
+# Backoff + Notify wenn es persistent crasht (echter Bug, nicht heilbar).
 if [ -n "$CRASHLOOP_CONTAINERS" ]; then
-    log "WARNING: Crash-loopende Container gefunden:"
+    log "WARNING: Crash-loopende Container:"
     for container in $CRASHLOOP_CONTAINERS; do
-        RESTART_COUNT=$(docker inspect "$container" --format '{{.RestartCount}}' 2>/dev/null || echo "0")
-        log "  - $container (restart count: $RESTART_COUNT)"
+        RC=$(docker inspect "$container" --format '{{.RestartCount}}' 2>/dev/null || echo "0")
+        log "  - $container (restart count: $RC)"
     done
-
     for container in $CRASHLOOP_CONTAINERS; do
         ATTEMPTS=$(track_restart "$container")
         if [ "$ATTEMPTS" -gt 3 ]; then
-            log "  SKIP: $container wurde in der letzten Stunde $ATTEMPTS-mal neu gestartet — manueller Eingriff noetig"
+            log "  SKIP: $container in der letzten Stunde $ATTEMPTS-mal angestossen — manueller Eingriff noetig"
             send_notification "🚨 <b>Container braucht manuellen Fix</b>\n\n$container crasht wiederholt ($ATTEMPTS-mal). Logs:\n<code>docker logs $container</code>" "high"
             continue
         fi
-        log "  Recreate $container (Versuch $ATTEMPTS/3)..."
-        bring_up "$container" 1
+        log "  docker restart $container (Versuch $ATTEMPTS/3)..."
+        run docker restart "$container"
     done
 fi
 
-# Stuck (Created/Exited) — einfach hochfahren.
+# Stuck (Created/Exited) — `docker start` (Env bleibt).
 if [ -n "$STUCK_CONTAINERS" ]; then
     log "WARNING: Container nicht laufend (sollten aber):"
     for container in $STUCK_CONTAINERS; do
@@ -346,18 +265,18 @@ if [ -n "$STUCK_CONTAINERS" ]; then
         log "  - $container (status: $STATUS)"
     done
     for container in $STUCK_CONTAINERS; do
-        bring_up "$container" 0
+        log "  docker start $container..."
+        run docker start "$container"
     done
 fi
 
 ALL_PROBLEM_CONTAINERS=$(printf '%s\n%s\n' "$STUCK_CONTAINERS" "$CRASHLOOP_CONTAINERS" | grep -v "^$" | sort -u || true)
 
 if [ "$DRY_RUN" = "1" ]; then
-    log "DRY_RUN: Geplante Recovery für: $(echo $ALL_PROBLEM_CONTAINERS | tr '\n' ' ')"
+    log "DRY_RUN: geplante Recovery fuer: $(echo $ALL_PROBLEM_CONTAINERS | tr '\n' ' ')"
     exit 0
 fi
 
-# Warten und verifizieren.
 sleep 10
 
 STILL_STUCK=""
@@ -370,11 +289,11 @@ STILL_CRASHING=$(docker ps -a --filter "status=restarting" --format "{{.Names}}"
 ALL_STILL_BROKEN=$(printf '%s\n%s\n' "$STILL_STUCK" "$STILL_CRASHING" | grep -v "^$" | sort -u || true)
 
 if [ -z "$ALL_STILL_BROKEN" ]; then
-    FIXED_MSG="Auto-fixed containers: $(echo $ALL_PROBLEM_CONTAINERS | tr '\n' ', ')"
+    FIXED_MSG="Auto-fixed: $(echo $ALL_PROBLEM_CONTAINERS | tr '\n' ', ')"
     log "SUCCESS: $FIXED_MSG"
     send_notification "🔧 <b>Mana Auto-Recovery</b>\n\n$FIXED_MSG"
 else
-    log "ERROR: Manche Container sind weiterhin kaputt:"
+    log "ERROR: Weiterhin kaputt:"
     for container in $ALL_STILL_BROKEN; do
         STATUS=$(docker inspect "$container" --format '{{.State.Status}}' 2>/dev/null || echo "unknown")
         log "  - $container (status: $STATUS)"
