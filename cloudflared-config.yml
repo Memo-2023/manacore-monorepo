@@ -483,4 +483,9 @@ ingress:
   - hostname: chor.mana.how
     service: http://localhost:3091
 
+  # mana-stats — öffentliche Transparenz-Stats (stats.mana.how + mana-ev.ch/zahlen).
+  # Host-Port 3118; DNS via `cloudflared tunnel route dns` auf den Tunnel gezeigt.
+  - hostname: stats.mana.how
+    service: http://localhost:3118
+
   - service: http_status:404
