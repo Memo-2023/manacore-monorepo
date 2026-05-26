@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import Analytics from '@mana/shared-landing-ui/atoms/Analytics.astro';
 
 interface Props {
 	title?: string;
@@ -38,21 +37,9 @@ const {
 			rel="stylesheet"
 		/>
 
-		<!-- Umami Analytics -->
-		{
-			import.meta.env.PUBLIC_UMAMI_WEBSITE_ID && (
-				<script
-					defer
-					src="https://stats.mana.how/script.js"
-					data-website-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID}
-				/>
-			)
-		}
-
 		<title>{title}</title>
 	</head>
 	<body class="antialiased">
 		<slot />
-		<Analytics />
 	</body>
 </html>

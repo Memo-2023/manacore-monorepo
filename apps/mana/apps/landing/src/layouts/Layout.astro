@@ -1,7 +1,6 @@
 ---
 import AlternateLinks from '../components/seo/AlternateLinks.astro';
 import Sidebar from '../components/navigation/Sidebar.astro';
-import Analytics from '@mana/shared-landing-ui/atoms/Analytics.astro';
 import { getLangFromUrl } from '../lib/i18n/config';
 
 export interface Props {
@@ -69,17 +68,6 @@ const lang = getLangFromUrl(Astro.url);
 			rel="stylesheet"
 		/>
 
-		<!-- Umami Analytics -->
-		{
-			import.meta.env.PUBLIC_UMAMI_WEBSITE_ID && (
-				<script
-					defer
-					src="https://stats.mana.how/script.js"
-					data-website-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID}
-				/>
-			)
-		}
-
 		<!-- Alternate language links for SEO -->
 		<AlternateLinks />
 
@@ -139,7 +127,6 @@ const lang = getLangFromUrl(Astro.url);
 
 		<!-- FAB Sidebar Navigation -->
 		<Sidebar />
-		<Analytics />
 	</body>
 </html>
 
@@ -248,7 +235,7 @@ const lang = getLangFromUrl(Astro.url);
 			linear-gradient(to right, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
 			linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
 			/* Bold lines every 10mm (40px) */
-				linear-gradient(to right, rgba(59, 130, 246, 0.3) 2px, transparent 2px),
+			linear-gradient(to right, rgba(59, 130, 246, 0.3) 2px, transparent 2px),
 			linear-gradient(to bottom, rgba(59, 130, 246, 0.3) 2px, transparent 2px);
 	}
 
@@ -308,9 +295,9 @@ const lang = getLangFromUrl(Astro.url);
       /* Diagonal shadow from top-left corner */
 			radial-gradient(ellipse 250px 150px at top left, rgba(0, 0, 0, 0.4) 0%, transparent 85%),
 			/* Diagonal shadow from top-right corner */
-				radial-gradient(ellipse 250px 150px at top right, rgba(0, 0, 0, 0.4) 0%, transparent 85%),
+			radial-gradient(ellipse 250px 150px at top right, rgba(0, 0, 0, 0.4) 0%, transparent 85%),
 			/* Main gradient from top to bottom */
-				linear-gradient(
+			linear-gradient(
 					to bottom,
 					rgba(15, 23, 42, 0.7) 0%,
 					rgba(15, 23, 42, 0.3) 40%,
@@ -324,9 +311,9 @@ const lang = getLangFromUrl(Astro.url);
       /* Diagonal shadow from bottom-left corner */
 			radial-gradient(ellipse 600px 400px at bottom left, rgba(0, 0, 0, 0.7) 0%, transparent 60%),
 			/* Diagonal shadow from bottom-right corner */
-				radial-gradient(ellipse 600px 400px at bottom right, rgba(0, 0, 0, 0.7) 0%, transparent 60%),
+			radial-gradient(ellipse 600px 400px at bottom right, rgba(0, 0, 0, 0.7) 0%, transparent 60%),
 			/* Main gradient from bottom to top */
-				linear-gradient(
+			linear-gradient(
 					to top,
 					rgba(15, 23, 42, 0.95) 0%,
 					rgba(15, 23, 42, 0.7) 30%,

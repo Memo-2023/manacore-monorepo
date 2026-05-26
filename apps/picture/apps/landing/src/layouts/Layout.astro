@@ -3,7 +3,6 @@ import '../styles/global.css';
 // import { HeadHrefLangs } from 'astro-i18next/components';
 import { t } from '../i18n';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
-import Analytics from '@mana/shared-landing-ui/atoms/Analytics.astro';
 
 interface Props {
 	title?: string;
@@ -36,17 +35,6 @@ const {
 		<!-- Language alternates -->
 		<!-- <HeadHrefLangs /> -->
 
-		<!-- Umami Analytics -->
-		{
-			import.meta.env.PUBLIC_UMAMI_WEBSITE_ID && (
-				<script
-					defer
-					src="https://stats.mana.how/script.js"
-					data-website-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID}
-				/>
-			)
-		}
-
 		<title>{title}</title>
 	</head>
 	<body class="antialiased">
@@ -56,7 +44,6 @@ const {
 		</div>
 
 		<slot />
-		<Analytics />
 	</body>
 </html>
 
