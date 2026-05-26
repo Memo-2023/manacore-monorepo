@@ -15,7 +15,7 @@
 #
 # What we pause: every container with a `mana-mon-*` name. That's the
 # observability stack (VictoriaMetrics, Loki, Glitchtip, cAdvisor,
-# umami, blackbox, exporters, …) — combined ~700 MiB resident, large
+# blackbox, exporters, …) — combined ~700 MiB resident, large
 # enough to give Vite the headroom it needs without touching anything
 # load-bearing. Postgres, Redis, the auth/api/web tier, all stay up.
 #

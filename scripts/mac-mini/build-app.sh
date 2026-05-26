@@ -31,7 +31,6 @@ BUILD_MEM_THRESHOLD_MB=3000
 # Monitoring containers (by container name — more reliable than compose service names)
 MONITORING_CONTAINERS=(
   mana-mon-grafana
-  mana-mon-umami
   mana-mon-victoria
   mana-mon-pushgateway
   mana-mon-cadvisor

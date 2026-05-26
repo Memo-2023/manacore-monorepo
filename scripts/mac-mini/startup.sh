@@ -146,7 +146,7 @@ log "Containers running: $RUNNING"
 
 # ─── Create missing databases ───
 log "Ensuring databases exist..."
-for db in mana_auth mana_credits chat todo calendar clock contacts storage umami; do
+for db in mana_auth mana_credits chat todo calendar clock contacts storage; do
     docker exec mana-infra-postgres psql -U postgres -c "CREATE DATABASE $db;" 2>/dev/null || true
 done
 

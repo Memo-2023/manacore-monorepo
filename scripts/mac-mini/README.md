@@ -236,7 +236,6 @@ Once running, services are available at:
 | Grafana | https://grafana.mana.how |
 | Status Page | https://status.mana.how |
 | GlitchTip | https://glitchtip.mana.how |
-| Umami | https://stats.mana.how |
 | SSH | ssh mac-mini (via cloudflared) |
 
 ## Native Services (non-Docker)
