@@ -80,24 +80,6 @@ services:
       retries: 3
       start_period: 60s
 
-  umami:
-    image: ghcr.io/umami-software/umami:postgresql-v2.18.0
-    container_name: mana-mon-umami
-    restart: unless-stopped
-    ports:
-      - '8010:3000'
-    environment:
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@192.168.178.131:5432/umami
-      DATABASE_TYPE: postgresql
-      APP_SECRET: ${UMAMI_APP_SECRET}
-      DISABLE_TELEMETRY: '1'
-    healthcheck:
-      test: ['CMD-SHELL', 'wget -q -O- http://127.0.0.1:3000/api/heartbeat || exit 1']
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-
   # ============================================
   # Photon Geocoder (pre-existing user container, adopted into compose
   # 2026-05-07 to gain a healthcheck). Backs mana-geocoding's

@@ -6,10 +6,8 @@ CREATE DATABASE mana_sync;
 
 -- Infrastructure databases (external tools)
 CREATE DATABASE glitchtip;
-CREATE DATABASE umami;
 
 -- Grant privileges
 GRANT ALL PRIVILEGES ON DATABASE mana_platform TO mana;
 GRANT ALL PRIVILEGES ON DATABASE mana_sync TO mana;
 GRANT ALL PRIVILEGES ON DATABASE glitchtip TO mana;
-GRANT ALL PRIVILEGES ON DATABASE umami TO mana;

@@ -1,36 +1,12 @@
 /**
- * Umami Analytics Utility
+ * Event-API — Web-Analytics DEAKTIVIERT (2026-05-26).
  *
- * Provides type-safe event tracking for all Mana apps.
- * Events are automatically sent to Umami at stats.mana.how
- *
- * @example
- * ```typescript
- * import { trackEvent, trackClick } from '@mana/shared-utils/analytics';
- *
- * // Track a custom event
- * trackEvent('signup_completed', { method: 'email' });
- *
- * // Track a button click
- * trackClick('cta_hero', 'Get Started');
- * ```
+ * Verein-weit kein Besucher-Tracking mehr (keine Tracking-Pixel, auch
+ * nicht „nur Analytics" — siehe mana/docs/MISSION.md). Die `*Events`-
+ * Objekte und `track*`-Funktionen bleiben als No-ops bestehen, damit die
+ * bestehenden Aufruf-Stellen quer durch die Module weiter kompilieren —
+ * sie senden nichts mehr.
  */
-
-// Umami types
-declare global {
-	interface Window {
-		umami?: {
-			track: (eventName: string, eventData?: Record<string, string | number | boolean>) => void;
-		};
-	}
-}
-
-/**
- * Check if Umami is available
- */
-export function isUmamiAvailable(): boolean {
-	return typeof window !== 'undefined' && typeof window.umami?.track === 'function';
-}
 
 /**
  * Track a custom event
@@ -45,15 +21,9 @@ export function trackEvent(
 	eventName: string,
 	data?: Record<string, string | number | boolean>
 ): void {
-	if (!isUmamiAvailable()) {
-		return;
-	}
-
-	try {
-		window.umami!.track(eventName, data);
-	} catch (error) {
-		console.warn('[Analytics] Failed to track event:', eventName, error);
-	}
+	// No-op: Web-Analytics entfernt (2026-05-26). Bewusst kein Tracking.
+	void eventName;
+	void data;
 }
 
 /**

@@ -24,20 +24,6 @@ import {
 } from './jwtUtils';
 
 /**
- * Inline analytics helper - tracks auth events via Umami if available.
- * No-ops silently in environments without Umami (mobile, SSR, dev).
- */
-function trackAuth(event: string, data?: Record<string, string | number | boolean>): void {
-	if (typeof window !== 'undefined' && (window as any).umami?.track) {
-		try {
-			(window as any).umami.track(event, { ...data, module: 'auth' });
-		} catch {
-			// Silently ignore tracking errors
-		}
-	}
-}
-
-/**
  * Default storage keys
  */
 const DEFAULT_STORAGE_KEYS: StorageKeys = {
@@ -135,11 +121,9 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					// SSO cookie is nice-to-have, don't fail login if this fails
 				}
 
-				trackAuth('login', { method: 'email' });
 				return { success: true };
 			} catch (error) {
 				console.error('Error signing in:', error);
-				trackAuth('login_failed', { method: 'email' });
 				return {
 					success: false,
 					error: error instanceof Error ? error.message : 'Unknown error during sign in',
@@ -175,11 +159,9 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 
 				// If emailVerified is false, the user needs to verify their email before login
 				const needsVerification = data?.user?.emailVerified === false;
-				trackAuth('signup', { method: 'email' });
 				return { success: true, needsVerification };
 			} catch (error) {
 				console.error('Error signing up:', error);
-				trackAuth('signup_failed', { method: 'email' });
 				return {
 					success: false,
 					error: error instanceof Error ? error.message : 'Unknown error during sign up',
@@ -203,7 +185,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					}).catch((err) => console.error('Error logging out on server:', err));
 				}
 
-				trackAuth('logout');
 				await service.clearAuthStorage();
 			} catch (error) {
 				console.error('Error signing out:', error);
@@ -228,7 +209,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					return service.handleAuthError(response.status, errorData);
 				}
 
-				trackAuth('password_reset_requested');
 				return { success: true };
 			} catch (error) {
 				console.error('Error sending password reset email:', error);
@@ -484,7 +464,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					return { success: false, error: err.message || 'Passkey registration failed' };
 				}
 
-				trackAuth('passkey_registered');
 				return { success: true };
 			} catch (error) {
 				// User cancelled or WebAuthn error
@@ -572,14 +551,12 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					storage.setItem(storageKeys.USER_EMAIL, data.user?.email || ''),
 				]);
 
-				trackAuth('login', { method: 'passkey' });
 				return { success: true };
 			} catch (error) {
 				if (error instanceof Error && error.name === 'NotAllowedError') {
 					return { success: false, error: 'Passkey authentication was cancelled' };
 				}
 				console.error('Passkey authentication error:', error);
-				trackAuth('login_failed', { method: 'passkey' });
 				return {
 					success: false,
 					error: error instanceof Error ? error.message : 'Passkey authentication failed',
@@ -758,7 +735,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					}
 				}
 
-				trackAuth('login', { method: '2fa' });
 				return { success: true };
 			} catch (error) {
 				return {
@@ -805,7 +781,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					}
 				}
 
-				trackAuth('login', { method: 'backup_code' });
 				return { success: true };
 			} catch (error) {
 				return {
@@ -892,7 +867,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 					return { success: false, error: err.message || 'Failed to send magic link' };
 				}
 
-				trackAuth('magic_link_sent');
 				return { success: true };
 			} catch (error) {
 				return {
@@ -1297,7 +1271,6 @@ export function createAuthService(config: AuthServiceConfig): AuthServiceInterfa
 				]);
 
 				console.log('SSO: Successfully authenticated via session cookie');
-				trackAuth('login', { method: 'sso' });
 				return { success: true };
 			} catch (error) {
 				// SSO failed - this is expected if user hasn't logged in anywhere

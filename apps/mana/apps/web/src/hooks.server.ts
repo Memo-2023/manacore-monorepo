@@ -1,5 +1,4 @@
 import type { Handle } from '@sveltejs/kit';
-import { injectUmamiAnalytics } from '@mana/shared-utils/analytics-server';
 import { setSecurityHeaders } from '@mana/shared-utils/security-headers';
 
 /**
@@ -226,7 +225,7 @@ window.__PUBLIC_MANA_ANALYTICS_URL__ = ${JSON.stringify(PUBLIC_MANA_ANALYTICS_UR
 window.__PUBLIC_AI_MISSION_GRANTS__ = ${JSON.stringify(PUBLIC_AI_MISSION_GRANTS)};
 window.__PUBLIC_GLITCHTIP_DSN__ = ${JSON.stringify(PUBLIC_GLITCHTIP_DSN)};
 </script>`;
-			return injectUmamiAnalytics(html.replace('<head>', `<head>${envScript}`));
+			return html.replace('<head>', `<head>${envScript}`);
 		},
 	});
 
