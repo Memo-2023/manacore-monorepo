@@ -14,7 +14,6 @@ Hilfsdienste vom Mini abgegeben — siehe [`docs/PLAN_OPTION_C.md`](../docs/PLAN
 |---|---|---|
 | `grafana` | `:8000` → `grafana.mana.how` | Dashboards (Phase 2a) |
 | `forgejo` | `:3041` → `git.mana.how` | Git-Mirror (Phase 2b) |
-| `umami` | `:8010` → `stats.mana.how` | Web-Analytics (Phase 2b) |
 | `victoriametrics` | `:9090` (intern) | Metrics-Store (Phase 2c) |
 | `loki` | `:3100` (intern) | Log-Store (Phase 2c) |
 | `pushgateway`, `blackbox-exporter`, `vmalert`, `alertmanager`, `alert-notifier` | (intern) | Metrics + Alerting (Phase 2c) |
@@ -78,7 +77,6 @@ Aktive Public-Hostnames (Stand 2026-05-07, config v28):
 | `gpu-ollama.mana.how` | `:11434` | Ollama API |
 | `grafana.mana.how` | `:8000` | Phase 2a |
 | `git.mana.how` | `:3041` | Forgejo (Phase 2b) |
-| `stats.mana.how` | `:8010` | Umami (Phase 2b) |
 | `glitchtip.mana.how` | `:8020` | Glitchtip (Phase 2d) |
 | `status.mana.how` | `:8090` | Status-Page (Phase 2e) |
 | `photon.mana.how` | `:2322` | Photon Geocoder (cross-LAN-Workaround für mana-geocoding's Probe + privacy-local Provider) |

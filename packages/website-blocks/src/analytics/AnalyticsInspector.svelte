@@ -10,7 +10,7 @@
 		if (provider === 'plausible') {
 			return 'Trage hier die Domain ein, die du bei Plausible registriert hast (z.B. "meineseite.de"). Keine Cookies, DSGVO-konform.';
 		}
-		return 'Umami Website-ID (UUID). Keine Cookies, DSGVO-konform.';
+		return 'Keine Cookies, DSGVO-konform.';
 	});
 
 	const keyLabel = $derived(provider === 'plausible' ? 'Domain' : 'Website-ID');
@@ -25,7 +25,6 @@
 			onchange={(e) => onChange({ provider: e.currentTarget.value as AnalyticsProps['provider'] })}
 		>
 			<option value="plausible">Plausible</option>
-			<option value="umami">Umami</option>
 		</select>
 	</label>
 

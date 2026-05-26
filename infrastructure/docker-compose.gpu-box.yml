@@ -3,7 +3,7 @@
 # Production-Hot-Path bleibt unverändert auf dem Mini.
 #
 # Architektur:
-#   - Apps hier (Grafana, Forgejo, Umami, Glitchtip-future) lesen Postgres
+#   - Apps hier (Grafana, Forgejo, Glitchtip-future) lesen Postgres
 #     auf 192.168.178.131:5432 als SoT.
 #   - VictoriaMetrics scrapt Mac-Mini-Services via 192.168.178.131:<port>
 #     (siehe monitoring/prometheus/prometheus.yml) und GPU-Box-eigene
@@ -40,7 +40,7 @@ services:
       retries: 3
 
   # ============================================
-  # Phase 2b — Forgejo + Umami
+  # Phase 2b — Forgejo
   # ============================================
   forgejo:
     image: codeberg.org/forgejo/forgejo:11

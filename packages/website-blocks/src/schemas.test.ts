@@ -202,8 +202,8 @@ describe('moduleEmbed', () => {
 });
 
 describe('analytics', () => {
-	it('accepts both providers', () => {
-		for (const provider of ['plausible', 'umami']) {
+	it('accepts the provider', () => {
+		for (const provider of ['plausible']) {
 			expect(safeValidateSchema('analytics', { provider }).success).toBe(true);
 		}
 	});

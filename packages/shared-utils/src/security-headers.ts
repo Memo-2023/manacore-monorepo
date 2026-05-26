@@ -2,7 +2,7 @@
  * Shared security headers for SvelteKit web apps.
  *
  * Sets standard security headers (CSP, X-Frame-Options, etc.)
- * with Umami analytics and GlitchTip error tracking pre-configured.
+ * with GlitchTip error tracking pre-configured.
  *
  * @example
  * ```typescript
@@ -33,7 +33,7 @@ interface SecurityHeadersOptions {
 
 /**
  * Set standard security headers on a Response object.
- * Includes Umami (stats.mana.how) and GlitchTip (glitchtip.mana.how) by default.
+ * Includes GlitchTip (glitchtip.mana.how) by default.
  */
 export function setSecurityHeaders(response: Response, options: SecurityHeadersOptions = {}): void {
 	const {
@@ -67,10 +67,10 @@ export function setSecurityHeaders(response: Response, options: SecurityHeadersO
 		// WebAssembly compilation, NOT eval()/new Function() — much narrower
 		// than the legacy 'unsafe-eval' source. Supported by all evergreen
 		// browsers.
-		`script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://stats.mana.how https://glitchtip.mana.how ${scriptSrc.join(' ')}`.trim(),
+		`script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://glitchtip.mana.how ${scriptSrc.join(' ')}`.trim(),
 		"style-src 'self' 'unsafe-inline'",
 		`img-src 'self' data: blob: https: ${imgSrc.join(' ')}`.trim(),
-		`connect-src 'self' https://stats.mana.how https://glitchtip.mana.how ${connectSrc.join(' ')}`.trim(),
+		`connect-src 'self' https://glitchtip.mana.how ${connectSrc.join(' ')}`.trim(),
 		`font-src 'self' ${fontSrc.join(' ')}`.trim(),
 		mediaSrc.length > 0 ? `media-src 'self' ${mediaSrc.join(' ')}`.trim() : '',
 		"object-src 'none'",

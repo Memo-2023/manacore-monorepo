@@ -11,11 +11,6 @@
 		if (block.props.scriptUrl) return block.props.scriptUrl;
 		return 'https://plausible.io/js/script.js';
 	});
-
-	const umamiSrc = $derived.by(() => {
-		if (block.props.scriptUrl) return block.props.scriptUrl;
-		return 'https://cloud.umami.is/script.js';
-	});
 </script>
 
 {#if !isPublic}
@@ -30,8 +25,6 @@
 {:else if configured}
 	{#if block.props.provider === 'plausible'}
 		<script defer data-domain={block.props.siteKey} src={plausibleSrc}></script>
-	{:else if block.props.provider === 'umami'}
-		<script defer data-website-id={block.props.siteKey} src={umamiSrc}></script>
 	{/if}
 {/if}
 

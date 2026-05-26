@@ -320,7 +320,7 @@
 		"total_entities": "Total entities",
 		"total_entities_desc": "Records across all apps",
 		"projects_with_data": "Projects with data",
-		"footnote_pre": "No tracking cookies — anonymous analytics via Umami. Details in the ",
+		"footnote_pre": "No tracking cookies — no web analytics. Details in the ",
 		"footnote_link": "privacy policy",
 		"footnote_post": ".",
 		"auth_title": "Authentication",
