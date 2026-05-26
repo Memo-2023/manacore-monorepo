@@ -71,8 +71,13 @@ COPY packages/shared-llm ./packages/shared-llm
 COPY packages/shared-ai ./packages/shared-ai
 COPY packages/cards-core ./packages/cards-core
 
-# Install dependencies (shared packages only - app deps added later)
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+# Install dependencies (shared packages only - app deps added later).
+# The npmrc secret carries the Verdaccio (@mana:registry=npm.mana.how)
+# auth token so private @mana/* packages resolve — without it pnpm falls
+# back to registry.npmjs.org and 404s on e.g. @mana/shared-icons. Mounted
+# as a BuildKit secret so the token never lands in an image layer.
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+    --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Ensure all @mana workspace packages are linked in node_modules

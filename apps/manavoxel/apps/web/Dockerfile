@@ -12,7 +12,8 @@ ENV PUBLIC_SYNC_SERVER_URL=$PUBLIC_SYNC_SERVER_URL
 COPY apps/manavoxel/packages/shared ./apps/manavoxel/packages/shared
 COPY apps/manavoxel/apps/web ./apps/manavoxel/apps/web
 
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+    --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --no-frozen-lockfile --ignore-scripts
 
 WORKDIR /app/apps/manavoxel/apps/web

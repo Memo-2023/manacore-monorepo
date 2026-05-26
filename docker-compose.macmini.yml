@@ -63,6 +63,8 @@ services:
     build:
       context: .
       dockerfile: apps/mana/apps/web/Dockerfile
+      secrets:
+        - npmrc
       args:
         PUBLIC_SYNC_SERVER_URL: wss://sync.mana.how
     image: mana-web:local
@@ -178,6 +180,8 @@ services:
     build:
       context: .
       dockerfile: apps/manavoxel/apps/web/Dockerfile
+      secrets:
+        - npmrc
     image: manavoxel-web:local
     container_name: mana-app-manavoxel-web
     restart: always
@@ -319,4 +323,14 @@ services:
   # zugunsten von `mana-news-pool` (Plattform-Service Port 3079,
   # ~/projects/mana/services/mana-news-pool/, eigene DB `mana_news_pool`).
   # mana-api/news/routes.ts proxied auf MANA_NEWS_POOL_URL.
+
+# Build-time secrets (BuildKit). Not mounted into running containers.
+secrets:
+  # Verdaccio (@mana:registry=npm.mana.how) auth for private @mana/*
+  # packages during web-app builds. Sourced from the build host's
+  # ~/.npmrc (registry mapping + resolved _authToken). Mounted via
+  # --mount=type=secret in the SvelteKit Dockerfiles, so the token
+  # never lands in an image layer. See docs/MAC_MINI_SERVER.md.
+  npmrc:
+    file: ${HOME}/.npmrc
 

@@ -25,6 +25,22 @@ DOCKER="${DOCKER_CMD:-/usr/local/bin/docker}"
 # 2026-04-23; this flag keeps it that way.
 COMPOSE_ARGS=(-f "$COMPOSE_FILE" --env-file "$ENV_FILE")
 
+# BuildKit is required for the --mount=type=secret in the SvelteKit
+# Dockerfiles (Verdaccio @mana token). `docker compose build` (v2) enables
+# it by default and reads the secret from the compose top-level `secrets:`;
+# the classic `docker build` for the base image needs it set explicitly.
+export DOCKER_BUILDKIT=1
+
+# Source for the `npmrc` build secret: registry mapping + resolved
+# Verdaccio _authToken so private @mana/* packages resolve during the base
+# image build. Without it pnpm falls back to registry.npmjs.org and 404s on
+# e.g. @mana/shared-icons. Defaults to the build host's ~/.npmrc.
+NPMRC_SECRET="${NPMRC_SECRET:-$HOME/.npmrc}"
+if [ ! -f "$NPMRC_SECRET" ]; then
+  echo "WARN: npmrc secret not found at $NPMRC_SECRET — @mana/* auth will" \
+       "fail during the sveltekit-base build (set NPMRC_SECRET)." >&2
+fi
+
 # Minimum free memory (in MB) needed for a Docker build
 BUILD_MEM_THRESHOLD_MB=3000
 
@@ -116,7 +132,7 @@ stop_monitoring_now() {
 
 build_base_images() {
   echo "=== Building sveltekit-base image ==="
-  $DOCKER build -f "$PROJECT_ROOT/docker/Dockerfile.sveltekit-base" -t sveltekit-base:local "$PROJECT_ROOT"
+  $DOCKER build --secret id=npmrc,src="$NPMRC_SECRET" -f "$PROJECT_ROOT/docker/Dockerfile.sveltekit-base" -t sveltekit-base:local "$PROJECT_ROOT"
   echo "sveltekit-base:local built."
   echo ""
 }
@@ -187,7 +203,7 @@ build_services() {
             echo "=== Rebuilding sveltekit-base (stale: newer commit touches packages/) ==="
             echo "    Triggering commit: $last_commit"
           fi
-          $DOCKER build -f "$PROJECT_ROOT/docker/Dockerfile.sveltekit-base" -t sveltekit-base:local "$PROJECT_ROOT"
+          $DOCKER build --secret id=npmrc,src="$NPMRC_SECRET" -f "$PROJECT_ROOT/docker/Dockerfile.sveltekit-base" -t sveltekit-base:local "$PROJECT_ROOT"
           echo ""
         fi
         break

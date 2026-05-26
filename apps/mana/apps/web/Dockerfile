@@ -21,7 +21,8 @@ COPY packages/cards-core ./packages/cards-core
 COPY packages/shared-crypto ./packages/shared-crypto
 COPY packages/website-blocks ./packages/website-blocks
 
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+    --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --no-frozen-lockfile --ignore-scripts
 
 WORKDIR /app/apps/mana/apps/web
