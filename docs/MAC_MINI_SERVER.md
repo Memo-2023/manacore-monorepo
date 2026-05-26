@@ -589,6 +589,31 @@ Das Base Image enthaelt alle Shared Packages (`packages/`) vorinstalliert und vo
 ./scripts/mac-mini/build-app.sh --base
 ```
 
+#### Verdaccio-Auth beim Build (`@mana/*`-Pakete)
+
+Der Base-Build (und die darauf aufbauenden Web-App-Builds) macht
+`pnpm install` und braucht dafür Zugriff auf die privaten `@mana/*`-Pakete
+in der Verdaccio-Registry (`npm.mana.how`). Ohne Auth fällt pnpm auf
+`registry.npmjs.org` zurück und 404t (z. B. an `@mana/shared-icons`).
+
+Die Auth kommt über einen **BuildKit-Secret-Mount**, nicht über eine in
+den Build-Context kopierte `.npmrc` — so landet der Token nie in einer
+Image-Layer:
+
+- **Quelle:** das `~/.npmrc` des Build-Hosts (Registry-Mapping +
+  aufgelöster `_authToken`). Auf dem Mac Mini: `/Users/mana/.npmrc`.
+- **Base-Build:** `build-app.sh` setzt `DOCKER_BUILDKIT=1` und übergibt
+  `--secret id=npmrc,src=$NPMRC_SECRET` (Default `~/.npmrc`, per
+  `NPMRC_SECRET` überschreibbar).
+- **App-Builds:** `docker compose build` liest den Secret aus dem
+  Top-Level-`secrets:`-Block der `docker-compose.macmini.yml`
+  (`npmrc.file: ${HOME}/.npmrc`); die SvelteKit-Dockerfiles mounten ihn
+  via `--mount=type=secret,id=npmrc,target=/root/.npmrc`.
+
+Fehlt `~/.npmrc`, warnt `build-app.sh` vor dem Build. Token-Recovery:
+siehe Memory `secret_npm_auth_token_macmini.md` bzw. `npm login` gegen
+`https://npm.mana.how/`.
+
 ### Build-Script (`build-app.sh`)
 
 Das Script prüft vor dem Build den verfügbaren RAM und stoppt Monitoring-Container **nur wenn nötig** (< 3 GB frei). Alle Container haben explizite `mem_limit` Obergrenzen in der `docker-compose.macmini.yml`, sodass der tatsächliche Verbrauch typischerweise 50-70% der Limits beträgt und genug Headroom für Builds bleibt.
