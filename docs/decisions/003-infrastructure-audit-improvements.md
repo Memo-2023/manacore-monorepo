@@ -19,7 +19,7 @@ Die aktuelle Docker-Compose-Konfiguration auf dem Mac Mini hat über die Zeit 52
 | 4000-4099 | Matrix Stack | 4000 synapse, 401x bots, 4080 element |
 | 5000-5099 | Web Frontends | 5000 dashboard, 501x app webs |
 | 6000-6099 | Automation | 6000 n8n, 601x telegram |
-| 8000-8099 | Monitoring UI | 8000 grafana, 8010 umami |
+| 8000-8099 | Monitoring UI | 8000 grafana, 8010 web-analytics |
 | 9000-9199 | Infra & Exporters | 9000 minio, 909x metrics |
 | 11000+ | Native macOS | 11434 ollama |
 

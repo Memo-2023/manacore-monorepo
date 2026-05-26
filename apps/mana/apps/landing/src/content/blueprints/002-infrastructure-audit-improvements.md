@@ -63,7 +63,7 @@ Dieses Dokument analysiert den aktuellen Zustand der Mana-Infrastruktur auf dem 
 │                                                                      │
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │                 Monitoring & Tools (8 Services)                │  │
-│  │  VictoriaMetrics │ Grafana │ Exporters │ Umami │ n8n           │  │
+│  │  VictoriaMetrics │ Grafana │ Exporters │ Web-Analytics │ n8n           │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
@@ -153,7 +153,7 @@ Dieses Dokument analysiert den aktuellen Zustand der Mana-Infrastruktur auf dem 
 | cAdvisor           | mana-cadvisor           | 8080 | Container-Metriken  |
 | Postgres Exporter  | mana-postgres-exporter  | 9187 | DB-Metriken         |
 | Redis Exporter     | mana-redis-exporter     | 9121 | Cache-Metriken      |
-| Umami              | mana-umami              | 3200 | Web Analytics       |
+| Web-Analytics      | mana-web-analytics      | 3200 | Web Analytics       |
 | n8n                | mana-n8n                | 5678 | Workflow Automation |
 | Telegram Stats Bot | mana-telegram-stats-bot | 3300 | Telegram Reports    |
 
@@ -198,7 +198,7 @@ AKTUELL (Chaotisch):
 │ 3031-3032 LÜCKE        │                                         │
 │ 3033 matrix-tts-bot    │ Bot im falschen Bereich!                │
 │ 3100 grafana           │ Monitoring im Backend-Bereich!          │
-│ 3200 umami             │ Warum 3200?                             │
+│ 3200 web-analytics             │ Warum 3200?                             │
 │ 3300-3301 Telegram     │ Telegram im 33xx Bereich                │
 │ 3310-3318 Matrix Bots  │ OK, aber 3033 fehlt!                    │
 ├──────────────────────────────────────────────────────────────────┤
@@ -341,7 +341,7 @@ NEU (Strukturiert):
 │                                                                      │
 │  8000-8099: Monitoring Dashboards                                    │
 │  ├── 8000: grafana                                                  │
-│  ├── 8010: umami                                                    │
+│  ├── 8010: web-analytics                                                    │
 │  └── 8080: victoriametrics-ui                                       │
 │                                                                      │
 │  9000-9199: Infrastructure & Exporters                               │

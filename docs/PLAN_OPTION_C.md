@@ -1,7 +1,7 @@
 # Plan — Option C: Workload-Split Mac Mini ↔ Windows-GPU-Box
 
 **Stand:** 2026-05-06
-**Ziel:** Nicht-zeitkritische Hilfsdienste (Monitoring, Forgejo, Glitchtip, Umami)
+**Ziel:** Nicht-zeitkritische Hilfsdienste (Monitoring, Forgejo, Glitchtip, Web-Analytics)
 auf die Windows-GPU-Box (64 GB RAM, derzeit 95 % idle System-RAM) verlagern.
 Single-Point-of-Failure innerhalb des Standorts entfernen, ohne Geld auszugeben.
 Production-Hot-Path bleibt unverändert auf dem Mini.
@@ -13,7 +13,7 @@ Production-Hot-Path bleibt unverändert auf dem Mini.
 | Phase 0 — Vor-Setup | ✅ | Hardware bestätigt (Ryzen 9 5950X / 64 GB / RTX 3090 / 660 GB frei C:), in `WINDOWS_GPU_SERVER_SETUP.md` dokumentiert |
 | Phase 1 — WSL2 + Docker | ✅ | War schon eingerichtet (Ubuntu 24.04, Docker 29.4.1, systemd). `.wslconfig` erweitert um `memory=24GB`, `processors=12`, `swap=8GB`, `vmIdleTimeout=-1` |
 | Phase 2a — Grafana auf GPU-Box | ✅ | Container `mana-mon-grafana` läuft auf `:8000`, Cross-Box-Datasources testen erfolgreich (Prometheus/VM, Loki, Business Metrics). DB-Datasources schlagen fehl wegen Pre-existing-Mis-config (DBs heißen `mana_admin`, nicht `mana`; keine `glitchtip` DB) |
-| Phase 2b — Umami + Forgejo | ✅ | Beide healthy auf GPU-Box. Glitchtip übersprungen — Mini-Glitchtip ist bereits im Broken-State (DB `glitchtip` existiert nicht in Postgres, läuft nur in Degraded-Mode), Migration würde Bug nicht heilen |
+| Phase 2b — Web-Analytics + Forgejo | ✅ | Beide healthy auf GPU-Box. Glitchtip übersprungen — Mini-Glitchtip ist bereits im Broken-State (DB `glitchtip` existiert nicht in Postgres, läuft nur in Degraded-Mode), Migration würde Bug nicht heilen |
 | Phase 2c — VM + Loki + Alerts | ✅ | Komplett auf GPU-Box. 11 Container neu (VM, Loki, Pushgateway, Blackbox, Vmalert, Alertmanager, Alert-notifier, GPU-eigenes Node-Exporter+Cadvisor+Promtail). VM scrapt 76 Targets, **69 UP / 7 DOWN** (DOWN sind alle pre-existing wrong /metrics endpoints auf Mana-Services, nicht durch Migration). Konfig-Pfade: `monitoring/{prometheus,loki,blackbox,alertmanager,alert-notifier}/`. Bekannte Limits siehe unten. |
 | Phase 2d — Glitchtip mit dediziertem DB-Stack | ✅ | 4 Container neu (mana-mon-glitchtip + worker + dedizierte glitchtip-postgres + glitchtip-redis). Mini-Postgres scheiterte bei `logs.0001_initial`-Partition-Creation mit OS-level "Permission denied" (macOS-Docker-Storage-Quirk auf externer SSD). Auf der GPU-Box mit Linux-ext4 saubere 333-Tabellen-Migration. Worker enqueuet UND finished Tasks → DB-Writes funktional (vorher hingen sie ewig). Public-Hostname `glitchtip.mana.how` → mana-gpu-server-Tunnel (config v23). |
 | Phase 2e — Status-Page auf GPU-Box | ✅ | 2 Container neu (`mana-mon-status-gen` + `mana-mon-status-nginx`). Sparse `/srv/mana/source` mit `mana-source-pull.timer` (stündlich) hostet das `generate-status-page.sh` und `mana-apps.ts`. status-gen schreibt in das Docker-Volume `status-output`, das status-nginx auf `:8090` ausliefert. Public-Hostname `status.mana.how` → mana-gpu-server-Tunnel (config v25). Bonus: behebt den Inode-Stale-Bind-Mount-Bug, der auf dem Mini bei jedem CD-`git checkout -f` die Status-Page kaputt machte. `vm.mana.how` (Phase-2c-Workaround für Mini→GPU-VM-Routing) wurde wieder aus dem Tunnel entfernt — VM ist nicht mehr public. |
@@ -21,7 +21,7 @@ Production-Hot-Path bleibt unverändert auf dem Mini.
 | Phase 2g — mana-research auslagern | ✅ | Web-Research-Orchestrator mit 16+ Search-/LLM-Providern. Nativer Build via workspace-Dockerfile (sparse-checkout `services/mana-research` + `packages/{shared-research,shared-types,shared-hono,shared-logger}`). Cross-LAN zu mana-auth/mana-credits/mana-llm/mana-search/postgres/redis (alle auf 192.168.178.131); Redis-Auth via `REDIS_PASSWORD` aus Mini's `.env.macmini` übernommen. `research.mana.how` zum GPU-Tunnel umgebogen via Cloudflare-API (config v29). Beide `PUBLIC_MANA_RESEARCH_URL`-Vars in mana-app-web auf https-URL umgestellt — gleicher Cross-LAN-Bridge-Pattern wie mana-ai (Mini-Container können 192.168.178.11 nicht direkt erreichen, daher Tunnel-Roundtrip). Mini Container 42 → 41. |
 | Phase 3 — Daten-Migration | n/a | Alle migrierten Apps lesen Mini-Postgres direkt — keine separate Datenmigration |
 | Phase 4 — Cloudflare-Cutover | ✅ | API-Approach via `cert.pem` apiToken: PUT `/accounts/.../cfd_tunnel/.../configurations` für GPU-Tunnel, dann `cloudflared tunnel route dns --overwrite-dns`. Kein Dashboard-Klick nötig. 3 Hostnames live (grafana/git/stats) |
-| Phase 5 — Mini-Compose aufräumen | ✅ | 3 Blöcke in `cloudflared-config.yml` auskommentiert (Backup angelegt), cloudflared neu geladen, Mini-Container `mana-mon-grafana` + `mana-mon-umami` gestoppt (nicht entfernt — Rollback bleibt möglich) |
+| Phase 5 — Mini-Compose aufräumen | ✅ | 3 Blöcke in `cloudflared-config.yml` auskommentiert (Backup angelegt), cloudflared neu geladen, Mini-Container `mana-mon-grafana` + `mana-mon-web-analytics` gestoppt (nicht entfernt — Rollback bleibt möglich) |
 
 ### Cloudflare-API-Approach (für nachvollziehbares Re-Run / weitere Cutover)
 
@@ -55,7 +55,7 @@ WSL2 (Ubuntu 24.04, 24 GB RAM-Limit, 12 vCPU, vmIdleTimeout=-1)
     │       └── datasources jetzt LOKAL (victoriametrics:9090, loki:3100, tempo:3200)
     ├── Phase 2b — Apps
     │   ├── mana-core-forgejo (forgejo:11, :3041) — DB → Mini-Postgres
-    │   └── mana-mon-umami (umami:2.18.0, :8010) — DB → Mini-Postgres
+    │   └── mana-mon-web-analytics (web-analytics:2.18.0, :8010) — DB → Mini-Postgres
     ├── Phase 2d — Glitchtip mit eigener DB-Insel
     │   ├── mana-mon-glitchtip (glitchtip:latest, :8020) — DB → glitchtip-postgres
     │   ├── mana-mon-glitchtip-worker — Celery + Beat
@@ -146,7 +146,7 @@ als langlebigen Windows-Prozess offen → WSL-VM idled nicht aus, Container
 | `vmalert` | 8880 | `victoriametrics/vmalert:v1.99.0` | — | Alerts-Dir aus Repo bind-mount |
 | `alertmanager` | 9093 | `prom/alertmanager:v0.27.0` | `mana-alertmanager-data` (8 KB) | |
 | `alert-notifier` | 9095 | `alert-notifier:local` | — | Lokales Image — auf GPU-Box neu bauen |
-| `umami` | 8010 | `umami:postgresql-v2.18.0` | (DB only) | DB `umami` bleibt auf Mini-Postgres, App ruft via 192.168.178.131:5432 |
+| `web-analytics` | 8010 | `web-analytics:postgresql-v2.18.0` | (DB only) | DB `web-analytics` bleibt auf Mini-Postgres, App ruft via 192.168.178.131:5432 |
 | `glitchtip` + `worker` | 8020 | `glitchtip:latest` | (DB only) | DB-Name TBD beim Migrieren — wahrscheinlich auch in Mini-Postgres |
 | `forgejo` (re-aktivieren) | 3041 | `codeberg.org/forgejo/forgejo:11` | (frisch oder Volume-Restore) | Container läuft heute **nicht**; DB-Tabelle vorhanden |
 
@@ -185,7 +185,7 @@ zurückgerollt — Storage-Volume kam dort nie an).
 | `grafana.mana.how` | Mini :8000 | GPU-Box :8000 | mana-gpu-server |
 | `git.mana.how` | Mini :3041 (heute 502, da Forgejo aus) | GPU-Box :3041 | mana-gpu-server |
 | `glitchtip.mana.how` | Mini :8020 | GPU-Box :8020 | mana-gpu-server |
-| `stats.mana.how` (Umami) | Mini :8010 | GPU-Box :8010 | mana-gpu-server |
+| `stats.mana.how` (Web-Analytics) | Mini :8010 | GPU-Box :8010 | mana-gpu-server |
 | `status.mana.how` | Mini :4400 (nginx) | **bleibt Mini** (status-page-gen schreibt in landings dir) | mana-server |
 | Alle anderen `*.mana.how` | Mini | **unverändert Mini** | mana-server |
 
@@ -284,7 +284,7 @@ Container-Liste zurückgeben.
 
 ### Phase 3 — Daten-Migration (3 h)
 
-#### Glitchtip + Umami
+#### Glitchtip + Web-Analytics
 
 Beide haben *keine* persistenten Container-Volumes — der Zustand liegt komplett
 in `mana-infra-postgres`. **Einfachster Weg:** App-Container auf GPU-Box
@@ -298,8 +298,8 @@ ssh mana-server 'PATH=/Applications/Docker.app/Contents/Resources/bin:$PATH; doc
 ```
 Falls nötig: Eintrag für `192.168.178.0/24` ergänzen, Postgres-Reload.
 
-DB-Namen + Credentials aus `docker-compose.macmini.yml` extrahieren (Umami:
-`umami` DB, Glitchtip-DB-Name TBD beim Migrieren).
+DB-Namen + Credentials aus `docker-compose.macmini.yml` extrahieren (Web-Analytics:
+`web-analytics` DB, Glitchtip-DB-Name TBD beim Migrieren).
 
 #### Forgejo
 
@@ -364,7 +364,7 @@ sauberer Re-Start ist hier billiger als jeder rsync-Fehler.
    Rollback) in `docker-compose.macmini.yml`:
    ```
    grafana, victoriametrics, loki, tempo, pushgateway, blackbox-exporter,
-   vmalert, alertmanager, alert-notifier, umami, glitchtip, glitchtip-worker
+   vmalert, alertmanager, alert-notifier, web-analytics, glitchtip, glitchtip-worker
    ```
 2. Sum-of-Limits neu berechnen (`./scripts/mac-mini/memory-baseline.sh`).
    Ziel: ≤ 6 GiB.
@@ -384,7 +384,7 @@ ist trivial.
 |---|---|
 | Phase 1 (WSL2 broken) | WSL2 deinstallieren, GPU-Box bleibt AI-only |
 | Phase 2 (Monitoring auf GPU-Box läuft nicht) | GPU-Box-Compose `down`, Mini bleibt SoT — kein Impact |
-| Phase 3 (Glitchtip/Umami können Mini-Postgres nicht erreichen) | pg_hba.conf zurück, GPU-Box-Container `down`, Mini-Container weiter — kein Impact |
+| Phase 3 (Glitchtip/Web-Analytics können Mini-Postgres nicht erreichen) | pg_hba.conf zurück, GPU-Box-Container `down`, Mini-Container weiter — kein Impact |
 | Phase 4 (Cutover) | DNS-Route zurück auf Mini-Tunnel + Mini-Container `up -d` (waren ja nur gestoppt) |
 | Phase 5 (Mini bricht beim Aufräumen) | `git checkout docker-compose.macmini.yml && docker compose up -d` — Container kommen zurück |
 
@@ -394,7 +394,7 @@ ist trivial.
 |---|---|
 | WSL2-Networking nach Patch-Tuesday weg | Healthcheck auf Mini probt GPU-Box-Endpoints; manuelles Eingreifen am nächsten Werktag |
 | AI-Tasks werden ge-OOM'd | `.wslconfig` begrenzt WSL auf 16 GB → AI-Tasks behalten 48 GB |
-| Glitchtip/Umami können Mini-Postgres-IP nicht auflösen | Vorab-Test in Phase 3: `psql -h 192.168.178.131 -U postgres -p 5432 -c '\l'` aus WSL2 |
+| Glitchtip/Web-Analytics können Mini-Postgres-IP nicht auflösen | Vorab-Test in Phase 3: `psql -h 192.168.178.131 -U postgres -p 5432 -c '\l'` aus WSL2 |
 | Mini-Tunnel führt nach Cutover noch alte Routen, weil DNS-Cache | TTL der Cloudflare-Records ist 60 s; `dig` prüfen vorm Verifizieren |
 | Status-Page-Gen findet VM nicht mehr | URL in `scripts/generate-status-page.sh` von `localhost:9090` auf `192.168.178.11:9090` ändern |
 

@@ -324,11 +324,11 @@ running, or pointing at a port nothing was bound to.
 
 **What changed (four containers started, three Postgres databases
 created):**
-- `docker compose -p manacore-monorepo up -d landings umami manavoxel-web synapse`
+- `docker compose -p manacore-monorepo up -d landings web-analytics manavoxel-web synapse`
   brought four compose-defined-but-not-running services back.
-- `mana-mon-umami` initially crashed because database `umami` didn't
+- `mana-mon-web-analytics` initially crashed because database `web-analytics` didn't
   exist on `mana-infra-postgres` — created it with
-  `CREATE DATABASE umami;` and the container went healthy.
+  `CREATE DATABASE web-analytics;` and the container went healthy.
 - `mana-matrix-synapse` initially crashed because role `synapse` didn't
   exist either, then because database `matrix` didn't exist —
   created both:

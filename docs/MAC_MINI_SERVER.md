@@ -627,7 +627,7 @@ Misst den tatsächlichen RAM-Verbrauch aller Container, sortiert nach Kategorie:
 
 ### Memory-Limits
 
-> **Stand 2026-05-07** — nach Phase 2c+2d+2e+2f+2g Cleanup (siehe [`PLAN_OPTION_C.md`](./PLAN_OPTION_C.md)) sind ~17 Service-Blöcke (Grafana, VictoriaMetrics, Loki, Tempo, Promtail, Pushgateway, Blackbox-Exporter, Vmalert, Alertmanager, Alert-Notifier, Umami, Glitchtip+Worker, Forgejo, Status-Page-Gen, news-ingester, mana-ai, mana-research) auf die GPU-Box gewandert und aus der Mini-Compose entfernt. Phase 2f-1 (verdaccio) wurde am 2026-05-07 zurückgerollt — verdaccio bleibt Standalone-Compose unter `~/projects/verdaccio/` auf dem Mini.
+> **Stand 2026-05-07** — nach Phase 2c+2d+2e+2f+2g Cleanup (siehe [`PLAN_OPTION_C.md`](./PLAN_OPTION_C.md)) sind ~17 Service-Blöcke (Grafana, VictoriaMetrics, Loki, Tempo, Promtail, Pushgateway, Blackbox-Exporter, Vmalert, Alertmanager, Alert-Notifier, Web-Analytics, Glitchtip+Worker, Forgejo, Status-Page-Gen, news-ingester, mana-ai, mana-research) auf die GPU-Box gewandert und aus der Mini-Compose entfernt. Phase 2f-1 (verdaccio) wurde am 2026-05-07 zurückgerollt — verdaccio bleibt Standalone-Compose unter `~/projects/verdaccio/` auf dem Mini.
 
 Container in `docker-compose.macmini.yml` haben explizite `mem_limit`:
 
