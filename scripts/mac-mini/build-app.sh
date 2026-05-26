@@ -227,9 +227,15 @@ build_services() {
   #      (`<hash>_<container_name>`) that compose sometimes creates when
   #      a previous recreate failed mid-cycle. Those aren't tracked by
   #      compose's own state, so `compose rm` misses them.
-  #   3. `up -d --remove-orphans` then creates a clean new container
-  #      and silences the "Found orphan containers" warning we kept
-  #      seeing for the unrelated mana-game-whopixels leftover.
+  #   3. `up -d` (NO --remove-orphans) creates the clean new container.
+  #      --remove-orphans was REMOVED 2026-05-26: this compose runs in the
+  #      shared `manacore-monorepo` project (COMPOSE_PROJECT_NAME in
+  #      .env.macmini), so --remove-orphans deletes every OTHER app's
+  #      containers (uload, comicello, moodlit, mana-stats, …) as
+  #      "orphans" — it nuked 23 of them in one rebuild. The per-service
+  #      `rm` pass above already clears this service's own leftovers; the
+  #      harmless "Found orphan containers" warning is the accepted cost.
+  #      See memory project-compose-project-collision.
   $DOCKER compose "${COMPOSE_ARGS[@]}" rm -fs "${services[@]}" 2>&1 \
     | grep -v 'No stopped containers' || true
   for svc in "${services[@]}"; do
@@ -252,7 +258,7 @@ build_services() {
       echo "$orphans" | xargs -r $DOCKER rm -f 2>/dev/null || true
     fi
   done
-  $DOCKER compose "${COMPOSE_ARGS[@]}" up -d --no-deps --remove-orphans "${services[@]}" 2>&1
+  $DOCKER compose "${COMPOSE_ARGS[@]}" up -d --no-deps "${services[@]}" 2>&1
 }
 
 # --- Main ---
