@@ -526,7 +526,6 @@ curl -s http://localhost:3000/
 The health check monitors:
 - All backend APIs and web frontends
 - Infrastructure (PostgreSQL, Redis)
-- Monitoring stack (Grafana, Umami, GlitchTip, VictoriaMetrics)
 - Alerting stack (vmalert, Alertmanager, Alert Notifier)
 - Disk space for `/` and `/Volumes/ManaData` (warning at 80%, critical at 90%)
 - Cloudflare Tunnel (cloudflared process)

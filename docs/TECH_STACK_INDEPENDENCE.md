@@ -15,7 +15,6 @@
 | Search | SearXNG + mana-search | Docker + NestJS |
 | Messaging | Matrix/Synapse + 13 Bots | Docker |
 | Monitoring | VictoriaMetrics + Grafana | Docker |
-| Analytics | Umami | Docker |
 | Error Tracking | GlitchTip (Sentry-kompatibel) | Docker |
 | Automation | n8n | Docker |
 | LLM | Ollama + mana-llm Gateway | Nativ + Python |

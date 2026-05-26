@@ -738,7 +738,6 @@ Der Service bleibt vorerst nebenher. Gründe:
 
 - [x] Prometheus-Metrics: `mana_api_website_publish_total{result}`, `_publish_duration_seconds`, `_submissions_total{result}`, `_host_resolve_total{result}`, `_domain_verify_total{result}`, `_public_reads_total{result}`, `_public_read_age_seconds`. `/metrics`-Endpoint an apps/api root (unauth, verlässt sich auf Reverse-Proxy).
 - [x] Orphan-Asset-GC: Script `apps/api/scripts/gc-website-assets.ts` — **read-only** in M7 first-pass. Walks published_snapshots + submissions for mediaId refs, compares against mana-media's app=website listing, reports orphans older than 30d. Deletion-Toggle nach 2-3 Wochen stabiler Reports.
-- [x] `analytics`-Block-Typ: Plausible + Umami mit self-hosted Script-URL-Override. Unsichtbar im Editor, emittiert genau einen `<script>` im public-Mode. Keine Cookies, keine PII.
 - [ ] Per-Site-Stats im Editor (Views/Tag, Top-Seiten) — verschoben auf M7.x. Der Analytics-Block deckt die Visitor-Seite; Editor-Inline-Dashboard ist Backlog bis jemand konkret danach fragt.
 - [ ] Submission-Retention: `payload` nach erfolgreicher Weitergabe nullen — M4.x Voraussetzung (Target-Delivery ist noch nicht gewired).
 - [x] Dashboards in `docs/observability/website.md` — Metrics-Referenz, PromQL-Queries, Alert-Vorschläge, Grafana-Pfad.

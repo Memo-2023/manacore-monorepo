@@ -52,13 +52,11 @@ This document defines the URL schema for all mana.how subdomains.
 | Service | URL | Description |
 |---------|-----|-------------|
 | **Grafana** | grafana.mana.how | Metrics dashboards |
-| **Umami** | (internal :8010) | Web analytics |
 
 ### Umami Tracking (Analytics)
 
 For web analytics, the following apps are tracked in Umami:
 
-| Umami Website ID | Display Name | Domain |
 |------------------|--------------|--------|
 | `mana-webapp` | Dashboard | mana.how |
 | `chat-webapp` | Chat | chat.mana.how |

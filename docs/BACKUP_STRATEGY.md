@@ -21,7 +21,6 @@ Alle Postgres-Container, die `*postgres*` matchen, ausgenommen
 
 | Container | User | DB(s) |
 |---|---|---|
-| `mana-infra-postgres` | `postgres` | mana_platform, mana_sync, mana_admin, memoro (956 MB), forgejo, glitchtip, umami |
 | `cards-postgres` | `cards` | cards |
 | `manaspur-postgres` | `manaspur` | manaspur |
 | `nutriphi-postgres` | `nutriphi` | nutriphi |

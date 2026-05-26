@@ -76,7 +76,6 @@ managarten/
 - **Build System:** Turborepo
 - **Formatting:** Prettier (tabs, single quotes, 100 char width)
 - **Hosting:** Mac Mini (self-hosted) via Docker + Cloudflare Tunnel
-- **Analytics:** Umami (stats.mana.how)
 
 ## License
 

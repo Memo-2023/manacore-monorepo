@@ -168,7 +168,6 @@ Pure CRUD apps use mana-sync directly.
 | Port | Service | Description |
 |------|---------|-------------|
 | 8000 | grafana | Metrics dashboards |
-| 8010 | umami | Web analytics |
 | 8020 | glitchtip | Error tracking |
 
 ## 9000-9199: Infrastructure & Exporters

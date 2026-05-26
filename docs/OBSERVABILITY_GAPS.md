@@ -10,11 +10,9 @@
 | Metriken (Infra + App) | Ja | VictoriaMetrics + Grafana | Produktionsreif |
 | Alerting | Ja | Alertmanager + Telegram/ntfy | 70+ Regeln |
 | Error Tracking (Backend) | Ja | GlitchTip | 18 Backends angebunden |
-| Web Analytics | Ja | Umami | 15 Apps getracked |
 | **Distributed Tracing** | **Nein** | — | Kein Tracing |
 | **Log-Aggregation** | **Nein** | — | Nur `docker logs` |
 | **APM (Application Performance Monitoring)** | **Nein** | — | Kein Runtime-Profiling |
-| **Frontend Error Monitoring** | **Nein** | — | Nur Umami (kein Error Tracking) |
 
 ---
 
@@ -351,7 +349,6 @@ Frontend Error Monitoring fängt Fehler ab, die im Browser des Users passieren �
 
 Ein User auf Safari iOS hat einen Fehler in der Todo-App — eine Svelte-Komponente wirft eine Exception und der Screen wird weiß. Der User schließt die App, kommt nicht wieder. Du erfährst davon nie, weil:
 - Kein Error wird an ein Backend gesendet
-- Umami zeigt nur "1 Seitenaufruf weniger als gestern"
 - GlitchTip hat nur Backend-Fehler
 
 **Szenario 2: API-Fehler aus Sicht des Users**

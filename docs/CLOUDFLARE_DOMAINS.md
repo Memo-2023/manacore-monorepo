@@ -120,7 +120,6 @@ Cloudflare Tunnel (bb0ea86d...)
 | Domain | Service | Port |
 |--------|---------|------|
 | `grafana.mana.how` | Grafana | 8000 |
-| `stats.mana.how` | Umami Analytics | 8010 |
 | `glitchtip.mana.how` | GlitchTip Errors | 8020 |
 | `ssh.mana.how` | SSH Access | 22 |
 

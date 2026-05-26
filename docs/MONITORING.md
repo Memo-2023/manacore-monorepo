@@ -9,7 +9,6 @@ All monitoring tools are publicly accessible - no login required (except GlitchT
 | Tool | URL | Access |
 |------|-----|--------|
 | **Grafana** | https://grafana.mana.how | No login needed (Anonymous Viewer) |
-| **Umami** | [Public Dashboard](https://stats.mana.how/share/face76f42d3e42beb8c80ea03f33a462/mana-webapp) | No login needed (Public Share) |
 | **GlitchTip** | https://glitchtip.mana.how | `guest@mana.how` / `guestguest` |
 
 ### Grafana Dashboards

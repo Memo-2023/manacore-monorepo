@@ -152,7 +152,6 @@ Legende: LOCAL = Self-hosted | CLOUD = Externer Dienst | FREE = Kostenlos
 | **Prometheus** | Metrics Collection | In mana-auth integriert |
 | **Grafana** | Dashboards | Konfigurierbar |
 | **Winston** | Application Logging | In allen NestJS Services |
-| **Umami** | Web Analytics | `UMAMI_APP_SECRET` |
 
 ---
 
@@ -440,7 +439,6 @@ echo "LLaVA ready at: http://localhost:11434"
 | Aufgabe | Auslöser | Aufwand |
 |---------|----------|---------|
 | Postal für Emails | Email-Volumen > 1000/Monat | 4h |
-| Umami self-hosted | Analytics benötigt | 2h |
 | Mehr LLM-Modelle | Qualitätsanforderungen | 1h |
 
 ### Phase 3: Hardware-Upgrade nötig
