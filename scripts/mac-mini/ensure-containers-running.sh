@@ -171,22 +171,18 @@ track_restart() {
     local count_file="$RESTART_TRACKER/$container"
     mkdir -p "$RESTART_TRACKER"
 
+    local count=0 age
     if [ -f "$count_file" ]; then
-        local count age
-        count=$(cat "$count_file")
+        count=$(cat "$count_file" 2>/dev/null || echo 0)
+        case "$count" in '' | *[!0-9]*) count=0 ;; esac
         age=$(($(date +%s) - $(stat -f %m "$count_file" 2>/dev/null || stat -c %Y "$count_file" 2>/dev/null)))
-        if [ "$age" -gt 3600 ]; then
-            echo "1" >"$count_file"
-            echo "1"
-        else
-            count=$((count + 1))
-            echo "$count" >"$count_file"
-            echo "$count"
-        fi
-    else
-        echo "1" >"$count_file"
-        echo "1"
+        [ "$age" -gt 3600 ] && count=0 # Zaehler nach 1h zuruecksetzen
     fi
+    count=$((count + 1))
+    # Im DRY_RUN den Zaehler NICHT persistieren (Probelaeufe sollen den
+    # Loop-Guard nicht künstlich hochtreiben).
+    [ "$DRY_RUN" = "1" ] || echo "$count" >"$count_file"
+    echo "$count"
 }
 
 # Bringt einen Container über SEIN eigenes Compose-Projekt wieder hoch
@@ -205,10 +201,10 @@ bring_up() {
         if [ "$recreate" = "1" ]; then
             log "  recreate $name via compose (project=$proj service=$svc)"
             run docker rm -f "$name"
-            run docker compose -p "$proj" -f "$cfg" up -d --no-deps "$svc"
+            run docker compose -p "$proj" -f "$cfg" up -d --no-deps --no-build "$svc"
         else
             log "  recover $name via compose (project=$proj service=$svc)"
-            run docker compose -p "$proj" -f "$cfg" up -d --no-deps "$svc"
+            run docker compose -p "$proj" -f "$cfg" up -d --no-deps --no-build "$svc"
         fi
     else
         # Kein Compose-Container (oder Config-Datei fehlt) — direkter Start.
@@ -217,46 +213,94 @@ bring_up() {
     fi
 }
 
-# --- mana-core Reconciliation: fehlende Core-Container neu erstellen -------
-# Ein komplett fehlender Container hat keine Labels — daher gegen die
-# Core-Compose abgleichen, welche Services definiert, aber ohne Container
-# sind, und nur die gezielt (re-)erzeugen.
-reconcile_mana_core() {
-    if [ ! -f "$MANA_CORE_COMPOSE" ]; then
-        log "core-reconcile: Compose nicht gefunden ($MANA_CORE_COMPOSE) — skip"
-        return 0
-    fi
-    if [ -f "$MAINT_LOCK" ]; then
-        log "core-reconcile: Wartungs-Lock aktiv ($MAINT_LOCK) — skip"
-        return 0
-    fi
+# --- Reconciliation: fehlende DAUERLÄUFER-Container neu erstellen ----------
+# Ein komplett fehlender Container hat keine Labels — daher pro Compose-
+# Projekt (aus den LAUFENDEN Containern abgeleitet) gegen die Compose
+# abgleichen, welche Dauerläufer-Services (restart always/unless-stopped)
+# definiert, aber ohne Container sind, und nur die gezielt (re-)erzeugen.
+# Deckt so auch eigenständige App-Stacks (zitare/nutriphi/viadocu/…) ab,
+# nicht nur mana-core. Schutzmechanismen:
+#   - Projekte ohne laufenden Container = bewusst unten → nicht anfassen.
+#   - Mehrdeutige Projektnamen (gleicher Name, verschiedene Composes =
+#     Projekt-Kollision, z.B. manacore-monorepo/herbatrium) → übersprungen.
+#   - Nur Dauerläufer (restart-Policy via config-json + jq) → keine
+#     Job/Init/Profile-Services.
+#   - Wartungs-Lock pausiert die ganze Reconciliation.
+#   - mana-core garantiert dabei (auch wenn ausnahmsweise kein Core-
+#     Container laeuft) via hardcodiertem Pfad.
+# ALLE compose-up-Aufrufe nutzen --no-build: ein Watchdog darf NIE ein
+# Image bauen (schwergewichtig → genau das kippte am 2026-05-26 die VM in
+# den OOM-Crash). Fehlt das Image, schlaegt der Start sauber fehl + Notify.
+reconcile_project() {
+    local proj="$1" cfg_csv="$2"
+    local fargs=() f IFS_OLD="$IFS"
+    IFS=','
+    for f in $cfg_csv; do
+        [ -n "$f" ] || continue
+        if [ ! -f "$f" ]; then
+            IFS="$IFS_OLD"
+            log "reconcile: $proj — Compose-Datei fehlt ($f) — skip"
+            return 0
+        fi
+        fargs+=(-f "$f")
+    done
+    IFS="$IFS_OLD"
+    [ "${#fargs[@]}" -eq 0 ] && return 0
 
-    local services svc cid missing=""
-    services=$(docker compose -p "$MANA_CORE_PROJECT" -f "$MANA_CORE_COMPOSE" config --services 2>/dev/null || true)
-    [ -z "$services" ] && {
-        log "core-reconcile: keine Services aus Compose lesbar — skip"
-        return 0
-    }
+    # Nur Dauerlaeufer — Job/Init/Profile-Services (restart no/on-failure
+    # oder profil-gated) bleiben aussen vor.
+    local longrunners
+    longrunners=$(docker compose -p "$proj" "${fargs[@]}" config --format json 2>/dev/null \
+        | jq -r '.services | to_entries[] | select((.value.restart // "") | test("always|unless-stopped")) | .key' 2>/dev/null || true)
+    [ -z "$longrunners" ] && return 0
 
-    for svc in $services; do
+    local svc cid missing=""
+    for svc in $longrunners; do
         cid=$(docker ps -a \
-            --filter "label=com.docker.compose.project=$MANA_CORE_PROJECT" \
+            --filter "label=com.docker.compose.project=$proj" \
             --filter "label=com.docker.compose.service=$svc" \
             --format '{{.ID}}' 2>/dev/null | head -1)
         [ -z "$cid" ] && missing="${missing:+$missing }$svc"
     done
 
     if [ -n "$missing" ]; then
-        log "core-reconcile: FEHLENDE Core-Container: $missing"
+        log "reconcile: $proj — FEHLENDE Dauerläufer: $missing"
         for svc in $missing; do
-            log "  (re-)erstelle Core-Service: $svc"
-            run docker compose -p "$MANA_CORE_PROJECT" -f "$MANA_CORE_COMPOSE" up -d --no-deps "$svc"
+            log "  (re-)erstelle $proj/$svc"
+            run docker compose -p "$proj" "${fargs[@]}" up -d --no-deps --no-build "$svc"
         done
-        send_notification "🔧 <b>mana-core</b>\n\nFehlende Container neu erstellt: $missing" "high"
+        send_notification "🔧 <b>$proj</b>\n\nFehlende Container neu erstellt: $missing" "high"
     fi
 }
 
-reconcile_mana_core
+reconcile_missing() {
+    if [ -f "$MAINT_LOCK" ]; then
+        log "reconcile: Wartungs-Lock aktiv ($MAINT_LOCK) — skip"
+        return 0
+    fi
+
+    # (Projekt|config_files)-Paare aus LAUFENDEN Containern + garantiert mana-core.
+    local pairs projects proj cfgs cfgcount
+    pairs=$(docker ps --format '{{.Label "com.docker.compose.project"}}|{{.Label "com.docker.compose.project.config_files"}}' 2>/dev/null | grep -v '^|' | grep -v '^$' | sort -u || true)
+    if [ -f "$MANA_CORE_COMPOSE" ]; then
+        pairs=$(printf '%s\n%s\n' "$pairs" "${MANA_CORE_PROJECT}|${MANA_CORE_COMPOSE}" | grep -v '^$' | sort -u)
+    fi
+
+    projects=$(printf '%s\n' "$pairs" | cut -d'|' -f1 | sort -u)
+    for proj in $projects; do
+        [ -z "$proj" ] && continue
+        # Alle distinct config_files-Werte fuer dieses Projekt.
+        cfgs=$(printf '%s\n' "$pairs" | awk -F'|' -v p="$proj" '$1==p{print $2}' | sort -u)
+        cfgcount=$(printf '%s\n' "$cfgs" | grep -c .)
+        if [ "$cfgcount" -ne 1 ]; then
+            log "reconcile: $proj — mehrdeutig ($cfgcount Compose-Sets) — skip"
+            continue
+        fi
+        reconcile_project "$proj" "$cfgs"
+    done
+}
+
+reconcile_missing
 
 # Nicht-laufende Container (created/exited), die laufen sollten.
 STUCK_CONTAINERS=""
@@ -285,8 +329,8 @@ if [ -n "$CRASHLOOP_CONTAINERS" ]; then
     for container in $CRASHLOOP_CONTAINERS; do
         ATTEMPTS=$(track_restart "$container")
         if [ "$ATTEMPTS" -gt 3 ]; then
-            log "  SKIP: $container wurde in der letzten Stunde $ATTEMPTS× neu gestartet — manueller Eingriff noetig"
-            send_notification "🚨 <b>Container braucht manuellen Fix</b>\n\n$container crasht wiederholt ($ATTEMPTS×). Logs:\n<code>docker logs $container</code>" "high"
+            log "  SKIP: $container wurde in der letzten Stunde $ATTEMPTS-mal neu gestartet — manueller Eingriff noetig"
+            send_notification "🚨 <b>Container braucht manuellen Fix</b>\n\n$container crasht wiederholt ($ATTEMPTS-mal). Logs:\n<code>docker logs $container</code>" "high"
             continue
         fi
         log "  Recreate $container (Versuch $ATTEMPTS/3)..."
