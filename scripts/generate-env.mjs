@@ -240,7 +240,6 @@ const APP_CONFIGS = [
 			// routet /api/* dorthin).
 			PUBLIC_MANA_AUTH_URL: (env) => env.MANA_AUTH_URL,
 			PUBLIC_AUTH_WEB_URL: (env) => env.MANA_AUTH_WEB_URL || 'http://localhost:3002',
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_MANA || '',
 			PUBLIC_GLITCHTIP_DSN: (env) => env.PUBLIC_GLITCHTIP_DSN || '',
 			// Speech-to-Text proxy (server-side only, never exposed to the client)
 			MANA_STT_URL: (env) => env.STT_URL || 'http://localhost:3020',
@@ -696,57 +695,43 @@ const APP_CONFIGS = [
 	// Chat Landing
 	{
 		path: 'apps/chat/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_CHAT_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Mana Landing
 	{
 		path: 'apps/mana/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_MANA_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Cards Landing
 	{
 		path: 'apps/cards/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_CARDS_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Calendar Landing
 	{
 		path: 'apps/calendar/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_CALENDAR_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Clock Landing
 	{
 		path: 'apps/clock/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_CLOCK_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Picture Landing
 	{
 		path: 'apps/picture/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_PICTURE_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Todo Landing
 	{
 		path: 'apps/todo/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_TODO_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Food Landing
@@ -754,17 +739,13 @@ const APP_CONFIGS = [
 	// Presi Landing
 	{
 		path: 'apps/presi/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_PRESI_LANDING || '',
-		},
+		vars: {},
 	},
 
 	// Music Landing
 	{
 		path: 'apps/mukke/apps/landing/.env',
-		vars: {
-			PUBLIC_UMAMI_WEBSITE_ID: (env) => env.UMAMI_WEBSITE_ID_MUSIC_LANDING || '',
-		},
+		vars: {},
 	},
 ];
 

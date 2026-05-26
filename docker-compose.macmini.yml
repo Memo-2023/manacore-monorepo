@@ -141,7 +141,6 @@ services:
       # is provisioned (see docs/plans/ai-mission-key-grant.md).
       PUBLIC_AI_MISSION_GRANTS: ${PUBLIC_AI_MISSION_GRANTS:-false}
       # Analytics & Error Tracking
-      PUBLIC_UMAMI_WEBSITE_ID: 32777167-e026-4618-933a-3429120b479b
       PUBLIC_GLITCHTIP_DSN: ${GLITCHTIP_DSN_MANA_WEB:-}
       # Speech-to-Text proxy: SvelteKit /api/v1/voice/transcribe forwards
       # to mana-stt via Cloudflare Tunnel. The browser never sees the API

@@ -22,12 +22,6 @@
 			icon: 'grafana' as const,
 		},
 		{
-			name: 'Umami Analytics',
-			url: 'https://stats.mana.how',
-			description: 'Web Analytics',
-			icon: 'analytics' as const,
-		},
-		{
 			name: 'Docker Dashboard',
 			url: 'https://grafana.mana.how/d/backends-docker',
 			description: 'Container Metrics',

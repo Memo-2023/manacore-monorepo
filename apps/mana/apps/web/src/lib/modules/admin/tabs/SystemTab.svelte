@@ -36,12 +36,6 @@
 			description: 'Raw metrics & queries',
 			icon: 'api' as const,
 		},
-		{
-			name: 'Umami Analytics',
-			url: 'https://stats.mana.how',
-			description: 'Web analytics dashboard',
-			icon: 'analytics' as const,
-		},
 	];
 
 	const statusColors = {
@@ -71,7 +65,6 @@
 			{ name: 'Redis', status: 'healthy', url: '-' },
 			{ name: 'MinIO', status: 'healthy', url: 'https://s3.mana.how' },
 			{ name: 'Grafana', status: 'healthy', url: 'https://grafana.mana.how' },
-			{ name: 'Umami', status: 'healthy', url: 'https://stats.mana.how' },
 		];
 		loading = false;
 	});

@@ -2,7 +2,8 @@
  * Funnel Tracking — fires one-time activation & retention events.
  *
  * Each event uses a localStorage flag so it fires at most once per user/device.
- * These events power Umami funnels:
+ * Analytics-Versand ist entfernt (2026-05-26) — die ManaEvents-Aufrufe
+ * sind No-ops; Flags/Stufen bleiben für evtl. künftige lokale Auswertung:
  *   signup → onboarding_completed → first_content_created → second_module_used → user_return_visit
  */
 
