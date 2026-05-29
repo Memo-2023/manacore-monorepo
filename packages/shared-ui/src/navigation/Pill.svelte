@@ -142,14 +142,14 @@
 		padding: 0.375rem;
 	}
 
-	/* active */
+	/* active — solider Fill (parität zu mana/packages/shared-ui@1.3.0) */
 	.pill.active {
-		background: hsl(var(--color-primary) / 0.15);
-		border-color: hsl(var(--color-primary) / 0.4);
-		color: hsl(var(--color-primary));
+		background: hsl(var(--color-primary));
+		border-color: hsl(var(--color-primary));
+		color: hsl(var(--color-primary-foreground));
 	}
 	.pill.active:not(:disabled):hover {
-		background: hsl(var(--color-primary) / 0.2);
+		background: hsl(var(--color-primary) / 0.9);
 	}
 
 	/* primary — vibrant CTA pill */
