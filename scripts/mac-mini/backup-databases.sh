@@ -233,6 +233,15 @@ log "=== Backup Summary ==="
 log "Databases backed up: $BACKUP_COUNT"
 log "Total backup size: $TOTAL_SIZE"
 
+# ─── Objekt-Speicher (MinIO) mitsichern ─────────────────────────────────
+# Läuft im selben nächtlichen (FDA-fähigen) Kontext wie die DB-Dumps.
+# Non-blocking: ein Objekt-Backup-Fehler kippt den DB-Backup-Status nicht.
+if [ -x "$SCRIPT_DIR/backup-objects.sh" ]; then
+    "$SCRIPT_DIR/backup-objects.sh" || log "Objekt-Backup meldete Fehler (siehe oben)"
+else
+    log "WARN: backup-objects.sh fehlt/nicht ausführbar — MinIO-Objekte NICHT gesichert"
+fi
+
 if [ -n "$FAILED_DBS" ]; then
     log "FAILED databases:$FAILED_DBS"
     send_notification "⚠️ <b>Backup Partially Failed</b>\n\nFailed:$FAILED_DBS\nSuccessful: $BACKUP_COUNT databases" "high"

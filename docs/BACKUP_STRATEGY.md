@@ -31,9 +31,34 @@ Dump-Pattern: `${container}_${db}_${date}.sql.gz`.
 
 Total nach erstem Run 2026-05-13: **~45 GB** in `/Volumes/ManaData/backups/postgres`.
 
+## Objekt-Speicher (MinIO) — `backup-objects.sh`
+
+Seit 2026-05-29 sichert `scripts/mac-mini/backup-objects.sh` die hochgeladenen
+Dateien aller MinIO-Container (Audio, PDF, Bilder …). Es wird am Ende von
+`backup-databases.sh` aufgerufen, läuft also im selben nächtlichen (FDA-fähigen)
+LaunchD-Lauf. Findet alle `*minio*`-Container automatisch und wählt das Verfahren
+**nach Größe** (`OBJECT_BACKUP_CAP_MB`, Default 2048):
+
+| Store | Größe | Verfahren | Ziel |
+|---|---|---|---|
+| `chorportal-prod-minio` | ~23 MB | gzip-Tar, Rotation 7/4 (Point-in-time) | `backups/minio/daily/` |
+| `manameme-minio` | ~200 MB | gzip-Tar, Rotation 7/4 | `backups/minio/daily/` |
+| `mana-infra-minio` | groß (memoro-Audio etc.) | inkrementeller `mc mirror` | `backups/minio/mirror/<container>/` |
+
+- **Tar** (≤ Cap): transienter Alpine via `--volumes-from` → `tar | gzip` auf den
+  Host. Kein Cred-/mc-Bedarf, bind & named volume gleichermaßen. Restore: Tarball
+  in das `/data` einer leeren MinIO entpacken.
+- **Mirror** (> Cap): transienter `minio/mc` via `--network container:<minio>`,
+  Root-Creds aus der Container-ENV (`MINIO_ROOT_USER[_FILE]`), `mc mirror` additiv
+  (kein `--remove` → gelöschte Objekte bleiben erhalten). Restore:
+  `mc mirror <mirror-dir> <ziel-alias>` in eine frische MinIO.
+
+> Bewusste Grenze: der Mirror ist single-version (kein Point-in-time wie die
+> getarrten Stores) und liegt auf derselben Disk. Versionierung + echtes
+> Off-Site für große Stores = Phase 2 (restic auf den Mirror, S3-Ziel).
+
 ### Was NICHT gebackupt wird (heute)
 
-- **MinIO-Objekte** (Cards-Media, mana-media, …) — getrennte Volumes
 - **`/Volumes/ManaData/{cards,manaspur,…}/postgres`** auf File-Level —
   pg_dump reicht für DBs, aber Disk-Bitrot würde damit nicht erfasst
 - **Cloudflared-Tunnel-Credentials** unter `~/.cloudflared/` (kritisch!)
