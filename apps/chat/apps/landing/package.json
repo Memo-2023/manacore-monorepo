@@ -12,6 +12,7 @@
 		"type-check": "astro check"
 	},
 	"dependencies": {
+		"@fontsource-variable/inter": "^5.1.1",
 		"@astrojs/check": "^0.9.0",
 		"@astrojs/sitemap": "^3.2.1",
 		"@mana/shared-landing-ui": "workspace:*",
