@@ -7,7 +7,6 @@
  * - Operations/costs: import { CreditOperationType, CREDIT_COSTS } from '@mana/credits'
  * - Service: import { createCreditService } from '@mana/credits'
  * - Web UI: import { CreditBalance } from '@mana/credits/web'
- * - Mobile UI: import { CreditBalance } from '@mana/credits/mobile'
  */
 
 // === Operations (costs, types, metadata) ===

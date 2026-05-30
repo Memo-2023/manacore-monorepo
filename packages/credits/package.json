@@ -11,8 +11,7 @@
 		"./web": {
 			"svelte": "./src/web/index.ts",
 			"default": "./src/web/index.ts"
-		},
-		"./mobile": "./src/mobile/index.ts"
+		}
 	},
 	"scripts": {
 		"type-check": "tsc --noEmit"

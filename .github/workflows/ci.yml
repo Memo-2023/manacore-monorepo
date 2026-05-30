@@ -1,10 +1,11 @@
 # CI Pipeline: validates PRs and sanity-builds standalone service images.
 #
 # Flow:
-#   PR → main/dev   : validate + auth-integration (required status check).
-#   Push → main/dev : sanity-build the changed standalone services
-#                     (mana-auth/-search/-sync/-notify/-api-gateway/-crawler/
-#                      -media/-credits) on GitHub-hosted runners.
+#   PR → main/dev   : validate (required status check).
+#   Push → main/dev : validate (type-check/lint/format — fängt Direkt-Pushes,
+#                     die keinen PR durchlaufen) + sanity-build der geänderten
+#                     standalone Services (mana-auth/-search/-sync/-notify/
+#                     -api-gateway/-crawler/-media/-credits) auf GitHub-Runnern.
 #
 # What's NOT in CI:
 #   - mana-web: built by the Mac Mini CD pipeline (cd-macmini.yml). Its
@@ -224,7 +225,9 @@ jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    # Läuft auf PRs UND auf direkten Pushes (main/dev) + workflow_dispatch.
+    # Wichtig: ohne den Push-Lauf entging der volle `pnpm type-check` jedem
+    # Direkt-Push auf main — so verrottete er unbemerkt (2026-05, 9 Pakete rot).
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
