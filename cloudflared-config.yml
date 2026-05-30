@@ -248,6 +248,13 @@ ingress:
     service: http://localhost:3110
   - hostname: memoro-audio.mana.how
     service: http://localhost:3101
+  # ── memoro.ai Brand-Domains (Cutover 2026-05-30) — selbe Backends ──
+  - hostname: app.memoro.ai
+    service: http://localhost:3130
+  - hostname: api.memoro.ai
+    service: http://localhost:3110
+  - hostname: audio.memoro.ai
+    service: http://localhost:3101
 
   # ============================================
   # Zitare (Code/zitare, separate repo)
@@ -487,5 +494,11 @@ ingress:
   # Host-Port 3118; DNS via `cloudflared tunnel route dns` auf den Tunnel gezeigt.
   - hostname: stats.mana.how
     service: http://localhost:3118
+
+  - hostname: audioguide.mana.how
+    service: http://localhost:3146
+  # Wunsch-App — zentraler Feedback-Eingang (wunsch.mana.how)
+  - hostname: wunsch.mana.how
+    service: http://localhost:3145
 
   - service: http_status:404
