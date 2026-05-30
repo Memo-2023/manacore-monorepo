@@ -17,7 +17,6 @@ import { registerMoodTools } from './mood.ts';
 import { registerNotesTools } from './notes.ts';
 import { registerSpacesTools } from './spaces.ts';
 import { registerTodoTools } from './todo.ts';
-import { registerComicTools } from './comic.ts';
 import { registerAugurTools } from './augur.ts';
 
 export function registerAllModules(): void {
@@ -28,7 +27,6 @@ export function registerAllModules(): void {
 	registerNotesTools();
 	registerSpacesTools();
 	registerTodoTools();
-	registerComicTools();
 	registerAugurTools();
 }
 
@@ -40,6 +38,5 @@ export {
 	registerNotesTools,
 	registerSpacesTools,
 	registerTodoTools,
-	registerComicTools,
 	registerAugurTools,
 };

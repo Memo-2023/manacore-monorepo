@@ -85,6 +85,7 @@ interface FormSnapshotBlob {
 		label?: string;
 		required?: boolean;
 		options?: Array<{ id: string; label: string }>;
+		config?: { ratingScale?: number };
 	}>;
 	branching?: unknown[];
 	settings?: { submitButtonLabel?: string; successMessage?: string };

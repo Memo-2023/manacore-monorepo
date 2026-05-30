@@ -9,7 +9,7 @@
 		"skipLibCheck": true,
 		"noEmit": true,
 		"rootDir": "src",
-		"types": ["bun-types"],
+		"types": ["bun"],
 		"paths": {
 			"@/*": ["./src/*"]
 		}

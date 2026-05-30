@@ -9,5 +9,9 @@
 		"outDir": "dist",
 		"declaration": true
 	},
-	"include": ["src/**/*.ts", "src/**/*.svelte"]
+	"include": ["src/**/*.ts", "src/**/*.svelte"],
+	// Bun-Tests (*.test.ts, `bun:test`) laufen über `bun test`, nicht über
+	// svelte-check — sie ziehen sonst fremde Service-Quellen + bun:test-Typen
+	// in den UI-Check. avatar.test.ts importiert z.B. mana-analytics/src.
+	"exclude": ["src/**/*.test.ts"]
 }
