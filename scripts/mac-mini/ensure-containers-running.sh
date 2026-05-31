@@ -118,44 +118,104 @@ send_notification() {
     fi
 }
 
-# --- colima-VM-Liveness-Guard ---------------------------------------------
-# Heilt einen Mid-Run-Crash der colima-VM (startup.sh laeuft nur beim Boot).
-# Wartungs-Lock pausiert; Backoff verhindert Endlos-Haemmern.
+# --- colima-Runtime-Liveness-Guard ----------------------------------------
+# Heilt sowohl einen Mid-Run-Crash der colima-VM (startup.sh laeuft nur beim
+# Boot) ALS AUCH einen "wedged" SSH-Mux: VM laeuft, aber docker.sock UND alle
+# Port-Forwards sind tot. In dem Fall LUEGT `colima status` "running" — deshalb
+# ist `docker info` die einzige verlaessliche Probe (so macht es auch
+# startup.sh). Vorfall 2026-05-31: der fruehere woechentliche blinde
+# `ssh -O exit`-Refresh (com.mana.ssh-mux-refresh, inzwischen abgeschafft) riss
+# den Mux ab, Lima baute ihn wedged neu auf, und dieser Guard — der damals nur
+# `colima status` pruefte und bei docker-Ausfall `exit 1` machte — bailte 8h
+# lang alle 5 Min statt zu heilen.
+# Eskalation: sanft (`ssh -O exit` + reprime) -> hart (`colima restart`).
+# Wartungs-Lock pausiert; Backoff verhindert Endlos-Haemmern; Heal-Lock
+# verhindert parallele Recovery-Laeufe.
 COLIMA_FAIL_TRACKER="/tmp/mana-colima-start-fails"
 COLIMA_MAX_FAILS=3
+COLIMA_SSH_SOCK="$HOME/.colima/_lima/colima/ssh.sock"
+COLIMA_HEAL_LOCK="/tmp/mana-colima-heal.lock"
 
-if ! colima status >/dev/null 2>&1; then
+docker_ok() { docker info >/dev/null 2>&1; }
+
+# Wartet bis docker erreichbar ist (oder Timeout). $1 = max Sekunden.
+wait_docker() {
+    local max="$1" i=0
+    while [ "$i" -lt "$max" ]; do
+        docker_ok && return 0
+        sleep 5
+        i=$((i + 5))
+    done
+    return 1
+}
+
+if ! docker_ok; then
     if [ -f "$MAINT_LOCK" ]; then
-        log "colima-Guard: VM down, aber Wartungs-Lock aktiv ($MAINT_LOCK) — kein Auto-Start"
+        log "colima-Guard: docker unerreichbar, aber Wartungs-Lock aktiv ($MAINT_LOCK) — keine Recovery"
         exit 0
     fi
+
+    # Parallel-Schutz: nur ein Recovery-Lauf gleichzeitig (mkdir ist atomar).
+    # Verwaisten Lock (>10 Min, z.B. nach gekilltem Lauf) als stale entfernen.
+    if [ -d "$COLIMA_HEAL_LOCK" ]; then
+        if [ -n "$(find "$COLIMA_HEAL_LOCK" -maxdepth 0 -mmin +10 2>/dev/null)" ]; then
+            log "colima-Guard: verwaister Heal-Lock (>10min) — entferne"
+            rmdir "$COLIMA_HEAL_LOCK" 2>/dev/null || true
+        else
+            log "colima-Guard: Recovery laeuft bereits (Lock) — ueberspringe diesen Lauf"
+            exit 0
+        fi
+    fi
+    mkdir "$COLIMA_HEAL_LOCK" 2>/dev/null || { log "colima-Guard: konnte Heal-Lock nicht setzen — ueberspringe"; exit 0; }
+    trap 'rmdir "$COLIMA_HEAL_LOCK" 2>/dev/null || true' EXIT
+
     FAILS=$(cat "$COLIMA_FAIL_TRACKER" 2>/dev/null || echo 0)
     case "$FAILS" in '' | *[!0-9]*) FAILS=0 ;; esac
     if [ "$FAILS" -ge "$COLIMA_MAX_FAILS" ]; then
-        log "colima-Guard: VM down + bereits $FAILS Fehlstarts — KEIN weiterer Auto-Start, manueller Eingriff noetig (z.B. in_use_by-Symlink loeschen, dann '$COLIMA_FAIL_TRACKER' entfernen)"
-        send_notification "colima-VM down + $FAILS Fehlstarts auf mana-server — manueller Eingriff noetig" "urgent"
+        log "colima-Guard: docker unerreichbar + bereits $FAILS Recovery-Fehlschlaege — KEIN weiterer Auto-Eingriff (manuell pruefen: in_use_by-Symlink? danach '$COLIMA_FAIL_TRACKER' loeschen)"
+        send_notification "colima auf mana-server unerreichbar + $FAILS Recovery-Fehlschlaege — manueller Eingriff noetig" "urgent"
         exit 1
     fi
-    log "colima-Guard: VM ist DOWN — starte colima (Versuch $((FAILS + 1))/$COLIMA_MAX_FAILS)"
-    if colima start >/dev/null 2>&1; then
-        log "colima-Guard: colima start erfolgreich — VM wieder oben"
-        send_notification "colima-VM war down, automatisch neu gestartet (mana-server)" "high"
-        rm -f "$COLIMA_FAIL_TRACKER"
-    else
-        echo $((FAILS + 1)) >"$COLIMA_FAIL_TRACKER"
-        log "colima-Guard: colima start FEHLGESCHLAGEN (Fehlstart $((FAILS + 1))/$COLIMA_MAX_FAILS)"
-        exit 1
+
+    # Schritt 1 (sanft): haengenden SSH-Mux sauber beenden, kurz auf Reprime
+    # warten. Greift, wenn nur der Mux halb-offen klemmt.
+    if [ -S "$COLIMA_SSH_SOCK" ]; then
+        log "colima-Guard: docker unerreichbar — Schritt 1 (sanft): SSH-Mux beenden + reprime"
+        ssh -F /dev/null -O exit -S "$COLIMA_SSH_SOCK" _ >/dev/null 2>&1 || true
+        if wait_docker 15; then
+            log "colima-Guard: sanfte Heilung erfolgreich — docker wieder erreichbar"
+            send_notification "colima-SSH-Mux hing fest, sanft geheilt (mana-server)" "high"
+            rm -f "$COLIMA_FAIL_TRACKER"
+        fi
     fi
+
+    # Schritt 2 (hart): colima restart — rebuildet Mux + Forwards zuverlaessig;
+    # Container kommen per restart-policy zurueck. Deckt wedged-VM UND echtes
+    # VM-down ab.
+    if ! docker_ok; then
+        log "colima-Guard: Schritt 2 (hart): colima restart (Versuch $((FAILS + 1))/$COLIMA_MAX_FAILS)"
+        colima restart >/dev/null 2>&1 || true
+        if wait_docker 180; then
+            log "colima-Guard: colima restart erfolgreich — docker wieder erreichbar"
+            send_notification "colima auf mana-server war down/wedged, per restart geheilt" "high"
+            rm -f "$COLIMA_FAIL_TRACKER"
+        else
+            echo $((FAILS + 1)) >"$COLIMA_FAIL_TRACKER"
+            log "colima-Guard: colima restart FEHLGESCHLAGEN (Fehlschlag $((FAILS + 1))/$COLIMA_MAX_FAILS)"
+            send_notification "colima-Recovery auf mana-server fehlgeschlagen (Versuch $((FAILS + 1))/$COLIMA_MAX_FAILS)" "urgent"
+            exit 1
+        fi
+    fi
+
+    rmdir "$COLIMA_HEAL_LOCK" 2>/dev/null || true
+    trap - EXIT
 else
     rm -f "$COLIMA_FAIL_TRACKER" 2>/dev/null || true
 fi
 # --- Ende colima-Guard ----------------------------------------------------
 
-# Check if docker is running
-if ! docker info >/dev/null 2>&1; then
-    log "ERROR: Docker is not running"
-    exit 1
-fi
+# Ab hier ist die Runtime erreichbar (vom Guard oben sichergestellt).
+docker_ok || { log "ERROR: Docker weiterhin unerreichbar nach Guard — Abbruch"; exit 1; }
 
 [ "$DRY_RUN" = "1" ] && log "DRY_RUN aktiv — es wird nichts veraendert, nur geloggt."
 
