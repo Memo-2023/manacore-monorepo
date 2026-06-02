@@ -130,7 +130,11 @@ def _load_pipeline():
             MODEL_ID,
             torch_dtype=dtype,
         )
-        _pipeline.to("cuda")
+        # CPU-Offload statt resident (.to("cuda")): nur die aktive Komponente
+        # liegt je Generierung kurz auf der GPU (~8 GB Peak statt ~15 GB
+        # resident) -> koexistiert mit Ollama/TTS/STT auf der geteilten 3090,
+        # kein VRAM-Paging. Misst ~10 s warm statt >220 s (Paging) vorher.
+        _pipeline.enable_model_cpu_offload()
     elif pipeline_class == "FluxPipeline":
         from diffusers import FluxPipeline
         _pipeline = FluxPipeline.from_pretrained(
