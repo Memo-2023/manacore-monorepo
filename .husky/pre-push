@@ -5,6 +5,13 @@
 #
 # Skip with: git push --no-verify (not recommended)
 
+# Ops-Checkouts ohne installierte Dependencies sollen pushen können — Check
+# sauber überspringen statt hart zu failen. Mit Deps läuft er wie gehabt.
+if ! command -v pnpm >/dev/null 2>&1 || [ ! -d node_modules ]; then
+  echo "⏭  pre-push svelte-check übersprungen — kein node_modules/pnpm (Ops-Checkout). 'pnpm install' aktiviert den Check."
+  exit 0
+fi
+
 echo "🔍 Running svelte-check..."
 cd apps/mana/apps/web && pnpm check 2>&1 | tail -5
 

@@ -1,1 +1,9 @@
+# Ops-Checkouts ohne installierte Dependencies (kein `pnpm install`, z. B. nur
+# Config-/Service-Edits) sollen committen können — Hook sauber überspringen
+# statt hart zu failen. Mit Deps läuft das Gate wie gehabt.
+if ! command -v pnpm >/dev/null 2>&1 || [ ! -d node_modules ]; then
+  echo "⏭  pre-commit übersprungen — kein node_modules/pnpm (Ops-Checkout). 'pnpm install' aktiviert die Gates."
+  exit 0
+fi
+
 pnpm exec lint-staged
