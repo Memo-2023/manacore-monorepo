@@ -501,4 +501,9 @@ ingress:
   - hostname: wunsch.mana.how
     service: http://localhost:3145
 
+  # Kollekta — persönliche Medien-Bibliothek (Code/kollekta/), local-first
+  # event-sync gegen sync2. Host-Port 3148 (mana/docs/PORTS.md).
+  - hostname: kollekta.mana.how
+    service: http://localhost:3148
+
   - service: http_status:404
