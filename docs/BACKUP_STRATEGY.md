@@ -151,3 +151,21 @@ docker stop cards-postgres-restore-test
 - `mana/docs/PLAN.md` § Backup-Strategy
 - `scripts/mac-mini/backup-databases.sh` — der eigentliche Code
 - `~/Library/LaunchAgents/com.mana.backup-databases.plist` — LaunchD-Job
+
+## Update 2026-06-03 — Off-Site aktiv, MinIO-Backup repariert
+
+Stand korrigiert (vorher oben „heute noch kein Off-Site / Phase 2"):
+
+- **MinIO-Objekt-Backup (`backup-objects.sh`) hatte sein `x`-Bit verloren** und
+  wurde von `backup-databases.sh` seit ~2026-05-31 mit WARN übersprungen (Uploads
+  ungesichert). Fix: `chmod +x` committet (`c8c4752ba`, nach GitHub gepusht) — läuft
+  seither wieder nächtlich.
+- **Off-Site (Zweitmaschine im LAN) ist LIVE.** `offsite_mirror` spiegelt die täglichen
+  Dumps AES-256-verschlüsselt auf die GPU-Box (`tills@192.168.178.11`,
+  `C:/mana/backups/postgres`). Blocker war: mana-server-Pubkey dort nicht autorisiert.
+  Behoben am 2026-06-03 — `id_ed25519` (`mana-server-deploy`) in der GPU-Box
+  `C:\ProgramData\ssh\administrators_authorized_keys` eingetragen (Windows: Admin-User
+  → administrators-File; ACL danach wieder hart read-only). End-to-end verifiziert.
+- **DB-Restore verifiziert** (chorportal-Dump → Wegwerf-DB, 84 Lieder, 0 Fehler).
+
+Offen bleibt echtes geografisches Off-Site (Cloud/R2/B2) — weiterhin Phase 2.
