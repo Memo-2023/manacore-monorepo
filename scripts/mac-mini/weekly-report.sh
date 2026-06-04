@@ -26,9 +26,16 @@ if [ -f "$PROJECT_ROOT/.env.notifications" ]; then
     source "$PROJECT_ROOT/.env.notifications"
 fi
 
-# Load env for database password
+# Nur die benoetigten Telegram-Vars aus .env.macmini ziehen — NICHT `source`n.
+# .env.macmini enthaelt mehrzeilige PEM-Werte (JWT_PUBLIC_KEY,
+# MANA_AI_PUBLIC_KEY_PEM); naives `source` interpretiert deren Folgezeilen als
+# Befehle ("PUBLIC: command not found") und der Job stirbt mit Exit 127.
 if [ -f "$PROJECT_ROOT/.env.macmini" ]; then
-    source "$PROJECT_ROOT/.env.macmini"
+    for _v in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID; do
+        _val=$(grep -E "^${_v}=" "$PROJECT_ROOT/.env.macmini" | head -1 | cut -d= -f2-)
+        [ -n "$_val" ] && export "${_v}=${_val}"
+    done
+    unset _v _val
 fi
 
 log() {

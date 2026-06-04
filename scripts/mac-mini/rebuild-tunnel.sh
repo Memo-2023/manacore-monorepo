@@ -52,7 +52,12 @@ set -euo pipefail
 
 CLOUDFLARED=/opt/homebrew/bin/cloudflared
 TUNNEL_NAME="mana-server"
-REPO_CONFIG="$HOME/projects/managarten/cloudflared-config.yml"
+# SOT der Ingress-Config ist seit 2026-06 mana-platform-deploy (von tunnel-
+# reconcile gepflegt), NICHT mehr managarten/cloudflared-config.yml (veraltet).
+# ACHTUNG: das ist ein pull-only git-Klon — Schritt 5 (Patchen mit neuer
+# Tunnel-ID) dirtied ihn; bei einem echten Full-Rebuild die neue Tunnel-ID
+# danach in die mana-Repo committen, sonst stallt der naechste git pull.
+REPO_CONFIG="$HOME/projects/mana-platform-deploy/infrastructure/cloudflared-config.yml"
 CLOUDFLARED_DIR="$HOME/.cloudflared"
 LOCAL_CONFIG="$CLOUDFLARED_DIR/config.yml"
 PLIST_FILE="$HOME/Library/LaunchAgents/com.cloudflare.cloudflared.plist"
