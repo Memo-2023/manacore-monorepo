@@ -50,20 +50,29 @@ Der Mini läuft über Ethernet (en0); WiFi (en1, 192.168.1.196) ist zusätzlich 
 
 ---
 
-## 2. Rest-Checkliste
+## 1c. Monitoring konsolidiert: 5 → 2 ✅ (4.6.)
 
-### 🟡 Niedrig
-- [ ] **Monitoring-Konsolidierung (bewusst NICHT im Sweep gemacht).** Es gibt 5 teils
-  überlappende Monitore: `ensure-containers` (300s, Container+colima-Guard),
-  `health-check` (300s, Service-Sweep+Notify), `server-health` (900s, legt
-  `till/mana-ops`-Issues an — **läuft, nicht anfassen**), `ssd-check`, `disk-check`
-  (900s). Ein Zusammenführen ist ein eigener, sorgfältiger Schritt — **kann ich als
-  fokussiertes Folge-Projekt machen**, nicht nebenbei.
-- [ ] **`mana-server-health-cron.sh` Exit 127 im Handlauf** — braucht vermutlich ein
-  Tool/Token, das nur im launchd-Kontext da ist. Im Betrieb legt es Issues an (HTTP
-  201), also funktional. Bei Gelegenheit Env-Abhängigkeit dokumentieren.
+Die fünf überlappenden Monitore sind jetzt **zwei mit klaren Rollen**:
+- **Enforcer:** `com.mana.ensure-containers` (300s) — heilt colima+Container aktiv. Unverändert.
+- **Reporter:** `com.mana.server-health` (900s) — `mana-server-health.sh full`,
+  meldet via Forgejo-Issues (`till/mana-ops`). Erweitert um die einzigartigen
+  Checks der alten Reporter: **Public-Hostname-Sweep** (alle ~115 CF-Routen),
+  **Disk-Schwellen** (80/90 %), **SSD-Mount+Symlinks** (Layer 5/6/7).
+- **Stillgelegt** (reversibel, `.retired-20260604.bak`): `com.mana.health-check`,
+  `com.mana.disk-check`, `com.mana.ssd-check`.
 
-### ℹ️ Beobachten / kein Handlungsbedarf
+Dabei mitgefixt:
+- **Flapping behoben** — `probe_vm` nutzt jetzt `docker info` statt `colima status`
+  (das lügt/flappt) + HTTP-Retry gegen Tunnel-Reload-Blips. Vorher filete der
+  Reporter bei jedem Reload Falsch-Issues. (mana `b818eb2`)
+- **6 tote Ingress-Routen entfernt** (vom Sweep aufgedeckt): quotes/quotess
+  (kein DNS), viadocu.mana.how-Web (AASA-Route bleibt!), api/playground/cardecky.com
+  (502/keine Antwort). Tunnel reloaded auf 120 Hosts. (mana `6d1f9cb`)
+- **Verloren (bewusst):** disk-check's Emergency-`docker prune` bei 90 % +
+  node_modules-auto-rm (Enforcer-Aufgabe; Disk bei 17/32 %, wöchentl. docker-cleanup
+  deckt Routine). Falls gewünscht → in den Enforcer.
+
+## 2. Beobachten / kein Handlungsbedarf
 - **pelias-Container** (gestoppt): **bleiben** — Abhängigkeit von `mana-discover`
   (im Aufbau), nicht stillgelegt. Disk ist entspannt (2,6 Ti frei).
 - **colima-RAM:** 12 GiB von 16 GB Host, 98 Container, Last ~2. Bei Swap-Druck in
