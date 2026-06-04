@@ -203,62 +203,6 @@ services:
       retries: 3
       start_period: 45s
 
-  mana-llm:
-    build:
-      context: ../mana/services/mana-llm
-      dockerfile: Dockerfile
-    container_name: mana-service-llm
-    restart: unless-stopped
-    # Tier-3 right-size 2026-04-28: live RSS ~46 MiB (18%). The service
-    # is a thin OpenAI-compatible router around the GPU-box Ollama —
-    # all heavy LLM work happens upstream, this container just proxies.
-    # 128m is 2.5× headroom for streaming response buffers.
-    mem_limit: 128m
-    # Kern (redis) lebt in Projekt mana-core, erreichbar übers Netz.
-    # Ollama lives on the Windows GPU box at 192.168.178.11:11434, but
-    # Colima containers can't reach the LAN range — the entire
-    # 192.168.178.0/24 subnet gets synthesized RST from inside any
-    # container, even though the macOS host routes there fine. The
-    # gpu-proxy LaunchAgent on the Mac Mini host (com.mana.gpu-proxy,
-    # see /Users/mana/gpu-proxy.py) bridges 127.0.0.1:13434 → GPU
-    # box's 11434, so we go through host.docker.internal:13434 to
-    # reach Ollama. Without this hop the local mana-llm starts
-    # cleanly but reports an empty model list and every chat
-    # completion fails with "All connection attempts failed", which
-    # cascades into voice quick-add silently degrading to its no-LLM
-    # fallback for everyone hitting the local stack.
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      PORT: 3025
-      LOG_LEVEL: info
-      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:13434}
-      OLLAMA_DEFAULT_MODEL: ${OLLAMA_MODEL:-gemma3:12b}
-      OLLAMA_TIMEOUT: 120
-      REDIS_URL: redis://redis:6379
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-      GROQ_API_KEY: ${GROQ_API_KEY:-}
-      TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
-      GOOGLE_DEFAULT_MODEL: gemini-2.0-flash
-      # Direct providers (added 2026-05-14, option D — sowohl direkt als auch
-      # OpenRouter). Leer-Werte werden vom Router still übersprungen.
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL:-gpt-4o-mini}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      ANTHROPIC_DEFAULT_MODEL: ${ANTHROPIC_DEFAULT_MODEL:-claude-sonnet-4-5}
-      AUTO_FALLBACK_ENABLED: "true"
-      OLLAMA_MAX_CONCURRENT: 5
-      CORS_ORIGINS: https://playground.mana.how,https://mana.how,https://chat.mana.how,https://manawald.mana.how,http://localhost:3090
-    ports:
-      - "3025:3025"
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3025/health')"]
-      interval: 120s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
   mana-api:
     build:
       context: .
