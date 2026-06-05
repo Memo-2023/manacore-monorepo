@@ -6,8 +6,6 @@ export * from './analytics';
 export { generateICalendar, downloadICalendar } from './ical-export';
 export {
 	expandRule,
-	habitScheduleToRRule,
-	rruleToHabitSchedule,
 	materializeRecurringBlocks,
 	regenerateForBlock,
 	cleanupFutureInstances,

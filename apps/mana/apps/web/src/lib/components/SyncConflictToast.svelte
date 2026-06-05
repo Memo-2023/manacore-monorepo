@@ -43,7 +43,6 @@
 		transactions: 'Transaktion',
 		cards: 'Karte',
 		cardDecks: 'Kartendeck',
-		habits: 'Gewohnheit',
 		documents: 'Dokument',
 		links: 'Link',
 		meals: 'Mahlzeit',

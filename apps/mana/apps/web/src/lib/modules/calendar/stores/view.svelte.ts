@@ -27,7 +27,6 @@ let visibleBlockTypes = $state<Set<TimeBlockType>>(
 	new Set([
 		'event',
 		'task',
-		'habit',
 		'timeEntry',
 		'focus',
 		'break',

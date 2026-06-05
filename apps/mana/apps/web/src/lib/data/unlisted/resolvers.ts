@@ -16,9 +16,7 @@
 
 import { db } from '$lib/data/database';
 import { decryptRecord } from '$lib/data/crypto';
-import { mediaFileUrl } from '$lib/modules/website/upload';
 import type { LocalEvent } from '$lib/modules/calendar/types';
-import type { LocalLibraryEntry } from '$lib/modules/library/types';
 import type { LocalTimeBlock } from '$lib/data/time-blocks/types';
 import type { LocalAugurEntry } from '$lib/modules/augur/types';
 import type { LocalLast } from '$lib/modules/lasts/types';
@@ -49,8 +47,6 @@ export async function buildUnlistedBlob(
 	switch (collection) {
 		case 'events':
 			return buildEventBlob(recordId);
-		case 'libraryEntries':
-			return buildLibraryEntryBlob(recordId);
 		case 'augurEntries':
 			return buildAugurEntryBlob(recordId);
 		case 'lasts':
@@ -113,45 +109,6 @@ async function buildEventBlob(recordId: string): Promise<Record<string, unknown>
 		endTime,
 		isAllDay,
 		timezone,
-	};
-}
-
-/**
- * Library entry → snapshot blob.
- *
- * Whitelist: title, kind, creators, year, coverUrl, rating.
- *
- * NOT inlined:
- *   - review        (free-text, often very personal)
- *   - tags, genres  (organisational metadata, not content)
- *   - status        (in-progress is private detail)
- *   - startedAt / completedAt / isFavorite / times (reading habits)
- *   - details.*     (current-page progress, episode tracker, etc.)
- *   - originalTitle (fine in theory but skip for noise reduction)
- *   - externalIds   (ISBN/TMDB linkage — useful only for re-import)
- */
-async function buildLibraryEntryBlob(recordId: string): Promise<Record<string, unknown>> {
-	const raw = await db.table<LocalLibraryEntry>('libraryEntries').get(recordId);
-	if (!raw || raw.deletedAt) {
-		throw new RecordNotFoundError('libraryEntries', recordId);
-	}
-
-	const decrypted = (await decryptRecord('libraryEntries', { ...raw })) as LocalLibraryEntry;
-
-	// Resolve the cover to an absolute URL: prefer coverUrl (already a
-	// full http(s) URL the user pasted in), otherwise transform a
-	// mana-media id into the canonical media-host URL.
-	const coverUrl =
-		decrypted.coverUrl ??
-		(decrypted.coverMediaId ? mediaFileUrl(decrypted.coverMediaId, 'medium') : null);
-
-	return {
-		title: decrypted.title,
-		kind: decrypted.kind,
-		creators: decrypted.creators ?? [],
-		year: decrypted.year ?? null,
-		coverUrl,
-		rating: decrypted.rating ?? null,
 	};
 }
 

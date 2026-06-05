@@ -26,7 +26,6 @@
 		"event_task_created": "Tasks erstellt",
 		"event_drink_logged": "Getraenk geloggt",
 		"event_meal_logged": "Mahlzeit geloggt",
-		"event_habit_logged": "Habit geloggt",
 		"event_journal_entry_created": "Journal-Eintrag",
 		"event_note_created": "Notiz erstellt",
 		"event_place_visited": "Ort besucht",

@@ -10,7 +10,7 @@
                       legacy per-module carousels (e.g. /todo) use.
 
     variant="fill"  — fills the main content area. Sub-routes
-                      (/picture, /picture/generate, /library, …) use
+                      (/picture, /picture/generate, …) use
                       this. Back-button replaces the close button when
                       a backHref is provided. No carousel window
                       actions.

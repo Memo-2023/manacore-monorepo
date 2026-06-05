@@ -261,7 +261,7 @@ The companion is a **second actor** that works alongside the human in every modu
 - **Scene lens** — workbench scenes can bind to an agent via `scene.viewingAsAgentId` (context menu → "An Agent binden…"). Pure UI lens, not a data-scope change. `SceneAppBar` shows the agent avatar on bound scene tabs.
 - **Workbench timeline** — `/ai-workbench` renders every AI-attributed event grouped by mission iteration with per-**agent** filter, per-module, per-mission. Each bucket header shows agent avatar + name + mission title. Per-bucket **Revert button** undoes the iteration's writes via `data/ai/revert/` (TaskCreated → delete, TaskCompleted → uncomplete, etc., newest-first). Separate **"Datenzugriff"** tab exposes the server-side decrypt audit (for missions with Key-Grants).
 
-### Tool Coverage (75 tools, 22 modules)
+### Tool Coverage (68 tools, 20 modules)
 
 Agents interact with the app through tools — each one either auto (executes silently during reasoning) or propose (creates a Proposal card the user must approve). Source of truth: `AI_TOOL_CATALOG` in `@mana/shared-ai/src/tools/schemas.ts` — both webapp policy (`src/lib/data/ai/policy.ts`) and server-side planner (`services/mana-ai/src/planner/tools.ts`) derive from it automatically, so drift is structurally impossible.
 
@@ -276,7 +276,6 @@ Agents interact with the app through tools — each one either auto (executes si
 | news-research | `research_news` | — |
 | articles | `save_article`, `archive_article`, `tag_article`, `add_article_highlight`, `import_articles_from_urls` (auto) | `list_articles` |
 | journal | `create_journal_entry` | — |
-| habits | `create_habit`, `log_habit` | `get_habits` |
 | contacts | `create_contact` | `get_contacts` |
 | quiz | `create_quiz`, `update_quiz`, `add_quiz_question`, `update_quiz_question`, `delete_quiz_question` | `list_quizzes`, `get_quiz_questions`, `get_quiz_stats` |
 | goals | `create_goal`, `pause_goal`, `resume_goal`, `complete_goal` | `list_goals`, `get_goal_progress` |
@@ -287,7 +286,6 @@ Agents interact with the app through tools — each one either auto (executes si
 | times | `start_timer`, `stop_timer` | `get_time_stats`, `get_timer_status`, `list_projects` |
 | wetter | — | `get_weather`, `get_rain_forecast` |
 | invoices | `create_invoice`, `mark_invoice_paid` | `list_invoices`, `get_invoice_stats` |
-| library | `create_library_entry`, `update_library_entry_status`, `rate_library_entry` | `list_library_entries` |
 | writing | `create_draft`, `generate_draft_content`, `refine_draft_selection`, `set_draft_status`, `save_draft_as_article` | `list_drafts`, `get_draft`, `list_writing_styles` |
 | comic | `create_comic_story`, `generate_comic_panel`, `create_comic_character`, `generate_character_variant`, `pin_character_variant` | `list_comic_stories`, `list_comic_characters` |
 
@@ -300,7 +298,7 @@ Pre-configured starter-kits at `/agents/templates` — two sections:
 - **Agent-Templates** (with AI): Recherche-Agent, Kontext-Agent, Today-Agent
 - **Workbench-Templates** (no AI): Calmness, Fitness, Deep Work
 
-Each template bundles: optional agent + optional scene layout + optional starter missions (paused) + optional per-module seeds. Template shape: `WorkbenchTemplate` in `@mana/shared-ai/src/agents/templates/types.ts`. Applicator: `src/lib/data/ai/agents/apply-template.ts`. Seed-handler registry: `src/lib/data/ai/agents/seed-registry.ts` — modules register via side-effect imports in `missions/setup.ts`. Current handlers: meditate, habits, goals. Plan: [`docs/plans/workbench-templates.md`](../../docs/plans/workbench-templates.md).
+Each template bundles: optional agent + optional scene layout + optional starter missions (paused) + optional per-module seeds. Template shape: `WorkbenchTemplate` in `@mana/shared-ai/src/agents/templates/types.ts`. Applicator: `src/lib/data/ai/agents/apply-template.ts`. Seed-handler registry: `src/lib/data/ai/agents/seed-registry.ts` — modules register via side-effect imports in `missions/setup.ts`. Current handlers: meditate, goals. Plan: [`docs/plans/workbench-templates.md`](../../docs/plans/workbench-templates.md).
 
 Full architecture (Planner prompt + parser in `@mana/shared-ai`, server-side runner, Postgres actor column, materialized snapshots, Multi-Agent gating, server-side web-research, Prometheus metrics + status.mana.how integration): [`docs/architecture/COMPANION_BRAIN_ARCHITECTURE.md`](../../docs/architecture/COMPANION_BRAIN_ARCHITECTURE.md) §20 (AI Workbench) + §21 (Mission Grants) + §22 (Multi-Agent Workbench).
 

@@ -9,8 +9,6 @@
 		"section_breakdown": "Distribuzione del tempo",
 		"empty_no_data": "Nessun dato nel periodo",
 		"section_daily": "Distribuzione giornaliera",
-		"section_heatmap": "Attività delle abitudini (90 giorni)",
-		"heatmap_cell_title": "{date}: {count} abitudini",
 		"section_plan_vs_reality": "Piano vs realtà",
 		"adherence_scheduled": "Pianificato",
 		"adherence_completed": "Completato",

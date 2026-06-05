@@ -50,18 +50,7 @@ test.describe('Mana app smoke test', () => {
 		// Wait for the notes page to load
 		await page.waitForTimeout(2000);
 
-		// ─── 4. Navigate to Habits ──────────────────────────────
-		// Habits has guest seed data (Coffee, Water, Workout) so
-		// we can verify the seed registry actually works.
-		await page.goto('/habits', { waitUntil: 'networkidle' });
-		await dismissWelcomeModal(page);
-
-		// If guest seeds are working, we should see the preset habits.
-		// The heading or stats row should render within a reasonable time.
-		const habitsContent = page.locator('.habits-page, [data-testid="habits"]');
-		await expect(habitsContent.first()).toBeVisible({ timeout: 15_000 });
-
-		// ─── 5. Navigate to Calculator (stateless module) ───────
+		// ─── 4. Navigate to Calculator (stateless module) ───────
 		// Calc is always available and doesn't need any data — good
 		// sanity check that the module routing itself works.
 		await page.goto('/calc', { waitUntil: 'networkidle' });
@@ -109,7 +98,6 @@ test.describe('Mana app smoke test', () => {
 			'/calendar',
 			'/contacts',
 			'/notes',
-			'/habits',
 			'/calc',
 			'/chat',
 			'/body',

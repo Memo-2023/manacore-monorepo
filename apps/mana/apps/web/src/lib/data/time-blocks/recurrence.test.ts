@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	expandRule,
-	habitScheduleToRRule,
-	rruleToHabitSchedule,
-	expandTemplatesVirtually,
-} from './recurrence';
+import { expandRule, expandTemplatesVirtually } from './recurrence';
 import type { LocalTimeBlock } from './types';
 
 describe('recurrence engine', () => {
@@ -67,52 +62,6 @@ describe('recurrence engine', () => {
 
 			const dates = expandRule('RRULE:FREQ=WEEKLY;INTERVAL=2', dtstart, rangeStart, rangeEnd);
 			expect(dates.length).toBe(2); // every other week
-		});
-	});
-
-	describe('habitScheduleToRRule', () => {
-		it('should return DAILY for all 7 days', () => {
-			const result = habitScheduleToRRule({ days: [0, 1, 2, 3, 4, 5, 6] });
-			expect(result).toBe('RRULE:FREQ=DAILY');
-		});
-
-		it('should return WEEKLY with BYDAY for specific days', () => {
-			const result = habitScheduleToRRule({ days: [1, 3, 5] }); // Mon, Wed, Fri
-			expect(result).toBe('RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR');
-		});
-
-		it('should handle weekends only', () => {
-			const result = habitScheduleToRRule({ days: [0, 6] }); // Sun, Sat
-			expect(result).toBe('RRULE:FREQ=WEEKLY;BYDAY=SU,SA');
-		});
-
-		it('should handle single day', () => {
-			const result = habitScheduleToRRule({ days: [1] }); // Monday
-			expect(result).toBe('RRULE:FREQ=WEEKLY;BYDAY=MO');
-		});
-	});
-
-	describe('rruleToHabitSchedule', () => {
-		it('should parse DAILY as all 7 days', () => {
-			const result = rruleToHabitSchedule('RRULE:FREQ=DAILY');
-			expect(result).toEqual({ days: [0, 1, 2, 3, 4, 5, 6] });
-		});
-
-		it('should parse WEEKLY with BYDAY', () => {
-			const result = rruleToHabitSchedule('RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR');
-			expect(result).toEqual({ days: [1, 3, 5] });
-		});
-
-		it('should round-trip habitSchedule → rrule → habitSchedule', () => {
-			const original = { days: [0, 2, 4] }; // Sun, Tue, Thu
-			const rrule = habitScheduleToRRule(original);
-			const parsed = rruleToHabitSchedule(rrule);
-			expect(parsed).toEqual(original);
-		});
-
-		it('should return null for unparseable rule', () => {
-			const result = rruleToHabitSchedule('RRULE:FREQ=MONTHLY');
-			expect(result).toBeNull();
 		});
 	});
 

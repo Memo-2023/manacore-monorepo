@@ -29,15 +29,6 @@ vi.mock('$lib/data/database', () => ({
 vi.mock('$lib/modules/notes/queries', () => ({
 	toNote: vi.fn((local) => ({ ...local })),
 }));
-vi.mock('$lib/modules/library/queries', () => ({
-	toLibraryEntry: vi.fn((local) => ({
-		creators: [],
-		year: null,
-		rating: null,
-		review: null,
-		...local,
-	})),
-}));
 import { scopedGet, scopedForModule } from '$lib/data/scope';
 import { decryptRecords } from '$lib/data/crypto';
 import { db } from '$lib/data/database';
@@ -73,60 +64,6 @@ describe('resolveReference - note', () => {
 		mockDecryptRecords.mockResolvedValue([{ id: 'n1', title: '', content: 'body' }]);
 		const result = await resolveReference({ kind: 'note', targetId: 'n1', note: null });
 		expect(result?.sourceLabel).toBe('Notiz: Ohne Titel');
-	});
-});
-
-describe('resolveReference - library', () => {
-	it('shapes a book entry with creators + year + rating into the label', async () => {
-		mockScopedGet.mockResolvedValue({
-			id: 'l1',
-			kind: 'book',
-			title: 'Dune',
-			creators: ['Frank Herbert'],
-			year: 1965,
-			rating: 5,
-			review: 'Lebensbuch.',
-		});
-		mockDecryptRecords.mockResolvedValue([
-			{
-				id: 'l1',
-				kind: 'book',
-				title: 'Dune',
-				creators: ['Frank Herbert'],
-				year: 1965,
-				rating: 5,
-				review: 'Lebensbuch.',
-			},
-		]);
-		const result = await resolveReference({ kind: 'library', targetId: 'l1', note: null });
-		expect(result?.sourceLabel).toBe('Buch: Dune (von Frank Herbert, 1965, Rating: 5/5)');
-		expect(result?.content).toContain('Lebensbuch');
-	});
-
-	it('uses the empty body when there is no review', async () => {
-		mockScopedGet.mockResolvedValue({
-			id: 'l1',
-			kind: 'movie',
-			title: 'Arrival',
-			creators: [],
-			year: null,
-			rating: null,
-			review: null,
-		});
-		mockDecryptRecords.mockResolvedValue([
-			{
-				id: 'l1',
-				kind: 'movie',
-				title: 'Arrival',
-				creators: [],
-				year: null,
-				rating: null,
-				review: null,
-			},
-		]);
-		const result = await resolveReference({ kind: 'library', targetId: 'l1', note: null });
-		expect(result?.sourceLabel).toBe('Film: Arrival');
-		expect(result?.content).toBe('');
 	});
 });
 

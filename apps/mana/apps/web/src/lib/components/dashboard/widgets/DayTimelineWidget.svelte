@@ -2,7 +2,7 @@
 	/**
 	 * DayTimelineWidget — "Mein Tag" chronological timeline
 	 *
-	 * Shows all timeBlocks for today across all modules (events, tasks, habits, time entries).
+	 * Shows all timeBlocks for today across all modules (events, tasks, time entries).
 	 * The key showcase of the Unified Time Model.
 	 */
 
@@ -17,7 +17,6 @@
 		CalendarBlank,
 		CheckSquare,
 		Timer,
-		Heart,
 		Lightning,
 		Clock,
 		Barbell,
@@ -32,7 +31,6 @@
 		SunHorizon,
 		Presentation,
 	} from '@mana/shared-icons';
-	import { getIconComponent } from '@mana/shared-icons';
 	import { format } from 'date-fns';
 
 	const todayStr = new Date().toISOString().split('T')[0];
@@ -70,7 +68,6 @@
 		event: { icon: CalendarBlank, label: 'Termin' },
 		task: { icon: CheckSquare, label: 'Aufgabe' },
 		timeEntry: { icon: Timer, label: 'Zeiterfassung' },
-		habit: { icon: Heart, label: 'Habit' },
 		focus: { icon: Lightning, label: 'Fokus' },
 		break: { icon: Clock, label: 'Pause' },
 		body: { icon: Barbell, label: 'Training' },
@@ -151,10 +148,8 @@
 		<div class="space-y-1">
 			{#each displayedBlocks as block (block.id)}
 				{@const cfg = typeConfig[block.type] ?? typeConfig.event}
-				{@const habitIcon =
-					block.type === 'habit' && block.icon ? getIconComponent(block.icon) : null}
 				{@const duration = getBlockDuration(block)}
-				{@const Icon = habitIcon ?? cfg.icon}
+				{@const Icon = cfg.icon}
 				<div
 					class="flex items-start gap-2.5 rounded-lg p-2 transition-colors hover:bg-surface-hover"
 				>

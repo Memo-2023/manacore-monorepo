@@ -4,7 +4,7 @@
   Looks up title / icon / color from the app-registry by appId so every
   (app)/{appId}/+page.svelte can stay three lines:
 
-    <RoutePage appId="library">
+    <RoutePage appId="recipes">
       <ListView />
     </RoutePage>
 

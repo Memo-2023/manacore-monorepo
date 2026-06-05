@@ -68,15 +68,13 @@ export interface BranchingRule {
 
 // ─── Settings ───────────────────────────────────────────────
 
-export type AutoSyncTarget = 'contacts' | 'events' | 'feedback' | 'library' | 'space_member';
+export type AutoSyncTarget = 'contacts' | 'events' | 'feedback' | 'space_member';
 
 export interface AutoSyncConfig {
 	target: AutoSyncTarget;
 	/** Optional anchor — for `events` this is the eventId the response RSVPs to. */
 	targetId?: string;
 	mapping: Record<string, string>;
-	/** M7c — for `library`: which kind of media-entry to create. */
-	libraryKind?: 'book' | 'movie' | 'series' | 'comic';
 	/** M7c — for `space_member`: role to assign on invite (default 'member'). */
 	spaceMemberRole?: 'member' | 'admin';
 }

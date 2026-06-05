@@ -4,7 +4,7 @@
  * Dexie read + decryptRecords + module type converter) so we don't drag
  * the per-module store layer into the writing module.
  *
- * M5 scope: `article`, `note`, `library`, `url`. Other kinds
+ * M5 scope: `article`, `note`, `url`. Other kinds
  * (`kontext`, `goal`, `me-image`) fall through to `null` and are
  * silently skipped by the generations store — they are on the roadmap
  * but not required for M5 to be useful.
@@ -19,9 +19,7 @@ import { scopedGet, scopedForModule } from '$lib/data/scope';
 import { decryptRecords } from '$lib/data/crypto';
 import { db } from '$lib/data/database';
 import { toNote } from '$lib/modules/notes/queries';
-import { toLibraryEntry } from '$lib/modules/library/queries';
 import type { LocalNote } from '$lib/modules/notes/types';
-import type { LocalLibraryEntry } from '$lib/modules/library/types';
 import type { LocalMeImage } from '$lib/modules/profile/types';
 import type { LocalGoal } from '$lib/companion/goals/types';
 import type { DraftReference } from '../types';
@@ -59,41 +57,6 @@ async function resolveNote(id: string): Promise<Omit<ResolvedReference, 'kind' |
 		sourceLabel: `Notiz: ${note.title || 'Ohne Titel'}`,
 		title: note.title || 'Notiz',
 		content: truncate(note.content ?? ''),
-	};
-}
-
-async function resolveLibrary(
-	id: string
-): Promise<Omit<ResolvedReference, 'kind' | 'note'> | null> {
-	const local = await scopedGet<LocalLibraryEntry>('libraryEntries', id);
-	if (!local || local.deletedAt) return null;
-	const [decrypted] = await decryptRecords('libraryEntries', [local]);
-	if (!decrypted) return null;
-	const entry = toLibraryEntry(decrypted);
-	const kindLabel =
-		entry.kind === 'book'
-			? 'Buch'
-			: entry.kind === 'movie'
-				? 'Film'
-				: entry.kind === 'series'
-					? 'Serie'
-					: entry.kind === 'comic'
-						? 'Comic'
-						: entry.kind;
-	const parts: string[] = [];
-	if (entry.creators.length) parts.push(`von ${entry.creators.join(', ')}`);
-	if (entry.year) parts.push(`${entry.year}`);
-	if (entry.rating !== null) parts.push(`Rating: ${entry.rating}/5`);
-	const meta = parts.length ? ` (${parts.join(', ')})` : '';
-
-	// Use the user's review as the body if present — it's the user's own
-	// distilled take; otherwise fall back to the title+metadata line so
-	// the reference still tells the model what the user engaged with.
-	const body = entry.review ? `Meine Notiz zu diesem ${kindLabel}:\n${entry.review}` : '';
-	return {
-		sourceLabel: `${kindLabel}: ${entry.title}${meta}`,
-		title: entry.title,
-		content: truncate(body),
 	};
 }
 
@@ -178,11 +141,6 @@ export async function resolveReference(ref: DraftReference): Promise<ResolvedRef
 			if (!ref.targetId) return null;
 			const base = await resolveNote(ref.targetId);
 			return base ? { ...base, kind: 'note', note: ref.note ?? null } : null;
-		}
-		case 'library': {
-			if (!ref.targetId) return null;
-			const base = await resolveLibrary(ref.targetId);
-			return base ? { ...base, kind: 'library', note: ref.note ?? null } : null;
 		}
 		case 'url': {
 			const base = resolveUrl(ref);

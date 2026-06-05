@@ -18,10 +18,10 @@
 		onchange: (patch: Partial<FormSettings>) => void;
 	} = $props();
 
-	// M7a contacts, M7b events, M7c library + space_member. feedback bleibt
+	// M7a contacts, M7b events, M7c space_member. feedback bleibt
 	// als Type-Wert für Legacy-Daten erhalten, taucht aber nicht im UI auf:
 	// architektonischer Mismatch (zentraler public-hub statt Owner-Daten).
-	const SUPPORTED_TARGETS: AutoSyncTarget[] = ['contacts', 'events', 'library', 'space_member'];
+	const SUPPORTED_TARGETS: AutoSyncTarget[] = ['contacts', 'events', 'space_member'];
 
 	const events$ = useAllEvents();
 	const events = $derived(events$.value);
@@ -85,45 +85,11 @@
 	const GUEST_KEYS = ['name', 'email', 'phone', 'note', 'plusOnes'] as const;
 	type GuestKey = (typeof GUEST_KEYS)[number];
 
-	const LIBRARY_KEYS = ['title', 'creators', 'year', 'review'] as const;
-	type LibraryKey = (typeof LIBRARY_KEYS)[number];
-
-	function libraryKeyLabel(key: LibraryKey): string {
-		switch (key) {
-			case 'title':
-				return $_('forms.builder.autoSync.libraryKey.title', { default: 'Titel' });
-			case 'creators':
-				return $_('forms.builder.autoSync.libraryKey.creators', {
-					default: 'Autor:innen / Creator',
-				});
-			case 'year':
-				return $_('forms.builder.autoSync.libraryKey.year', { default: 'Jahr' });
-			case 'review':
-				return $_('forms.builder.autoSync.libraryKey.review', { default: 'Notiz' });
-		}
-	}
-
 	const SPACE_KEYS = ['email'] as const;
 	type SpaceKey = (typeof SPACE_KEYS)[number];
 
 	function spaceKeyLabel(key: SpaceKey): string {
 		return key === 'email' ? 'E-Mail' : key;
-	}
-
-	const LIBRARY_KINDS = ['book', 'movie', 'series', 'comic'] as const;
-	type LibraryKind = (typeof LIBRARY_KINDS)[number];
-
-	function libraryKindLabel(k: LibraryKind): string {
-		switch (k) {
-			case 'book':
-				return $_('forms.builder.autoSync.libraryKind.book', { default: 'Buch' });
-			case 'movie':
-				return $_('forms.builder.autoSync.libraryKind.movie', { default: 'Film' });
-			case 'series':
-				return $_('forms.builder.autoSync.libraryKind.series', { default: 'Serie' });
-			case 'comic':
-				return $_('forms.builder.autoSync.libraryKind.comic', { default: 'Comic' });
-		}
 	}
 
 	function guestKeyLabel(key: GuestKey): string {
@@ -148,9 +114,6 @@
 	const target = $derived<AutoSyncTarget | 'none'>(settings.autoSync?.target ?? 'none');
 	const targetId = $derived(settings.autoSync?.targetId ?? '');
 	const mapping = $derived(settings.autoSync?.mapping ?? {});
-	const libraryKind = $derived<LibraryKind>(
-		(settings.autoSync?.libraryKind as LibraryKind | undefined) ?? 'book'
-	);
 	const spaceMemberRole = $derived<'member' | 'admin'>(
 		settings.autoSync?.spaceMemberRole ?? 'member'
 	);
@@ -167,7 +130,6 @@
 				target: next,
 				mapping: {},
 				...(next === 'events' && targetId ? { targetId } : {}),
-				...(next === 'library' ? { libraryKind } : {}),
 				...(next === 'space_member' ? { spaceMemberRole } : {}),
 			},
 		});
@@ -178,16 +140,6 @@
 			autoSync: {
 				target: 'events',
 				targetId: eventId || undefined,
-				mapping,
-			},
-		});
-	}
-
-	function setLibraryKind(kind: LibraryKind) {
-		onchange({
-			autoSync: {
-				target: 'library',
-				libraryKind: kind,
 				mapping,
 			},
 		});
@@ -217,7 +169,6 @@
 				target: t,
 				mapping: next,
 				...(cfg?.targetId ? { targetId: cfg.targetId } : {}),
-				...(cfg?.libraryKind ? { libraryKind: cfg.libraryKind } : {}),
 				...(cfg?.spaceMemberRole ? { spaceMemberRole: cfg.spaceMemberRole } : {}),
 			},
 		});
@@ -450,15 +401,11 @@
 						? $_('forms.builder.autoSync.targetContacts', { default: 'Kontakt' })
 						: t === 'events'
 							? $_('forms.builder.autoSync.targetEvents', { default: 'Event-RSVP' })
-							: t === 'library'
-								? $_('forms.builder.autoSync.targetLibrary', {
-										default: 'Library-Eintrag',
+							: t === 'space_member'
+								? $_('forms.builder.autoSync.targetSpaceMember', {
+										default: 'Space-Einladung',
 									})
-								: t === 'space_member'
-									? $_('forms.builder.autoSync.targetSpaceMember', {
-											default: 'Space-Einladung',
-										})
-									: t}
+								: t}
 				</option>
 			{/each}
 		</select>
@@ -487,25 +434,6 @@
 					})}
 				</p>
 			{/if}
-		{/if}
-
-		{#if target === 'library'}
-			<label class="setting-row">
-				<span class="setting-label">
-					{$_('forms.builder.autoSync.libraryKindPicker', {
-						default: 'Welche Art von Eintrag?',
-					})}
-				</span>
-				<select
-					value={libraryKind}
-					onchange={(e) =>
-						setLibraryKind((e.currentTarget as HTMLSelectElement).value as LibraryKind)}
-				>
-					{#each LIBRARY_KINDS as k}
-						<option value={k}>{libraryKindLabel(k)}</option>
-					{/each}
-				</select>
-			</label>
 		{/if}
 
 		{#if target === 'space_member'}
@@ -550,19 +478,14 @@
 								default:
 									'Wähle für jedes Form-Feld, welches Gast-Feld es füllen soll. RSVPs werden auf "Zusage" gesetzt.',
 							})
-						: target === 'library'
-							? $_('forms.builder.autoSync.libraryHint', {
-									default:
-										'Mappe ein Form-Feld auf "Titel" — der Rest ist optional. Empfohlen: zusätzlich Autor:innen + Jahr.',
+						: target === 'space_member'
+							? $_('forms.builder.autoSync.spaceMemberMappingHint', {
+									default: 'Mappe genau ein Feld auf "E-Mail". Andere Felder werden ignoriert.',
 								})
-							: target === 'space_member'
-								? $_('forms.builder.autoSync.spaceMemberMappingHint', {
-										default: 'Mappe genau ein Feld auf "E-Mail". Andere Felder werden ignoriert.',
-									})
-								: $_('forms.builder.autoSync.contactsHint', {
-										default:
-											'Wähle für jedes Form-Feld, welches Kontakt-Feld es füllen soll. Leerlassen = ignorieren.',
-									})}
+							: $_('forms.builder.autoSync.contactsHint', {
+									default:
+										'Wähle für jedes Form-Feld, welches Kontakt-Feld es füllen soll. Leerlassen = ignorieren.',
+								})}
 				</p>
 				<div class="mapping-grid">
 					{#each ANSWER_FIELDS as f (f.id)}
@@ -579,10 +502,6 @@
 								{#if target === 'events'}
 									{#each GUEST_KEYS as gk}
 										<option value={gk}>{guestKeyLabel(gk)}</option>
-									{/each}
-								{:else if target === 'library'}
-									{#each LIBRARY_KEYS as lk}
-										<option value={lk}>{libraryKeyLabel(lk)}</option>
 									{/each}
 								{:else if target === 'space_member'}
 									{#each SPACE_KEYS as sk}

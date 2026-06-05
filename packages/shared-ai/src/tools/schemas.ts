@@ -526,47 +526,6 @@ export const AI_TOOL_CATALOG: readonly ToolSchema[] = [
 		],
 	},
 
-	// ── Habits ────────────────────────────────────────────────
-	{
-		name: 'create_habit',
-		module: 'habits',
-		description: 'Erstellt einen neuen Habit-Tracker. Gibt die ID des neuen Habits zurueck.',
-		defaultPolicy: 'propose',
-		parameters: [
-			{ name: 'title', type: 'string', description: 'Titel des Habits', required: true },
-			{ name: 'icon', type: 'string', description: 'Emoji-Icon', required: true },
-			{
-				name: 'color',
-				type: 'string',
-				description: 'Hex-Farbe (z.B. #EF4444)',
-				required: true,
-			},
-		],
-	},
-	{
-		name: 'log_habit',
-		module: 'habits',
-		description:
-			'Loggt eine Ausfuehrung eines existierenden Habits fuer heute. Optional mit Notiz.',
-		defaultPolicy: 'propose',
-		parameters: [
-			{ name: 'habitId', type: 'string', description: 'ID des Habits', required: true },
-			{
-				name: 'note',
-				type: 'string',
-				description: 'Optionale Notiz zum Log',
-				required: false,
-			},
-		],
-	},
-	{
-		name: 'get_habits',
-		module: 'habits',
-		description: 'Gibt alle aktiven Habits zurueck',
-		defaultPolicy: 'auto',
-		parameters: [],
-	},
-
 	// ── MyDay ─────────────────────────────────────────────────
 	{
 		name: 'get_myday_summary',
@@ -1293,113 +1252,6 @@ export const AI_TOOL_CATALOG: readonly ToolSchema[] = [
 			'Gibt Rechnungs-Kennzahlen zurueck: offene Summe, ueberfaellige Summe, YTD fakturiert + bezahlt (pro Waehrung, in Hauptwaehrung als Gleitkomma).',
 		defaultPolicy: 'auto',
 		parameters: [],
-	},
-
-	// ── Library ───────────────────────────────────────────────
-	{
-		name: 'create_library_entry',
-		module: 'library',
-		description:
-			'Erstellt einen neuen Eintrag in der Bibliothek (Buch, Film, Serie oder Comic). Default-Status ist "planned" falls nicht anders angegeben.',
-		defaultPolicy: 'propose',
-		parameters: [
-			{
-				name: 'kind',
-				type: 'string',
-				description: 'Art des Eintrags',
-				required: true,
-				enum: ['book', 'movie', 'series', 'comic'],
-			},
-			{ name: 'title', type: 'string', description: 'Titel', required: true },
-			{
-				name: 'creators',
-				type: 'string',
-				description: 'Autor/Regisseur/Creator, mehrere durch Komma trennen',
-				required: false,
-			},
-			{ name: 'year', type: 'number', description: 'Erscheinungsjahr', required: false },
-			{
-				name: 'status',
-				type: 'string',
-				description: 'Anfangsstatus',
-				required: false,
-				enum: ['planned', 'active', 'completed', 'paused', 'dropped'],
-			},
-			{
-				name: 'rating',
-				type: 'number',
-				description: 'Bewertung 1-5 (nur bei completed sinnvoll)',
-				required: false,
-			},
-			{
-				name: 'tags',
-				type: 'string',
-				description: 'Tags durch Komma getrennt',
-				required: false,
-			},
-			{
-				name: 'genres',
-				type: 'string',
-				description: 'Genres durch Komma getrennt',
-				required: false,
-			},
-		],
-	},
-	{
-		name: 'update_library_entry_status',
-		module: 'library',
-		description:
-			'Aendert den Status eines Bibliotheks-Eintrags (planned/active/completed/paused/dropped). Setzt beim Wechsel auf "active" automatisch startedAt, bei "completed" completedAt.',
-		defaultPolicy: 'propose',
-		parameters: [
-			{ name: 'entryId', type: 'string', description: 'ID des Eintrags', required: true },
-			{
-				name: 'status',
-				type: 'string',
-				description: 'Neuer Status',
-				required: true,
-				enum: ['planned', 'active', 'completed', 'paused', 'dropped'],
-			},
-		],
-	},
-	{
-		name: 'rate_library_entry',
-		module: 'library',
-		description: 'Setzt die Bewertung (1-5) eines Bibliotheks-Eintrags.',
-		defaultPolicy: 'propose',
-		parameters: [
-			{ name: 'entryId', type: 'string', description: 'ID des Eintrags', required: true },
-			{ name: 'rating', type: 'number', description: 'Bewertung 1 bis 5', required: true },
-		],
-	},
-	{
-		name: 'list_library_entries',
-		module: 'library',
-		description:
-			'Listet Bibliotheks-Eintraege (id, kind, title, status, rating). Optional nach Art und Status filterbar.',
-		defaultPolicy: 'auto',
-		parameters: [
-			{
-				name: 'kind',
-				type: 'string',
-				description: 'Nur eine Art zeigen',
-				required: false,
-				enum: ['book', 'movie', 'series', 'comic'],
-			},
-			{
-				name: 'status',
-				type: 'string',
-				description: 'Nur einen Status zeigen',
-				required: false,
-				enum: ['planned', 'active', 'completed', 'paused', 'dropped'],
-			},
-			{
-				name: 'limit',
-				type: 'number',
-				description: 'Maximale Anzahl (Standard 30)',
-				required: false,
-			},
-		],
 	},
 
 	// ── Broadcast (Newsletter) ───────────────────────────────
@@ -2214,7 +2066,7 @@ export const AI_TOOL_CATALOG: readonly ToolSchema[] = [
 		name: 'suggest_lasts',
 		module: 'lasts',
 		description:
-			'Laesst die Inferenz-Engine ueber places/habits/contacts scannen und generiert "suspected"-Lasts mit inferredFrom-Provenance fuer Eintraege, die Frequenz-Drops zeigen. Dedupliziert gegen existierende Lasts und die Cooldown-Liste. Schreibt direkt in die Inbox — kein Proposal-Workflow noetig, weil die Eintraege als suspected landen und der User sie dort akzeptieren oder verwerfen kann.',
+			'Laesst die Inferenz-Engine ueber places/contacts scannen und generiert "suspected"-Lasts mit inferredFrom-Provenance fuer Eintraege, die Frequenz-Drops zeigen. Dedupliziert gegen existierende Lasts und die Cooldown-Liste. Schreibt direkt in die Inbox — kein Proposal-Workflow noetig, weil die Eintraege als suspected landen und der User sie dort akzeptieren oder verwerfen kann.',
 		defaultPolicy: 'auto',
 		parameters: [],
 	},

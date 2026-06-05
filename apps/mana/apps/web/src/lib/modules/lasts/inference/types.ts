@@ -19,7 +19,7 @@ export interface InferenceCandidate {
  * never write.
  */
 export interface InferenceSource {
-	id: string; // 'places' | 'habits' | …
+	id: string; // 'places' | 'contacts' | …
 	scan: (now: Date) => Promise<InferenceCandidate[]>;
 }
 

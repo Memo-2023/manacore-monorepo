@@ -29,7 +29,6 @@
 		{ value: 'TaskCompleted', label: $_('goals.editor.event_task_completed'), module: 'todo' },
 		{ value: 'TaskCreated', label: $_('goals.editor.event_task_created'), module: 'todo' },
 		{ value: 'DrinkLogged', label: $_('goals.editor.event_drink_logged'), module: 'drink' },
-		{ value: 'HabitLogged', label: $_('goals.editor.event_habit_logged'), module: 'habits' },
 		{
 			value: 'JournalEntryCreated',
 			label: $_('goals.editor.event_journal_entry_created'),

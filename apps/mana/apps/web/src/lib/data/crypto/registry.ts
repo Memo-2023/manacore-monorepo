@@ -378,7 +378,7 @@ export const ENCRYPTION_REGISTRY: Record<string, EncryptionConfig> = {
 	},
 
 	// ─── TimeBlocks (cross-module hub) ───────────────────────
-	// Phase 7.1: encrypted alongside tasks + calendar.events + habits
+	// Phase 7.1: encrypted alongside tasks + calendar.events
 	// because the consumer modules denormalize their title/description
 	// into the timeBlock for cheap calendar rendering. Encrypting only
 	// the source records would still leak the same fields here.
@@ -658,25 +658,6 @@ export const ENCRYPTION_REGISTRY: Record<string, EncryptionConfig> = {
 	// and are themselves encrypted. Offsets + color + articleId are
 	// structural — the reader needs them for range scans and rendering.
 	//
-	// ─── Library ─────────────────────────────────────────────
-	// Reading / watching log with a kind discriminator (book / movie /
-	// series / comic) in one table. User-typed text (title, original
-	// title, creators, review, tags) is encrypted; structural fields
-	// (kind, status, year, rating, completedAt, genres, isFavorite,
-	// times, externalIds, details) stay plaintext — they drive the
-	// tab filter, the status chips, the Jahresrückblick query, and
-	// the episode/page progress UI.
-	//
-	// `details` is the discriminated union and sometimes carries
-	// free-text (publisher, director). Those are factual metadata,
-	// not user-typed reflection, so they ship plaintext alongside the
-	// other structural fields. If a future feature adds free-text
-	// notes *inside* details, add that specific path here.
-	libraryEntries: {
-		enabled: true,
-		fields: ['title', 'originalTitle', 'creators', 'review', 'tags'],
-	},
-
 	// ─── Writing ─────────────────────────────────────────────
 	// Ghostwriter module — drafts, version snapshots, generation records,
 	// and user-defined styles. The full prose is the most sensitive

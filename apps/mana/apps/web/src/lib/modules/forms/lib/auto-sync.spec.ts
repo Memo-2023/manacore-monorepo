@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
 	buildContactFromAnswers,
 	buildEventGuestFromAnswers,
-	buildLibraryEntryFromAnswers,
 	buildSpaceInviteFromAnswers,
 } from './auto-sync';
 
@@ -104,58 +103,6 @@ describe('buildEventGuestFromAnswers', () => {
 			{ 'f-fn': 'firstName', 'f-name': 'name' }
 		);
 		expect(result).toEqual({ name: 'Anna Mustermann' });
-	});
-});
-
-describe('buildLibraryEntryFromAnswers', () => {
-	it('maps title / creators / year / review', () => {
-		expect(
-			buildLibraryEntryFromAnswers(
-				{
-					'f-title': 'Dune',
-					'f-creators': 'Frank Herbert',
-					'f-year': '1965',
-					'f-review': 'Tolles Buch',
-				},
-				{
-					'f-title': 'title',
-					'f-creators': 'creators',
-					'f-year': 'year',
-					'f-review': 'review',
-				}
-			)
-		).toEqual({
-			title: 'Dune',
-			creators: ['Frank Herbert'],
-			year: 1965,
-			review: 'Tolles Buch',
-		});
-	});
-
-	it('splits multi-creator strings on comma/semicolon/newline', () => {
-		expect(
-			buildLibraryEntryFromAnswers(
-				{ 'f-c': 'Frank Herbert; Brian Herbert\nKevin J. Anderson' },
-				{ 'f-c': 'creators' }
-			)
-		).toEqual({ creators: ['Frank Herbert', 'Brian Herbert', 'Kevin J. Anderson'] });
-	});
-
-	it('rejects out-of-range years', () => {
-		expect(buildLibraryEntryFromAnswers({ 'f-y': '1800' }, { 'f-y': 'year' })).toEqual({});
-		expect(buildLibraryEntryFromAnswers({ 'f-y': '2200' }, { 'f-y': 'year' })).toEqual({});
-		expect(buildLibraryEntryFromAnswers({ 'f-y': '2026' }, { 'f-y': 'year' })).toEqual({
-			year: 2026,
-		});
-	});
-
-	it('skips empty / non-string values gracefully', () => {
-		expect(
-			buildLibraryEntryFromAnswers(
-				{ 'f-title': '', 'f-year': null },
-				{ 'f-title': 'title', 'f-year': 'year' }
-			)
-		).toEqual({});
 	});
 });
 

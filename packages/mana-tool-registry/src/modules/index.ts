@@ -10,7 +10,6 @@
  *   3. Extend `ModuleId` in `../types.ts`.
  */
 
-import { registerHabitsTools } from './habits.ts';
 import { registerJournalTools } from './journal.ts';
 import { registerMeTools } from './me.ts';
 import { registerMoodTools } from './mood.ts';
@@ -20,7 +19,6 @@ import { registerTodoTools } from './todo.ts';
 import { registerAugurTools } from './augur.ts';
 
 export function registerAllModules(): void {
-	registerHabitsTools();
 	registerJournalTools();
 	registerMeTools();
 	registerMoodTools();
@@ -31,7 +29,6 @@ export function registerAllModules(): void {
 }
 
 export {
-	registerHabitsTools,
 	registerJournalTools,
 	registerMeTools,
 	registerMoodTools,

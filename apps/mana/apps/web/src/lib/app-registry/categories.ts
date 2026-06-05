@@ -57,7 +57,6 @@ export const APP_CATEGORY_MAP: Record<string, AppCategory> = {
 	goals: 'companion',
 
 	// Leben — personal, wellness, everyday
-	habits: 'life',
 	body: 'life',
 	sleep: 'life',
 	mood: 'life',
@@ -103,7 +102,6 @@ export const APP_CATEGORY_MAP: Record<string, AppCategory> = {
 	guides: 'creative',
 	quotes: 'creative',
 	uload: 'creative',
-	library: 'creative',
 	playground: 'creative',
 	quiz: 'creative',
 

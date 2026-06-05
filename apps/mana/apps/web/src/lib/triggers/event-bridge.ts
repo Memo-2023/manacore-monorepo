@@ -22,8 +22,6 @@ const EVENT_MAP: Record<string, { appId: string; collection: string; op: string 
 	CalendarEventCreated: { appId: 'calendar', collection: 'events', op: 'insert' },
 	CalendarEventDeleted: { appId: 'calendar', collection: 'events', op: 'delete' },
 	DrinkLogged: { appId: 'drink', collection: 'drinkEntries', op: 'insert' },
-	HabitLogged: { appId: 'habits', collection: 'habitLogs', op: 'insert' },
-	HabitCreated: { appId: 'habits', collection: 'habits', op: 'insert' },
 	JournalEntryCreated: { appId: 'journal', collection: 'journalEntries', op: 'insert' },
 	NoteCreated: { appId: 'notes', collection: 'notes', op: 'insert' },
 	ContactCreated: { appId: 'contacts', collection: 'contacts', op: 'insert' },

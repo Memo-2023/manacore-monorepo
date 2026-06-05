@@ -1,7 +1,7 @@
 /**
  * Unified Recurrence Engine — RRULE expansion + materialization.
  *
- * One system for all modules: Calendar events, Tasks, Habits.
+ * One system for all modules: Calendar events, Tasks, and beyond.
  * Uses rrule.js for RFC 5545 RRULE expansion.
  *
  * Hybrid approach:
@@ -15,7 +15,6 @@ import { db } from '$lib/data/database';
 import { timeBlockTable } from './collections';
 import { createBlock, deleteBlock } from './service';
 import type { LocalTimeBlock } from './types';
-import type { HabitSchedule } from '$lib/modules/habits/types';
 
 // ─── RRULE Expansion ─────────────────────────────────────
 
@@ -36,50 +35,6 @@ function formatRRuleDate(date: Date): string {
 		.toISOString()
 		.replace(/[-:]/g, '')
 		.replace(/\.\d{3}/, '');
-}
-
-// ─── HabitSchedule ↔ RRULE Conversion ────────────────────
-
-const DAY_MAP: Record<number, string> = {
-	0: 'SU',
-	1: 'MO',
-	2: 'TU',
-	3: 'WE',
-	4: 'TH',
-	5: 'FR',
-	6: 'SA',
-};
-
-const REVERSE_DAY_MAP: Record<string, number> = {
-	SU: 0,
-	MO: 1,
-	TU: 2,
-	WE: 3,
-	TH: 4,
-	FR: 5,
-	SA: 6,
-};
-
-/** Convert a HabitSchedule to an RRULE string. */
-export function habitScheduleToRRule(schedule: HabitSchedule): string {
-	if (schedule.days.length === 7) return 'RRULE:FREQ=DAILY';
-	const byDay = schedule.days.map((d) => DAY_MAP[d]).join(',');
-	return `RRULE:FREQ=WEEKLY;BYDAY=${byDay}`;
-}
-
-/** Convert an RRULE string back to a HabitSchedule (best-effort). */
-export function rruleToHabitSchedule(rrule: string): HabitSchedule | null {
-	const clean = rrule.replace(/^RRULE:/, '');
-	if (clean.includes('FREQ=DAILY')) {
-		return { days: [0, 1, 2, 3, 4, 5, 6] };
-	}
-	const byDayMatch = clean.match(/BYDAY=([A-Z,]+)/);
-	if (!byDayMatch) return null;
-	const days = byDayMatch[1]
-		.split(',')
-		.map((d) => REVERSE_DAY_MAP[d])
-		.filter((d) => d !== undefined);
-	return { days: days.sort() };
 }
 
 // ─── Materialization ─────────────────────────────────────

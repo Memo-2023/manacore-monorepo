@@ -85,7 +85,7 @@ describe('resolveModulesForTemplates', () => {
 	it('respects a custom cap', () => {
 		const result = resolveModulesForTemplates(['alltag', 'health'], 5);
 		expect(result.length).toBe(5);
-		expect(result).toEqual(['todo', 'calendar', 'notes', 'contacts', 'habits']);
+		expect(result).toEqual(['todo', 'calendar', 'notes', 'contacts', 'body']);
 	});
 
 	it('silently ignores unknown template ids', () => {

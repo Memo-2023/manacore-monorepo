@@ -21,7 +21,6 @@
 
 	const KIND_ICON: Record<DraftReference['kind'], string> = {
 		note: '📝',
-		library: '📚',
 		kontext: '🗂',
 		goal: '🎯',
 		url: '🔗',
@@ -30,7 +29,6 @@
 
 	const KIND_LABEL: Record<DraftReference['kind'], string> = {
 		note: 'Notiz',
-		library: 'Library',
 		kontext: 'Kontext',
 		goal: 'Ziel',
 		url: 'Link',

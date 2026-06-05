@@ -17,14 +17,12 @@
 			onchange={(e) => onChange({ source: e.currentTarget.value as ModuleEmbedProps['source'] })}
 		>
 			<option value="picture.board">Picture-Board</option>
-			<option value="library.entries">Bibliothek</option>
 			<option value="calendar.events">Kalender (Termine)</option>
 			<option value="todo.tasks">Todos</option>
 			<option value="goals.goals">Ziele</option>
 			<option value="places.places">Orte</option>
 			<option value="recipes.recipes">Rezepte</option>
 			<option value="wardrobe.outfits">Wardrobe (Outfits)</option>
-			<option value="habits.habits">Habits</option>
 			<option value="quiz.quizzes">Quizze</option>
 			<option value="events.socialEvents">Events (RSVP)</option>
 			<option value="cards.decks">Karten (Decks)</option>

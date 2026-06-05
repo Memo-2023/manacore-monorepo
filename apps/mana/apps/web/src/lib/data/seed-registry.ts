@@ -14,7 +14,6 @@
 import { db } from './database';
 
 // ─── Module Seed Imports ─────────────────────────────────────
-import { HABITS_GUEST_SEED } from '$lib/modules/habits/collections';
 import { BODY_GUEST_SEED } from '$lib/modules/body/collections';
 import { JOURNAL_GUEST_SEED } from '$lib/modules/journal/collections';
 import { DREAMS_GUEST_SEED } from '$lib/modules/dreams/collections';
@@ -32,7 +31,6 @@ import { MEDITATE_GUEST_SEED } from '$lib/modules/meditate/collections';
 import { SLEEP_GUEST_SEED } from '$lib/modules/sleep/collections';
 import { MOOD_GUEST_SEED } from '$lib/modules/mood/collections';
 import { QUIZ_GUEST_SEED } from '$lib/modules/quiz/collections';
-import { WISHES_GUEST_SEED } from '$lib/modules/wishes/collections';
 import { AUGUR_GUEST_SEED } from '$lib/modules/augur/collections';
 
 /**
@@ -52,7 +50,6 @@ function register(seed: Record<string, Record<string, unknown>[]>) {
 }
 
 // Register all module seeds
-register(HABITS_GUEST_SEED);
 register(BODY_GUEST_SEED);
 register(JOURNAL_GUEST_SEED);
 register(DREAMS_GUEST_SEED);
@@ -70,7 +67,6 @@ register(MEDITATE_GUEST_SEED);
 register(SLEEP_GUEST_SEED);
 register(MOOD_GUEST_SEED);
 register(QUIZ_GUEST_SEED);
-register(WISHES_GUEST_SEED);
 register(AUGUR_GUEST_SEED);
 
 /**

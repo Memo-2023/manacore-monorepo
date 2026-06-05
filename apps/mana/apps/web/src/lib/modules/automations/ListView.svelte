@@ -20,7 +20,6 @@
 
 	// ─── Data ────────────────────────────────────────────────
 	let automations = $state<LocalAutomation[]>([]);
-	let habits = $state<{ id: string; title: string; icon: string }[]>([]);
 	let suggestions = $state<AutomationSuggestion[]>([]);
 
 	$effect(() => {
@@ -31,22 +30,6 @@
 				.then((all) => all.filter((a) => !a.deletedAt));
 		}).subscribe((val) => {
 			automations = val ?? [];
-		});
-		return () => sub.unsubscribe();
-	});
-
-	$effect(() => {
-		const sub = liveQuery(async () => {
-			const all = await db.table('habits').toArray();
-			return all
-				.filter((h: Record<string, unknown>) => !h.deletedAt && !h.isArchived)
-				.map((h: Record<string, unknown>) => ({
-					id: h.id as string,
-					title: h.title as string,
-					icon: (h.icon ?? h.emoji ?? 'star') as string,
-				}));
-		}).subscribe((val) => {
-			habits = val ?? [];
 		});
 		return () => sub.unsubscribe();
 	});
@@ -163,10 +146,6 @@
 	function actionDetail(a: LocalAutomation): string {
 		const act = ACTION_OPTIONS.find((o) => o.app === a.targetApp && o.action === a.targetAction);
 		if (!act) return a.targetAction;
-		if (a.targetAction === 'logHabit' && a.targetParams?.habitId) {
-			const habit = habits.find((h) => h.id === a.targetParams?.habitId);
-			return habit ? `${act.actionLabel}: ${habit.title}` : act.actionLabel;
-		}
 		return act.actionLabel;
 	}
 
@@ -282,36 +261,18 @@
 						</select>
 						{#if selectedAction}
 							{#each selectedAction.params as param}
-								{#if param.key === 'habitId'}
-									<select
-										class="form-select"
-										value={newParams[param.key] ?? ''}
-										onchange={(e) => {
-											newParams = {
-												...newParams,
-												[param.key]: (e.target as HTMLSelectElement).value,
-											};
-										}}
-									>
-										<option value="">{$_('automations.list_view.placeholder_habit')}</option>
-										{#each habits as h}
-											<option value={h.id}>{h.title}</option>
-										{/each}
-									</select>
-								{:else}
-									<input
-										class="form-input"
-										type="text"
-										placeholder={param.label}
-										value={newParams[param.key] ?? ''}
-										oninput={(e) => {
-											newParams = {
-												...newParams,
-												[param.key]: (e.target as HTMLInputElement).value,
-											};
-										}}
-									/>
-								{/if}
+								<input
+									class="form-input"
+									type="text"
+									placeholder={param.label}
+									value={newParams[param.key] ?? ''}
+									oninput={(e) => {
+										newParams = {
+											...newParams,
+											[param.key]: (e.target as HTMLInputElement).value,
+										};
+									}}
+								/>
 							{/each}
 						{/if}
 					</div>

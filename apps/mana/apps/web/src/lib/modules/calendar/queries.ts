@@ -2,7 +2,7 @@
  * Reactive Queries & Pure Helpers for Calendar module.
  *
  * The calendar is now a universal time view: it queries timeBlocks (which contain
- * events, tasks, habits, time entries) and joins with LocalEvent for native
+ * events, tasks, time entries) and joins with LocalEvent for native
  * calendar events.
  *
  * Uses Dexie liveQuery to automatically re-render when IndexedDB changes

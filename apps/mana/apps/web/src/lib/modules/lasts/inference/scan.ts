@@ -16,8 +16,7 @@
  * Source registriert wird. Manuelles `create_last`/`confirm_last` via
  * Tool oder UI funktioniert unverändert.
  *
- * Nächste-Schritte-Kandidaten: habits (HabitLog-Timestamps → "Habit
- * lange nicht mehr geloggt"), contacts (Contact.lastInteractionAt →
+ * Nächste-Schritte-Kandidaten: contacts (Contact.lastInteractionAt →
  * "Person lange nicht mehr getroffen"). Plan in
  * mana/docs/playbooks/MANAGARTEN_LIFTS_FOLLOWUPS.md.
  */
@@ -30,7 +29,7 @@ import type { LocalLast, LocalLastsCooldown } from '../types';
 import { INFERENCE_DEFAULTS, type InferenceCandidate, type InferenceSource } from './types';
 
 // `places` inference source dekommissioniert 2026-05-19 mit places-Modul.
-// habits/contacts-Sources sind in M3.b geplant — kein aktiver Scanner aktuell.
+// contacts-Source ist in M3.b geplant — kein aktiver Scanner aktuell.
 const SOURCES: InferenceSource[] = [];
 
 /** Read all lasts in the active Space (decrypted). */

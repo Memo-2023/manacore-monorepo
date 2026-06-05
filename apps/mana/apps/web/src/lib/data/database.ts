@@ -222,10 +222,6 @@ db.version(1).stores({
 	playgroundConversations: 'id, model, isPinned, updatedAt',
 	playgroundMessages: 'id, conversationId, role, order, [conversationId+order]',
 
-	// ─── Habits (appId: 'habits') ───
-	habits: 'id, order, isArchived, color',
-	habitLogs: 'id, habitId, timeBlockId, [habitId+timeBlockId]',
-
 	// ─── Journal (appId: 'journal') ───
 	journalEntries: 'id, entryDate, mood, isPinned, isArchived, isFavorite, updatedAt',
 
@@ -270,7 +266,7 @@ db.version(1).stores({
 
 	// ─── TimeBlocks (appId: 'timeblocks') — unified time model ───
 	// Cross-cutting scheduling table that calendar events, time entries,
-	// habit logs and scheduled tasks all project into. See PROD_READINESS
+	// and scheduled tasks all project into. See PROD_READINESS
 	// notes in time-blocks/service.ts for the design rationale.
 	timeBlocks:
 		'id, startDate, kind, type, sourceModule, sourceId, parentBlockId, [sourceModule+sourceId], [type+startDate], [kind+startDate], [parentBlockId+recurrenceDate]',
@@ -559,33 +555,10 @@ db.version(23).stores({
 	userContext: 'id',
 });
 
-// v24 — Wishes module: wishlists with price tracking.
-// wishesItems indexes [listId+order] for the per-list view,
-// status for the active/fulfilled filter tabs.
-// wishesPriceChecks indexes [wishId+checkedAt] for the per-wish
-// price history timeline (reverse range scan).
-db.version(24).stores({
-	wishesItems: 'id, listId, status, priority, category, [listId+order], [status+order]',
-	wishesLists: 'id, order, isArchived',
-	wishesPriceChecks: 'id, wishId, checkedAt, [wishId+checkedAt]',
-});
-
 // v25 — Wetter module: saved locations and user preferences.
 db.version(25).stores({
 	wetterLocations: 'id, isDefault, order',
 	wetterSettings: 'id',
-});
-
-// v26 — Library module: single-table media log with a `kind` discriminator.
-// v24 + v25 are reserved for the wishes + wetter modules being developed
-// in parallel; library jumps to v26 to avoid colliding with those.
-// Index strategy:
-//   - kind indexes the tab filter (book / movie / series / comic) — hottest path.
-//   - status powers the "Läuft / Fertig / Geplant" filter strip.
-//   - completedAt gives the Jahresrückblick a cheap range scan of completed items.
-//   - isFavorite supports the favourites-only toggle without a full-table filter.
-db.version(26).stores({
-	libraryEntries: 'id, kind, status, completedAt, isFavorite',
 });
 
 // v27 — Invoices module: outbound finance (issuing invoices to clients).
@@ -1227,7 +1200,7 @@ db.version(50).upgrade(async (tx) => {
 // v51 — Lasts module (docs/plans/lasts-module.md M1).
 // Mirror sibling to firsts: the *last* time you did/felt/saw something —
 // either marked manually or surfaced retrospectively by the inference
-// scanner that watches places/contacts/food/habits for frequency drops.
+// scanner that watches places/contacts/food for frequency drops.
 //
 // Single space-scoped table. Index strategy:
 //   - status for the suspected/confirmed/reclaimed tab filter
@@ -1241,7 +1214,7 @@ db.version(51).stores({
 
 // v52 — Lasts inference cooldown (docs/plans/lasts-module.md M3).
 // Records dismissed inference candidates so the scanner doesn't keep
-// re-suggesting the same place / contact / habit for ~12 months. ID is
+// re-suggesting the same place / contact for ~12 months. ID is
 // deterministic (`${refTable}:${refId}`) for structural idempotency:
 // re-dismissing the same candidate is a Dexie put no-op-equivalent.
 //

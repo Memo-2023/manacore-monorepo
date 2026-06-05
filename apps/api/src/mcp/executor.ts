@@ -557,65 +557,6 @@ register('create_journal_entry', async (args, userId) => {
 	return ok(`Journal-Eintrag erstellt.`, { id: entryId });
 });
 
-// ── Habits tools ──────────────────────────────────────────────
-
-register('get_habits', async (_args, userId) => {
-	const records = await readLatestRecords(userId, 'habits', 'habits');
-	const habits = records
-		.filter((r) => !r.isArchived)
-		.map((r) => ({ id: r.id, title: r.title, icon: r.icon, color: r.color }));
-	if (habits.length === 0) return ok('Keine Habits.');
-	return ok(`${habits.length} Habits`, habits);
-});
-
-register('create_habit', async (args, userId) => {
-	const habitId = crypto.randomUUID();
-	const now = nowIso();
-	const data = {
-		id: habitId,
-		userId,
-		title: args.title as string,
-		icon: args.icon as string,
-		color: args.color as string,
-		order: 0,
-		createdAt: now,
-		updatedAt: now,
-	};
-	await writeRecord(
-		userId,
-		'habits',
-		'habits',
-		habitId,
-		'insert',
-		data,
-		fieldTs(Object.keys(data))
-	);
-	return ok(`Habit "${args.title}" erstellt.`, { id: habitId });
-});
-
-register('log_habit', async (args, userId) => {
-	const logId = crypto.randomUUID();
-	const blockId = crypto.randomUUID();
-	const now = nowIso();
-	const data = {
-		id: logId,
-		habitId: args.habitId as string,
-		timeBlockId: blockId,
-		note: (args.note as string) ?? '',
-		createdAt: now,
-	};
-	await writeRecord(
-		userId,
-		'habits',
-		'habitLogs',
-		logId,
-		'insert',
-		data,
-		fieldTs(Object.keys(data))
-	);
-	return ok(`Habit geloggt.`);
-});
-
 // ── Entry point ────────────────────────────────────────────────
 
 /**

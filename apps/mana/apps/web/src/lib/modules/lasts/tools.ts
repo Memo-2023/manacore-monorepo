@@ -263,7 +263,7 @@ export const lastsTools: ModuleTool[] = [
 		name: 'suggest_lasts',
 		module: 'lasts',
 		description:
-			'Scannt places/habits/contacts auf Frequenz-Drops und schreibt Vorschläge als suspected Lasts in die Inbox',
+			'Scannt places/contacts auf Frequenz-Drops und schreibt Vorschläge als suspected Lasts in die Inbox',
 		parameters: [],
 		async execute() {
 			const result = await lastsStore.suggestLasts();

@@ -1,6 +1,6 @@
 <!--
   Analytics — Zeit-Budget Dashboard
-  Shows time breakdown, daily trends, habit heatmap, and plan adherence.
+  Shows time breakdown, daily trends, and plan adherence.
 -->
 <script lang="ts">
 	import { getDateFnsLocale } from '$lib/i18n/format';
@@ -12,12 +12,10 @@
 	import {
 		breakdownByType,
 		dailyStats,
-		habitHeatmap,
 		planAdherence,
 		productiveStreak,
 		type TimeBreakdown,
 		type DailyStat,
-		type HeatmapCell,
 	} from '$lib/data/time-blocks/analytics';
 	import { Clock, TrendUp, Fire, Target } from '@mana/shared-icons';
 	import { format, subDays } from 'date-fns';
@@ -42,7 +40,6 @@
 	// Analytics
 	let typeBreakdown = $derived(breakdownByType(periodBlocks));
 	let daily = $derived(dailyStats(periodBlocks, periodDays));
-	let heatmap = $derived(habitHeatmap(allBlocks, 90));
 	let adherence = $derived(planAdherence(periodBlocks));
 	let streak = $derived(productiveStreak(allBlocks));
 
@@ -158,26 +155,6 @@
 								{format(new Date(day.date), 'EEE', { locale: getDateFnsLocale() })}
 							</span>
 						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Habit heatmap -->
-			<div class="card">
-				<h2 class="card-title">{$_('timeline.analytics.section_heatmap')}</h2>
-				<div class="heatmap">
-					{#each heatmap as cell}
-						<div
-							class="heatmap-cell"
-							class:intensity-0={cell.intensity === 0}
-							class:intensity-1={cell.intensity === 1}
-							class:intensity-2={cell.intensity === 2}
-							class:intensity-3={cell.intensity === 3}
-							class:intensity-4={cell.intensity === 4}
-							title={$_('timeline.analytics.heatmap_cell_title', {
-								values: { date: cell.date, count: cell.count },
-							})}
-						></div>
 					{/each}
 				</div>
 			</div>
@@ -425,35 +402,6 @@
 	.daily-label {
 		font-size: 0.6875rem;
 		color: hsl(var(--color-muted-foreground));
-	}
-
-	/* Heatmap */
-	.heatmap {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 2px;
-	}
-
-	.heatmap-cell {
-		width: 10px;
-		height: 10px;
-		border-radius: 2px;
-	}
-
-	.heatmap-cell.intensity-0 {
-		background: hsl(var(--color-muted));
-	}
-	.heatmap-cell.intensity-1 {
-		background: hsl(142 71% 45% / 0.25);
-	}
-	.heatmap-cell.intensity-2 {
-		background: hsl(142 71% 45% / 0.5);
-	}
-	.heatmap-cell.intensity-3 {
-		background: hsl(142 71% 45% / 0.75);
-	}
-	.heatmap-cell.intensity-4 {
-		background: hsl(142 71% 45%);
 	}
 
 	/* Adherence */

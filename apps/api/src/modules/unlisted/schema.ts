@@ -28,7 +28,7 @@ export const snapshots = unlistedSchema.table(
 		userId: text('user_id').notNull(),
 		/** Where the original record lives. Better-Auth organization nanoid. */
 		spaceId: text('space_id').notNull(),
-		/** Dexie collection name: 'events' | 'libraryEntries' | 'places' | … */
+		/** Dexie collection name: 'events' | 'places' | … */
 		collection: text('collection').notNull(),
 		/** Original record id from Dexie. Untethered UUID (no FK across stores). */
 		recordId: uuid('record_id').notNull(),

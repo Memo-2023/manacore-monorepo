@@ -2,10 +2,9 @@
   ReferencePicker — inline "Quellen" section inside the briefing form.
   Shows the currently-attached references as ReferenceChip pills (with
   live-resolved display labels) and a "+ Quelle" dropdown for adding
-  new ones. Six kinds:
+  new ones. Five kinds:
 
     - note      → searchable list of notes
-    - library   → searchable list of library entries
     - url       → freeform URL input + optional context note
     - kontext   → space's standing-context Note (one-click add; the Note flagged isSpaceContext)
     - goal      → searchable list of goals
@@ -17,20 +16,12 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { useAllNotes, useSpaceContextNote } from '$lib/modules/notes/queries';
-	import { useAllEntries as useAllLibraryEntries } from '$lib/modules/library/queries';
 	import { useAllMeImages } from '$lib/modules/profile/queries';
 	import { useAllGoals } from '$lib/companion/goals/queries';
 	import ReferenceChip from './ReferenceChip.svelte';
 	import type { DraftReference, DraftReferenceKind } from '../types';
 
-	const SUPPORTED_KINDS: DraftReferenceKind[] = [
-		'note',
-		'library',
-		'url',
-		'kontext',
-		'goal',
-		'me-image',
-	];
+	const SUPPORTED_KINDS: DraftReferenceKind[] = ['note', 'url', 'kontext', 'goal', 'me-image'];
 	const MAX_REFERENCES = 6;
 	/** Sentinel targetId — the resolver finds the flagged note by scope-scan,
 	 *  not by id, but a non-null id keeps the de-dupe + chip-key logic uniform. */
@@ -45,14 +36,12 @@
 	} = $props();
 
 	const notes$ = useAllNotes();
-	const library$ = useAllLibraryEntries();
 	const kontext$ = useSpaceContextNote();
 	const meImages$ = useAllMeImages();
 	const goals$ = useAllGoals();
 
 	// Lookup maps so chips can resolve their display label from targetId.
 	const notesById = $derived(new Map((notes$.value ?? []).map((n) => [n.id, n])));
-	const libraryById = $derived(new Map((library$.value ?? []).map((e) => [e.id, e])));
 	const meImagesById = $derived(new Map((meImages$.value ?? []).map((m) => [m.id, m])));
 	const goalsById = $derived(new Map((goals$.value ?? []).map((g) => [g.id, g])));
 	const kontextDoc = $derived(kontext$.value);
@@ -66,10 +55,6 @@
 			return n
 				? n.title || $_('writing.reference_picker.label_note_untitled')
 				: $_('writing.reference_picker.label_note_missing');
-		}
-		if (ref.kind === 'library') {
-			const e = libraryById.get(ref.targetId);
-			return e ? e.title : $_('writing.reference_picker.label_library_missing');
 		}
 		if (ref.kind === 'goal') {
 			const g = goalsById.get(ref.targetId);
@@ -87,7 +72,7 @@
 		return ref.targetId;
 	}
 
-	type PickerMode = 'closed' | 'note' | 'library' | 'url' | 'kontext' | 'goal' | 'me-image';
+	type PickerMode = 'closed' | 'note' | 'url' | 'kontext' | 'goal' | 'me-image';
 	let mode = $state<PickerMode>('closed');
 	let searchQuery = $state('');
 	let urlInput = $state('');
@@ -130,18 +115,6 @@
 		if (!q) return all.slice(0, 20);
 		return all
 			.filter((n) => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q))
-			.slice(0, 20);
-	});
-
-	const filteredLibrary = $derived.by(() => {
-		const q = searchQuery.trim().toLowerCase();
-		const all = library$.value ?? [];
-		if (!q) return all.slice(0, 20);
-		return all
-			.filter(
-				(e) =>
-					e.title.toLowerCase().includes(q) || e.creators.some((c) => c.toLowerCase().includes(q))
-			)
 			.slice(0, 20);
 	});
 
@@ -225,7 +198,7 @@
 		</p>
 	{/if}
 
-	{#if mode === 'note' || mode === 'library' || mode === 'goal' || mode === 'me-image'}
+	{#if mode === 'note' || mode === 'goal' || mode === 'me-image'}
 		<div class="search">
 			<!-- svelte-ignore a11y_autofocus -->
 			<input
@@ -252,25 +225,6 @@
 										{n.content.length > 80 ? '…' : ''}
 									</span>
 								{/if}
-							</button>
-						{/each}
-					{/if}
-				{:else if mode === 'library'}
-					{#if filteredLibrary.length === 0}
-						<p class="muted small">{$_('writing.reference_picker.no_results')}</p>
-					{:else}
-						{#each filteredLibrary as e (e.id)}
-							<button
-								type="button"
-								class="result"
-								onclick={() => addRef({ kind: 'library', targetId: e.id, note: null })}
-							>
-								<strong>{e.title}</strong>
-								<span class="meta">
-									{e.kind}
-									{#if e.creators.length}· {e.creators[0]}{/if}
-									{#if e.year}· {e.year}{/if}
-								</span>
 							</button>
 						{/each}
 					{/if}

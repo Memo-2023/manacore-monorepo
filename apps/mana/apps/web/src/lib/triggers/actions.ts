@@ -11,12 +11,6 @@ export type ActionHandler = (
 ) => Promise<void>;
 
 export const ACTIONS: Record<string, Record<string, ActionHandler>> = {
-	habits: {
-		logHabit: async (params) => {
-			const { habitsStore } = await import('$lib/modules/habits/stores/habits.svelte');
-			await habitsStore.logHabit(params.habitId, 'Auto: Trigger');
-		},
-	},
 	todo: {
 		createTask: async (params, source) => {
 			const { tasksStore } = await import('$lib/modules/todo/stores/tasks.svelte');

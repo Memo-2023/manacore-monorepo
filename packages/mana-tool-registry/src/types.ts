@@ -16,7 +16,6 @@
 import type { z } from 'zod';
 
 export type ModuleId =
-	| 'habits'
 	| 'spaces'
 	// — M1.5+ additions below —
 	| 'todo'
@@ -97,7 +96,7 @@ export interface ToolSpec<
 	InputSchema extends z.ZodTypeAny = z.ZodTypeAny,
 	OutputSchema extends z.ZodTypeAny = z.ZodTypeAny,
 > {
-	/** Canonical dot-name, e.g. `habits.create`. Unique across registry. */
+	/** Canonical dot-name, e.g. `todo.create`. Unique across registry. */
 	readonly name: string;
 	/** Human-facing description — used by MCP, LLM system prompts. */
 	readonly description: string;

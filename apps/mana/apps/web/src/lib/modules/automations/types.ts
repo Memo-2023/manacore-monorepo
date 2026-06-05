@@ -73,13 +73,6 @@ export const SOURCE_OPTIONS: SourceOption[] = [
 		fields: ['title', 'content'],
 	},
 	{
-		app: 'habits',
-		appLabel: 'Habits',
-		collection: 'habitLogs',
-		collectionLabel: 'Habit-Logs',
-		fields: ['habitId'],
-	},
-	{
 		app: 'places',
 		appLabel: 'Places',
 		collection: 'places',
@@ -90,13 +83,6 @@ export const SOURCE_OPTIONS: SourceOption[] = [
 
 /** Available target actions. Params with type='select' get populated dynamically. */
 export const ACTION_OPTIONS: ActionOption[] = [
-	{
-		app: 'habits',
-		appLabel: 'Habits',
-		action: 'logHabit',
-		actionLabel: 'Habit loggen',
-		params: [{ key: 'habitId', label: 'Habit', type: 'select' }],
-	},
 	{
 		app: 'todo',
 		appLabel: 'Todo',

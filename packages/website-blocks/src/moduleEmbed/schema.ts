@@ -28,13 +28,11 @@ export const EmbedResolvedSchema = z.object({
  */
 export const EmbedSourceSchema = z.enum([
 	'picture.board',
-	'library.entries',
 	'calendar.events',
 	'todo.tasks',
 	'goals.goals',
 	'places.places',
 	'recipes.recipes',
-	'habits.habits',
 	'quiz.quizzes',
 	'events.socialEvents',
 	'cards.decks',

@@ -3,7 +3,6 @@
 	import { onMount, getContext } from 'svelte';
 	import { calendarViewStore } from '../stores/view.svelte';
 	import { eventsStore } from '../stores/events.svelte';
-	import { createBlock } from '$lib/data/time-blocks/service';
 	import { dropTarget } from '@mana/shared-ui/dnd';
 	import type { DragPayload } from '@mana/shared-ui/dnd';
 	import {
@@ -174,13 +173,9 @@
 		onEventClick?.(event);
 	}
 
-	/** Handle cross-module drop (task/habit onto calendar). */
+	/** Handle cross-module drop (task onto calendar). */
 	async function handleCrossModuleDrop(day: Date, payload: DragPayload) {
 		const data = payload.data as Record<string, unknown>;
-		const defaultStart = new Date(day);
-		defaultStart.setHours(9, 0, 0, 0);
-		const defaultEnd = new Date(day);
-		defaultEnd.setHours(10, 0, 0, 0);
 
 		if (payload.type === 'task') {
 			// Schedule task on calendar
@@ -189,19 +184,6 @@
 			await tasksStore.updateTask(data.id as string, {
 				_scheduleStartDate: dateStr,
 				_scheduleStartTime: '09:00',
-			});
-		} else if (payload.type === 'habit') {
-			// Create a logged habit block at this day
-			await createBlock({
-				startDate: defaultStart.toISOString(),
-				endDate: defaultEnd.toISOString(),
-				kind: 'logged',
-				type: 'habit',
-				sourceModule: 'habits',
-				sourceId: (data.id as string) || crypto.randomUUID(),
-				title: (data.title as string) || 'Habit',
-				color: (data.color as string) || null,
-				icon: (data.icon as string) || null,
 			});
 		}
 	}
@@ -280,7 +262,7 @@
 						isSameDay(day, dragToCreate.createTargetDay)}
 					onpointerdown={dragToCreate.startCreate}
 					use:dropTarget={{
-						accepts: ['task', 'habit'],
+						accepts: ['task'],
 						onDrop: (p) => handleCrossModuleDrop(day, p),
 					}}
 				>

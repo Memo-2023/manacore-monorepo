@@ -16,9 +16,9 @@
 	import ConflictWarning from './ConflictWarning.svelte';
 
 	import type { TimeBlockType } from '$lib/data/time-blocks/types';
-	import { CheckSquare, Timer, Heart } from '@mana/shared-icons';
+	import { CheckSquare, Timer } from '@mana/shared-icons';
 
-	type QuickCreateType = 'event' | 'timeEntry' | 'habit';
+	type QuickCreateType = 'event' | 'timeEntry';
 
 	interface Props {
 		startTime: Date;
@@ -188,15 +188,6 @@
 				>
 					<Timer size={12} />
 					{$_('calendar.quick_event.type_time_entry')}
-				</button>
-				<button
-					type="button"
-					class="type-pill"
-					class:active={blockType === 'habit'}
-					onclick={() => (blockType = 'habit')}
-				>
-					<Heart size={12} />
-					{$_('calendar.quick_event.type_habit')}
 				</button>
 			</div>
 

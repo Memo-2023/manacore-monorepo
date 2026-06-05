@@ -93,7 +93,7 @@ export interface Calendar {
 /**
  * Construct a CalendarEvent from a TimeBlock.
  * For native calendar events, also merges LocalEvent domain data.
- * For cross-module blocks (tasks, habits, time entries), uses TimeBlock display fields.
+ * For cross-module blocks (tasks, time entries), uses TimeBlock display fields.
  */
 export function timeBlockToCalendarEvent(
 	block: TimeBlock,
@@ -114,7 +114,7 @@ export function timeBlockToCalendarEvent(
 		parentEventId: null,
 		color: eventData?.color ?? block.color,
 		tagIds: eventData?.tagIds ?? [],
-		// Cross-module TimeBlock entries (tasks, habits, time entries) don't
+		// Cross-module TimeBlock entries (tasks, time entries) don't
 		// carry a calendar-specific visibility — they inherit 'space' so
 		// they stay invisible on the website (public requires explicit opt-in).
 		visibility: eventData?.visibility ?? 'space',

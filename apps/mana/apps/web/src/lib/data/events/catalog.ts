@@ -187,27 +187,6 @@ export type PlacesEventType =
 	| 'TrackingStarted'
 	| 'TrackingStopped';
 
-// ── Habits ──────────────────────────────────────────
-
-export interface HabitLoggedPayload {
-	logId: string;
-	habitId: string;
-	habitTitle: string;
-	note?: string;
-}
-
-export interface HabitCreatedPayload {
-	habitId: string;
-	title: string;
-}
-
-export interface HabitDeletedPayload {
-	habitId: string;
-	title: string;
-}
-
-export type HabitsEventType = 'HabitLogged' | 'HabitCreated' | 'HabitDeleted';
-
 // ── Journal ─────────────────────────────────────────
 
 export interface JournalEntryCreatedPayload {
@@ -623,7 +602,6 @@ export type ManaEventType =
 	| CalendarEventType
 	| DrinkEventType
 	| PlacesEventType
-	| HabitsEventType
 	| JournalEventType
 	| NotesEventType
 	| ContactsEventType
@@ -684,10 +662,6 @@ export type ManaEvent =
 	| DomainEvent<'LocationLogged', LocationLoggedPayload>
 	| DomainEvent<'TrackingStarted', TrackingStartedPayload>
 	| DomainEvent<'TrackingStopped', TrackingStoppedPayload>
-	// Habits
-	| DomainEvent<'HabitLogged', HabitLoggedPayload>
-	| DomainEvent<'HabitCreated', HabitCreatedPayload>
-	| DomainEvent<'HabitDeleted', HabitDeletedPayload>
 	// Journal
 	| DomainEvent<'JournalEntryCreated', JournalEntryCreatedPayload>
 	| DomainEvent<'JournalMoodSet', JournalMoodSetPayload>

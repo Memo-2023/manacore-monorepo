@@ -3,7 +3,7 @@
 	/**
 	 * CalendarEventsWidget - Upcoming timeBlocks (local-first)
 	 *
-	 * Shows events, tasks, habits, and time entries from the next 7 days.
+	 * Shows events, tasks, and time entries from the next 7 days.
 	 * Reads directly from the timeBlocks table via cross-app query.
 	 * Reactive: auto-updates when data changes (sync, other tabs).
 	 */
@@ -11,7 +11,7 @@
 	import { _ } from 'svelte-i18n';
 	import { useUpcomingEvents } from '$lib/data/cross-app-queries';
 	import type { LocalTimeBlock } from '$lib/data/time-blocks/types';
-	import { CalendarBlank, CheckSquare, Timer, Heart } from '@mana/shared-icons';
+	import { CalendarBlank, CheckSquare, Timer } from '@mana/shared-icons';
 
 	const events = useUpcomingEvents(7);
 
@@ -21,7 +21,6 @@
 		event: CalendarBlank,
 		task: CheckSquare,
 		timeEntry: Timer,
-		habit: Heart,
 	};
 
 	function formatEventTime(block: LocalTimeBlock): string {

@@ -11,7 +11,8 @@
  * both the module config AND the corresponding entry below in the same
  * commit — this makes such changes visible in code review.
  *
- * Last full snapshot refresh: 2026-05-18 (food + wardrobe module retirement;
+ * Last full snapshot refresh: 2026-06-05 (library → kollekta, wishes → wunsch,
+ * habits → stetig module retirement; food + wardrobe retired 2026-05-18;
  * citycorners + cards modules already retired before).
  */
 
@@ -93,10 +94,6 @@ const LEGACY_TABLES = new Set([
 	'rituals',
 	'ritualSteps',
 	'ritualLogs',
-	// Wishes — module surface exists, registry adoption pending.
-	'wishesItems',
-	'wishesLists',
-	'wishesPriceChecks',
 	// User-level legacy table from the v40 tag-preset migration; lives
 	// outside the module-registry by design (cross-module shared shape).
 	'userTagPresets',
@@ -218,7 +215,6 @@ describe('module-registry — snapshot', () => {
 			questions: ['qCollections', 'questions', 'answers', 'questionTags'],
 			calc: ['calculations', 'savedFormulas'],
 			guides: ['guides', 'sections', 'steps', 'guideCollections', 'runs', 'guideTags'],
-			habits: ['habits', 'habitLogs'],
 			notes: ['notes', 'noteTags'],
 			journal: ['journalEntries'],
 			dreams: ['dreams', 'dreamSymbols', 'dreamTags'],
@@ -252,7 +248,6 @@ describe('module-registry — snapshot', () => {
 			mood: ['moodEntries', 'moodSettings'],
 			quiz: ['quizzes', 'quizQuestions', 'quizAttempts'],
 			profile: ['userContext', 'meImages'],
-			library: ['libraryEntries'],
 			invoices: ['invoices', 'invoiceClients', 'invoiceSettings'],
 			broadcasts: ['broadcastCampaigns', 'broadcastTemplates', 'broadcastSettings'],
 			wetter: ['wetterLocations', 'wetterSettings'],

@@ -65,7 +65,6 @@ import { timesModuleConfig } from '$lib/modules/times/module.config';
 import { questionsModuleConfig } from '$lib/modules/questions/module.config';
 import { calcModuleConfig } from '$lib/modules/calc/module.config';
 import { guidesModuleConfig } from '$lib/modules/guides/module.config';
-import { habitsModuleConfig } from '$lib/modules/habits/module.config';
 import { notesModuleConfig } from '$lib/modules/notes/module.config';
 import { journalModuleConfig } from '$lib/modules/journal/module.config';
 import { dreamsModuleConfig } from '$lib/modules/dreams/module.config';
@@ -85,7 +84,6 @@ import { sleepModuleConfig } from '$lib/modules/sleep/module.config';
 import { moodModuleConfig } from '$lib/modules/mood/module.config';
 import { quizModuleConfig } from '$lib/modules/quiz/module.config';
 import { profileModuleConfig } from '$lib/modules/profile/module.config';
-import { libraryModuleConfig } from '$lib/modules/library/module.config';
 import { invoicesModuleConfig } from '$lib/modules/invoices/module.config';
 import { broadcastModuleConfig } from '$lib/modules/broadcasts/module.config';
 import { wetterModuleConfig } from '$lib/modules/wetter/module.config';
@@ -114,7 +112,6 @@ export const MODULE_CONFIGS: readonly ModuleConfig[] = [
 	questionsModuleConfig,
 	calcModuleConfig,
 	guidesModuleConfig,
-	habitsModuleConfig,
 	notesModuleConfig,
 	journalModuleConfig,
 	dreamsModuleConfig,
@@ -134,7 +131,6 @@ export const MODULE_CONFIGS: readonly ModuleConfig[] = [
 	moodModuleConfig,
 	quizModuleConfig,
 	profileModuleConfig,
-	libraryModuleConfig,
 	invoicesModuleConfig,
 	broadcastModuleConfig,
 	wetterModuleConfig,

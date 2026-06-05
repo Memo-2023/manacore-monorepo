@@ -10,7 +10,6 @@
 		CheckCircle,
 		ArrowsClockwise,
 	} from '@mana/shared-icons';
-	import { getIconComponent } from '@mana/shared-icons';
 
 	interface Props {
 		event: CalendarEvent;
@@ -41,11 +40,6 @@
 	}: Props = $props();
 
 	let isDraft = $derived(eventsStore.isDraftEvent(event.id));
-
-	/** Resolve the Phosphor icon component for habit blocks. */
-	let habitIconComponent = $derived(
-		event.blockType === 'habit' && event.icon ? getIconComponent(event.icon) : null
-	);
 
 	function handleClick(e: MouseEvent) {
 		if (isDragging || isResizing || isDraft) {
@@ -120,11 +114,6 @@
 			<span class="type-icon"><CheckSquare size={10} weight="bold" /></span>
 		{:else if event.blockType === 'timeEntry'}
 			<span class="type-icon"><Timer size={10} weight="bold" /></span>
-		{:else if event.blockType === 'habit' && habitIconComponent}
-			{@const HabitIcon = habitIconComponent}
-			<span class="type-icon">
-				<HabitIcon size={10} weight="bold" />
-			</span>
 		{:else if event.blockType === 'focus'}
 			<span class="type-icon"><Lightning size={10} weight="bold" /></span>
 		{/if}
@@ -192,10 +181,6 @@
 
 	.event-card.block-type-task {
 		border-left: 3px solid rgba(255, 255, 255, 0.6);
-	}
-
-	.event-card.block-type-habit {
-		border-radius: var(--radius-sm, 4px) 8px 8px var(--radius-sm, 4px);
 	}
 
 	.event-card.block-type-timeEntry {

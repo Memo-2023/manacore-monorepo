@@ -23,7 +23,6 @@
 
 import { contactsStore } from '$lib/modules/contacts/stores/contacts.svelte';
 import { eventGuestsStore } from '$lib/modules/events/stores/guests.svelte';
-import { libraryEntriesStore } from '$lib/modules/library/stores/entries.svelte';
 import { authFetch } from '$lib/data/scope';
 import { decryptRecords, isVaultUnlocked } from '$lib/data/crypto';
 import { formResponseTable, formTable } from '../collections';
@@ -142,52 +141,6 @@ export function buildEventGuestFromAnswers(
 }
 
 /**
- * Build a library-entry patch from a form response. The mapping is
- * narrower than for contacts: library entries are dominated by `title`,
- * with optional creators / year / review. Pure.
- */
-export function buildLibraryEntryFromAnswers(
-	answers: Record<string, AnswerValue>,
-	mapping: Record<string, string>
-): {
-	title?: string;
-	creators?: string[];
-	year?: number;
-	review?: string;
-} {
-	const out: { title?: string; creators?: string[]; year?: number; review?: string } = {};
-	for (const [fieldId, key] of Object.entries(mapping)) {
-		const value = answers[fieldId];
-		if (value === null || value === undefined) continue;
-		const str = typeof value === 'string' ? value.trim() : String(value);
-		if (!str) continue;
-		switch (key) {
-			case 'title':
-				out.title = str;
-				break;
-			case 'creator':
-			case 'creators': {
-				const arr = str
-					.split(/[,;\n]+/)
-					.map((s) => s.trim())
-					.filter(Boolean);
-				if (arr.length > 0) out.creators = arr;
-				break;
-			}
-			case 'year': {
-				const n = Number(str);
-				if (Number.isFinite(n) && n >= 1900 && n <= 2100) out.year = Math.round(n);
-				break;
-			}
-			case 'review':
-				out.review = str;
-				break;
-		}
-	}
-	return out;
-}
-
-/**
  * Build a space-invite payload from a form response. Just the email —
  * the role lives on the autoSync config, not on the form-fields.
  */
@@ -244,23 +197,6 @@ async function dispatchTarget(
 				rsvpStatus: 'yes',
 			});
 			return result.success ? result.id : null;
-		}
-		case 'library': {
-			if (!cfg.libraryKind) {
-				throw new Error('autoSync.libraryKind ist erforderlich für target=library');
-			}
-			const data = buildLibraryEntryFromAnswers(answers, cfg.mapping);
-			// Library entries need a title — a creator-only or year-only
-			// row would be useless.
-			if (!data.title) return null;
-			const entry = await libraryEntriesStore.createEntry({
-				kind: cfg.libraryKind,
-				title: data.title,
-				creators: data.creators,
-				year: data.year ?? null,
-				review: data.review ?? null,
-			});
-			return entry?.id ?? null;
 		}
 		case 'space_member': {
 			const invite = buildSpaceInviteFromAnswers(answers, cfg.mapping);

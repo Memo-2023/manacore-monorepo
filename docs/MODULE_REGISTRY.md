@@ -1,6 +1,6 @@
 # Mana Module Registry
 
-Alle 76 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
+Alle 73 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
 
 ---
 
@@ -18,14 +18,13 @@ Alle 76 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
 | `inventory` | Inventory | Besitz verwalten mit Fotos, Quittungen, Garantien |
 | `calc` | Calc | Taschenrechner (Standard, Scientific, Programmer, Unit-Conversion) |
 
-## Gesundheit & Wellness (11)
+## Gesundheit & Wellness (10)
 
 | Modul | Name | Beschreibung |
 |---|---|---|
 | `body` | Body | Workout-Logging, Progressive Overload, Messungen, Energie-Checks |
 | `food` | Food (Essen) | AI-gestütztes Ernährungstracking mit Foto-Analyse |
 | `drink` | Drink | Getränke-Tracking mit Tageszielen und Favoriten |
-| `habits` | Habits | Schnelles Tally-Tracking für Gewohnheiten mit Streaks |
 | `sleep` | Sleep | Schlaf-Tracking mit Qualität, Trends, Traum-Verlinkung |
 | `period` | Periode | Menstruations-Tracking mit Vorhersagen und Phasen-Erkennung |
 | `stretch` | Stretch | Mobility-Assessments und geführte Dehn-Routinen |
@@ -34,7 +33,7 @@ Alle 76 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
 | `mood` | Mood | Stimmungs-Tracking mehrmals täglich mit Kontext und Mustern |
 | `moodlit` | Moodlit | Beruhigende Ambient-Beleuchtung mit animierten Farbverläufen |
 
-## Kreativität & Medien (8)
+## Kreativität & Medien (7)
 
 | Modul | Name | Beschreibung |
 |---|---|---|
@@ -44,7 +43,6 @@ Alle 76 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
 | `presi` | Presi | Präsentationen mit AI-Design-Vorschlägen |
 | `cards` | Cardecky | AI-generierte Flashcards mit Spaced Repetition |
 | `recipes` | Rezepte | Rezepte sammeln mit Zutaten und Schritten |
-| `library` | Bibliothek | Bücher, Filme, Serien, Comics — Status, Rating, Fortschritt |
 | `storage` | Storage | Cloud-Storage mit Ordnern, Versionierung und Sharing |
 
 ## Wissen & Lernen (7)
@@ -103,12 +101,6 @@ Alle 76 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
 | `myday` | Mein Tag | Tagesübersicht: Tasks, Events, Wasser, Ernährung, Streaks |
 | `activity` | Aktivität | Live-Activity-Stream über alle Module |
 
-## Shopping (1)
-
-| Modul | Name | Beschreibung |
-|---|---|---|
-| `wishes` | Wünsche | Wunschlisten mit Preis-Tracking und Prioritäten |
-
 ## AI-System (8)
 
 | Modul | Name | Beschreibung |
@@ -146,4 +138,6 @@ Alle 76 Module der Mana-App (`apps/mana/apps/web/src/lib/modules/`).
 
 ---
 
-**Gesamt: 76 Module** — davon ~54 public/published und ~22 intern/AI/System.
+**Gesamt: 73 Module** — davon ~51 public/published und ~22 intern/AI/System.
+
+> **Retired (als eigenständige Apps rausgespinnt, 2026-06-05):** `library` → [kollekta.mana.how](https://kollekta.mana.how), `wishes` → [wunsch.mana.how](https://wunsch.mana.how), `habits` → [stetig.mana.how](https://stetig.mana.how). **Vollständig entfernt** (kein Nutzer/keine Daten vorhanden): Module, Routen, Dexie-Tabellen + Schema-Versionen (v24 wishes, v26 library, habits aus dem Basis-Schema), Crypto-Klassifikation, AI-Tools, i18n-Namespaces, App-Registry/Branding-Einträge. `habit` ist auch kein `TimeBlockType` mehr. Frühere Lifts ebenso retired: `quotes`→zitare, `music`→mukke, `places`→viadocu, `food`→nutriphi, `moodlit`, `memoro`, `who`, `plants`→herbatrium, `news`→pageta, `cards`→wordeck, `comic`→comicello, `citycorners`→seepuls.

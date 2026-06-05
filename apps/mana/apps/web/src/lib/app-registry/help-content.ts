@@ -32,17 +32,17 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 	},
 	calendar: {
 		description:
-			'Termine und Zeitblöcke planen. Verknüpft sich mit Aufgaben, Habits und sozialen Events.',
+			'Termine und Zeitblöcke planen. Verknüpft sich mit Aufgaben und sozialen Events.',
 		features: [
 			'Tages-, Wochen- und Monatsansicht',
 			'Wiederkehrende Termine',
 			'Zeitblöcke für fokussiertes Arbeiten',
-			'Verknüpfung mit Todo, Habits & Events',
+			'Verknüpfung mit Todo & Events',
 			'AI-Tools: Termine erstellen, heutige Termine abfragen',
 		],
 		tips: [
 			'Ziehe einen Kontakt auf den Kalender um ein Treffen zu planen',
-			'Zeitblöcke verbinden Kalender, Aufgaben und Habits',
+			'Zeitblöcke verbinden Kalender und Aufgaben',
 		],
 	},
 	contacts: {
@@ -58,22 +58,6 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		tips: [
 			'Ziehe einen Kontakt auf Todo um eine "Kontaktieren"-Aufgabe zu erstellen',
 			'Kontakte tauchen als Verknüpfung in Events und Journal auf',
-		],
-	},
-	habits: {
-		description:
-			'Gewohnheiten aufbauen und tracken. Tägliche Streaks, farbige Kategorien und Kalender-Integration.',
-		features: [
-			'Tägliches Logging per Tap',
-			'Streak-Tracking mit Tageszielen',
-			'Zeitblock-Verknüpfung im Kalender',
-			'Farbige Kategorien',
-			'Archivieren statt Löschen',
-			'AI-Tools: Habits erstellen, loggen, Status abfragen',
-		],
-		tips: [
-			'Habits erscheinen als Zeitblöcke im Kalender wenn du sie loggst',
-			'Im Chat: "Logge Meditation für heute"',
 		],
 	},
 	notes: {
@@ -477,22 +461,6 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		],
 		tips: ['Die Hygiene-Checkliste hilft, gute Schlafgewohnheiten zu entwickeln'],
 	},
-	wishes: {
-		description:
-			'Wunschliste mit Preiszielen, Produkt-Links und Listen. Organisiere Wünsche nach Anlass.',
-		features: [
-			'Wünsche mit Zielpreis & Kategorie',
-			'Listen erstellen (Geburtstag, Weihnachten, Für mich, ...)',
-			'Produkt-URLs pro Wunsch hinterlegen',
-			'Preisverlauf-Tracking',
-			'Prioritäten & Status (offen / erfüllt / archiviert)',
-			'AI-Tools: Wünsche erstellen, auflisten, als erfüllt markieren',
-		],
-		tips: [
-			'Erstelle Listen für verschiedene Anlässe — so behältst du den Überblick',
-			'Im Chat: "Setze Sony WH-1000XM5 auf meine Wunschliste, Zielpreis 250€"',
-		],
-	},
 	wetter: {
 		description:
 			'Wetter für deine Standorte mit detaillierter Vorhersage und Vergleich verschiedener Wettermodelle.',
@@ -514,7 +482,7 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		features: [
 			'12 Textarten: Blog, Essay, E-Mail, Social, Story, Brief, Rede, Bewerbung, Pressetext, Bio, …',
 			'9 eingebaute Schreibstile (Akademisch, Casual Blog, LinkedIn, Hemingway, Memoir, …) plus eigene Stile',
-			'Quellen verknüpfen aus 7 Modulen: Artikel, Notiz, Library, Kontext, Ziel, Bild, URL',
+			'Quellen verknüpfen aus 6 Modulen: Artikel, Notiz, Kontext, Ziel, Bild, URL',
 			'Selection-Verfeinerung: Markiere Text → Kürzen / Erweitern / Ton ändern / Umschreiben / Übersetzen',
 			'Versionierung mit "Als Checkpoint speichern" + Wiederherstellen',
 			'Visibility: privat / Space / Unlisted-Link / öffentlich',
@@ -528,21 +496,6 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 			'In der BriefingForm: "Quellen" → 7 Buttons. Nutze "Kontext" um den Space-Kontext-Doc anzuhängen.',
 			'Drafts sind ziehbar — auf andere Module droppen, sobald deren Drop-Targets ausgebaut sind',
 			'Eigene Stile unter "🎨 Stile" anlegen — die Beschreibung wird wörtlich an die KI übergeben',
-		],
-	},
-	library: {
-		description:
-			'Medien-Log — Bücher, Filme, Serien und Comics tracken. Status, Fortschritt, Bewertung.',
-		features: [
-			'Bücher, Filme, Serien, Comics in einer Ansicht',
-			'Status: läuft / fertig / geplant / abgebrochen',
-			'Fortschritt tracken (Seiten, Episoden, Ausgaben)',
-			'Bewertung & Review-Text',
-			'Favoriten & Jahresrückblick',
-		],
-		tips: [
-			'Nutze "Geplant" als Merkliste für Empfehlungen',
-			'Der Jahresrückblick zeigt was du im laufenden Jahr geschafft hast',
 		],
 	},
 	'news-research': {
@@ -560,10 +513,9 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 	},
 	myday: {
 		description:
-			'Tagesübersicht — alles Wichtige auf einen Blick: Termine, Aufgaben, Habits und Stimmung.',
+			'Tagesübersicht — alles Wichtige auf einen Blick: Termine, Aufgaben und Stimmung.',
 		features: [
 			'Heutige Termine & Aufgaben',
-			'Habit-Fortschritt des Tages',
 			'Schnellzugriff auf häufige Aktionen',
 			'AI-Zusammenfassung des Tages',
 		],
@@ -621,7 +573,7 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 			'Ziele setzen und Fortschritt verfolgen. Verknüpft sich mit AI-Missionen und dem Kontext-Profil.',
 		features: [
 			'Ziele mit Status definieren (offen / in Arbeit / erreicht)',
-			'Modulübergreifende Verknüpfung mit Aufgaben & Habits',
+			'Modulübergreifende Verknüpfung mit Aufgaben',
 			'AI-Tools: Ziele abfragen und in Missionen referenzieren',
 			'Ziele als Input für AI-Missionen nutzen',
 		],
@@ -754,7 +706,7 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		],
 		tips: [
 			'Ziehe ein Modul in den Chat um es als Kontext zu übergeben',
-			'"Plane meine Woche" — nutzt Kalender + Todo + Habits zusammen',
+			'"Plane meine Woche" — nutzt Kalender + Todo zusammen',
 			'Für tiefe Recherche: `research_news` Tool mit `depth: "deep"`',
 		],
 	},
@@ -823,9 +775,9 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		description:
 			'Tägliche oder wöchentliche Rituale als geführte Zeremonien. Morgendroutine, Abend-Reflexion, Wochen-Rückblick — Schritt für Schritt.',
 		features: [
-			'Zeremonie-Steps: Prompt-Frage, Notiz, Habit, Tag-Edit, Atemübung',
+			'Zeremonie-Steps: Prompt-Frage, Notiz, Tag-Edit, Atemübung',
 			'Zeitplan: täglich/wöchentlich/manuell',
-			'Verknüpfung mit Habits, Notizen, Goals',
+			'Verknüpfung mit Notizen, Goals',
 			'Verschlüsselte Antworten',
 		],
 		tips: [
@@ -853,7 +805,7 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 			'Mana Spiral — visueller Fingerabdruck deiner Aktivität als farbiger Pixel-Spiral-Plot. Zeigt auf einen Blick, wie dein System-Rhythmus aussieht.',
 		features: [
 			'Pixel pro Tag pro Modul',
-			'Farben codieren Modul-Art (Aufgaben, Habits, Notizen, Essen, …)',
+			'Farben codieren Modul-Art (Aufgaben, Notizen, Essen, …)',
 			'Monats- oder Jahresansicht',
 			'Klick auf Pixel → Details des Tags',
 		],

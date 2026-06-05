@@ -20,7 +20,6 @@ export type DragType =
 	| 'event'
 	| 'link'
 	| 'contact'
-	| 'habit'
 	| 'note'
 	| 'transaction'
 	| 'place'
@@ -28,7 +27,6 @@ export type DragType =
 	| 'journal-entry'
 	| 'first'
 	| 'last'
-	| 'wish'
 	| 'draft';
 
 export interface DragPayload<T = Record<string, unknown>> {

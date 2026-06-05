@@ -12,7 +12,7 @@
 	const allCalendarItems = useAllCalendarItems();
 
 	// Provide data to child components via Svelte context
-	// calendarEvents now contains ALL timeBlock types (events, tasks, habits, timeEntries)
+	// calendarEvents now contains ALL timeBlock types (events, tasks, timeEntries)
 	setContext('calendars', allCalendars);
 	setContext('calendarEvents', allCalendarItems);
 

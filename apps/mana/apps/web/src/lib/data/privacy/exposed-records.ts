@@ -56,18 +56,6 @@ function asString(v: unknown, fallback = 'Ohne Titel'): string {
 
 const TABLES: TableConfig[] = [
 	{
-		module: 'library',
-		collection: 'libraryEntries',
-		moduleLabel: 'Bibliothek',
-		encrypted: true,
-		title: (r) => asString(r.title),
-		href: (id) => `/library/entry/${id}`,
-		setVisibility: async (id, next) => {
-			const { libraryEntriesStore } = await import('$lib/modules/library/stores/entries.svelte');
-			return libraryEntriesStore.setVisibility(id, next);
-		},
-	},
-	{
 		module: 'picture',
 		collection: 'boards',
 		moduleLabel: 'Bilder (Boards)',
@@ -125,18 +113,6 @@ const TABLES: TableConfig[] = [
 		setVisibility: async (id, next) => {
 			const { recipesStore } = await import('$lib/modules/recipes/stores/recipes.svelte');
 			return recipesStore.setVisibility(id, next);
-		},
-	},
-	{
-		module: 'habits',
-		collection: 'habits',
-		moduleLabel: 'Habits',
-		encrypted: true,
-		title: (r) => asString(r.title),
-		href: () => '/habits',
-		setVisibility: async (id, next) => {
-			const { habitsStore } = await import('$lib/modules/habits/stores/habits.svelte');
-			return habitsStore.setVisibility(id, next);
 		},
 	},
 	{

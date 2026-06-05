@@ -50,7 +50,7 @@ export type GenerationProvider = 'mana-ai' | 'mana-llm' | 'local-llm';
 
 export type StyleSource = 'preset' | 'custom-description' | 'sample-trained' | 'self-trained';
 
-export type DraftReferenceKind = 'note' | 'library' | 'kontext' | 'goal' | 'url' | 'me-image';
+export type DraftReferenceKind = 'note' | 'kontext' | 'goal' | 'url' | 'me-image';
 
 export type DraftPublishModule = 'website' | 'social-relay' | 'mail' | 'presi';
 

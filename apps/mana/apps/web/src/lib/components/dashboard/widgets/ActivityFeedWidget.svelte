@@ -18,7 +18,6 @@
 		CalendarBlank,
 		CheckSquare,
 		Timer,
-		Heart,
 		Lightning,
 		Clock,
 		Pulse,
@@ -34,7 +33,6 @@
 		SunHorizon,
 		Presentation,
 	} from '@mana/shared-icons';
-	import { getIconComponent } from '@mana/shared-icons';
 	import { formatDistanceToNow } from 'date-fns';
 	const MAX_ITEMS = 10;
 
@@ -54,7 +52,6 @@
 		event: CalendarBlank,
 		task: CheckSquare,
 		timeEntry: Timer,
-		habit: Heart,
 		focus: Lightning,
 		break: Clock,
 		body: Barbell,
@@ -106,10 +103,7 @@
 	{:else}
 		<div class="space-y-1">
 			{#each items as block (block.id)}
-				{@const TypeIcon = typeIcons[block.type] ?? CalendarBlank}
-				{@const habitIcon =
-					block.type === 'habit' && block.icon ? getIconComponent(block.icon) : null}
-				{@const Icon = habitIcon ?? TypeIcon}
+				{@const Icon = typeIcons[block.type] ?? CalendarBlank}
 				<div
 					class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-hover"
 				>

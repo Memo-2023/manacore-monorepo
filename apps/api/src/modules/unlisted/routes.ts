@@ -34,7 +34,6 @@ const routes = new Hono<{ Variables: AuthVariables }>();
  */
 const ALLOWED_COLLECTIONS = new Set<string>([
 	'events',
-	'libraryEntries',
 	'places',
 	'augurEntries',
 	'lasts',

@@ -122,7 +122,7 @@ export const manaStore = {
 			await db.table('dashboardConfigs').bulkPut(guestDashboardConfigs);
 		}
 
-		// Seed per-module guest data (habits presets, body exercises, dream
+		// Seed per-module guest data (body exercises, dream
 		// examples, etc.). Idempotent: only inserts into empty tables.
 		await seedAllGuestData();
 	},

@@ -26,7 +26,6 @@
 		"event_task_created": "Tasks created",
 		"event_drink_logged": "Drink logged",
 		"event_meal_logged": "Meal logged",
-		"event_habit_logged": "Habit logged",
 		"event_journal_entry_created": "Journal entry",
 		"event_note_created": "Note created",
 		"event_place_visited": "Place visited",

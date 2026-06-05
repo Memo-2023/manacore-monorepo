@@ -22,13 +22,11 @@ import { timeBlockTable } from '$lib/data/time-blocks/collections';
 import { mediaFileUrl } from './upload';
 import type { EmbedItem, EmbedSource, ModuleEmbedProps } from '@mana/website-blocks';
 import type { LocalBoard, LocalBoardItem, LocalImage } from '$lib/modules/picture/types';
-import type { LocalLibraryEntry } from '$lib/modules/library/types';
 import type { LocalEvent } from '$lib/modules/calendar/types';
 import type { LocalTask } from '$lib/modules/todo/types';
 import type { LocalTaskTag } from '$lib/modules/todo/types';
 import type { LocalGoal } from '$lib/companion/goals/types';
 import type { LocalRecipe } from '$lib/modules/recipes/types';
-import type { LocalHabit, LocalHabitLog } from '$lib/modules/habits/types';
 import type { LocalQuiz } from '$lib/modules/quiz/types';
 import type { LocalSocialEvent } from '$lib/modules/events/types';
 import type { LocalDeck as LocalPresiDeck } from '$lib/modules/presi/types';
@@ -50,9 +48,6 @@ export async function resolveEmbed(props: ModuleEmbedProps): Promise<ResolvedEmb
 			case 'picture.board':
 				items = await resolvePictureBoard(props);
 				break;
-			case 'library.entries':
-				items = await resolveLibraryEntries(props);
-				break;
 			case 'calendar.events':
 				items = await resolveCalendarEvents(props);
 				break;
@@ -64,9 +59,6 @@ export async function resolveEmbed(props: ModuleEmbedProps): Promise<ResolvedEmb
 				break;
 			case 'recipes.recipes':
 				items = await resolveRecipes(props);
-				break;
-			case 'habits.habits':
-				items = await resolveHabits(props);
 				break;
 			case 'quiz.quizzes':
 				items = await resolveQuizzes(props);
@@ -152,54 +144,6 @@ async function resolvePictureBoard(props: ModuleEmbedProps): Promise<EmbedItem[]
 		});
 	}
 	return out;
-}
-
-/**
- * Library-entries: returns book/movie/series/comic entries the owner has
- * explicitly marked 'public' via the VisibilityPicker on the entry's
- * detail view. `canEmbedOnWebsite` is the hard gate — user-provided
- * filters (kind/status/favorite) stack on top but cannot override it.
- *
- * First pilot of the unified visibility system (docs/plans/
- * visibility-system.md). Before M2 this path used `isFavorite` as a
- * weak proxy for public intent; that filter is still available as an
- * optional user-facing filter on top of the visibility gate.
- */
-async function resolveLibraryEntries(props: ModuleEmbedProps): Promise<EmbedItem[]> {
-	let locals = await db.table<LocalLibraryEntry>('libraryEntries').toArray();
-	locals = locals.filter((e) => !e.deletedAt && canEmbedOnWebsite(e.visibility ?? 'private'));
-
-	if (props.filter?.kind) {
-		locals = locals.filter((e) => e.kind === props.filter?.kind);
-	}
-	if (props.filter?.status) {
-		locals = locals.filter((e) => e.status === props.filter?.status);
-	}
-	if (props.filter?.isFavorite === true) {
-		locals = locals.filter((e) => e.isFavorite === true);
-	}
-
-	// Newest completions first.
-	locals.sort((a, b) => {
-		const aKey = a.completedAt ?? a.updatedAt ?? '';
-		const bKey = b.completedAt ?? b.updatedAt ?? '';
-		return bKey.localeCompare(aKey);
-	});
-
-	const decrypted = (await decryptRecords('libraryEntries', locals)) as LocalLibraryEntry[];
-
-	return decrypted.map((entry) => {
-		const creators = (entry.creators ?? []).slice(0, 2).join(', ');
-		const year = entry.year ? ` · ${entry.year}` : '';
-		const subtitle = creators ? `${creators}${year}` : year.trim() || undefined;
-		return {
-			title: entry.title,
-			subtitle,
-			imageUrl:
-				entry.coverUrl ??
-				(entry.coverMediaId ? mediaFileUrl(entry.coverMediaId, 'medium') : undefined),
-		};
-	});
 }
 
 /**
@@ -427,85 +371,6 @@ async function resolveRecipes(props: ModuleEmbedProps): Promise<EmbedItem[]> {
 			title: r.title,
 			subtitle: parts.join(' · ') || undefined,
 			imageUrl: r.photoThumbnailUrl ?? r.photoUrl ?? undefined,
-		};
-	});
-}
-
-/**
- * Habits: build-in-public use case. Returns active habits flipped to
- * 'public' with their current streak as subtitle.
- *
- * Whitelist: title + "🔥 N Tage Streak · gesamt M ×" — never the per-log
- * timestamps or notes (those reveal sleep/intake patterns). Streak +
- * total are aggregate counts that sit at the right level of detail
- * for a public "what I'm working on" widget.
- */
-async function resolveHabits(props: ModuleEmbedProps): Promise<EmbedItem[]> {
-	let habits = await db.table<LocalHabit>('habits').toArray();
-	habits = habits.filter(
-		(h) => !h.deletedAt && !h.isArchived && canEmbedOnWebsite(h.visibility ?? 'private')
-	);
-
-	if (props.filter?.tagIds?.length) {
-		// Habits don't have direct tagIds today; the filter is reserved
-		// for when they do. Skip silently.
-	}
-
-	if (habits.length === 0) return [];
-
-	const habitIds = new Set(habits.map((h) => h.id));
-	const allLogs = await db.table<LocalHabitLog>('habitLogs').toArray();
-	const logsByHabit = new Map<string, LocalHabitLog[]>();
-	for (const log of allLogs) {
-		if (log.deletedAt || !habitIds.has(log.habitId)) continue;
-		const list = logsByHabit.get(log.habitId) ?? [];
-		list.push(log);
-		logsByHabit.set(log.habitId, list);
-	}
-
-	// Resolve each log's date via its TimeBlock (date-only, the time
-	// dimension itself is intentionally not exposed).
-	const blockIds = allLogs.map((l) => l.timeBlockId).filter(Boolean);
-	const blocks =
-		blockIds.length > 0
-			? await db.table<LocalTimeBlock>('timeBlocks').where('id').anyOf(blockIds).toArray()
-			: [];
-	const blockDateById = new Map<string, string>();
-	for (const b of blocks) blockDateById.set(b.id, (b.startDate ?? '').slice(0, 10));
-
-	function streakFor(logs: LocalHabitLog[]): number {
-		const dates = new Set<string>();
-		for (const l of logs) {
-			const d = blockDateById.get(l.timeBlockId);
-			if (d) dates.add(d);
-		}
-		let streak = 0;
-		const cursor = new Date();
-		while (true) {
-			const key = cursor.toISOString().slice(0, 10);
-			if (!dates.has(key)) break;
-			streak++;
-			cursor.setDate(cursor.getDate() - 1);
-		}
-		return streak;
-	}
-
-	const decrypted = (await decryptRecords('habits', habits)) as LocalHabit[];
-
-	// Active streak first, then total-count.
-	const enriched = decrypted.map((h) => {
-		const logs = logsByHabit.get(h.id) ?? [];
-		return { habit: h, streak: streakFor(logs), total: logs.length };
-	});
-	enriched.sort((a, b) => b.streak - a.streak || b.total - a.total);
-
-	return enriched.map(({ habit, streak, total }) => {
-		const parts: string[] = [];
-		if (streak > 0) parts.push(`🔥 ${streak} ${streak === 1 ? 'Tag' : 'Tage'} Streak`);
-		if (total > 0) parts.push(`gesamt ${total} ×`);
-		return {
-			title: habit.title,
-			subtitle: parts.length > 0 ? parts.join(' · ') : undefined,
 		};
 	});
 }

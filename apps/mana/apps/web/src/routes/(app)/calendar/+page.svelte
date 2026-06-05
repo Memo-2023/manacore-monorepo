@@ -86,7 +86,6 @@
 			const routeMap: Record<string, string> = {
 				todo: '/todo',
 				times: '/times',
-				habits: '/habits',
 			};
 			const route = routeMap[event.sourceModule];
 			if (route) {
@@ -148,30 +147,6 @@
 				tags: [],
 				visibility: 'private',
 				source: { app: 'manual' },
-			});
-			showQuickCreate = false;
-			return;
-		}
-
-		if (data.blockType === 'habit') {
-			// Create a habit log via TimeBlock + LocalHabitLog
-			const { createBlock } = await import('$lib/data/time-blocks/service');
-			const { habitLogTable } = await import('$lib/modules/habits/collections');
-			const logId = crypto.randomUUID();
-			const timeBlockId = await createBlock({
-				startDate: data.startTime,
-				endDate: data.endTime,
-				kind: 'logged',
-				type: 'habit',
-				sourceModule: 'habits',
-				sourceId: logId,
-				title: data.title,
-			});
-			await habitLogTable.add({
-				id: logId,
-				habitId: '', // No specific habit linked
-				timeBlockId,
-				note: null,
 			});
 			showQuickCreate = false;
 			return;

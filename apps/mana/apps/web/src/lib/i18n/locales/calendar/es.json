@@ -160,7 +160,6 @@
 		"block_event": "Eventos",
 		"block_task": "Tareas",
 		"block_time_entry": "Tiempos",
-		"block_habit": "Hábitos",
 		"block_body": "Entrenamiento",
 		"block_watering": "Riego",
 		"block_sleep": "Sueño",
@@ -193,7 +192,6 @@
 		"placeholder_title": "Añadir un título",
 		"type_event": "Evento",
 		"type_time_entry": "Tiempo",
-		"type_habit": "Hábito",
 		"placeholder_location": "Añadir ubicación",
 		"placeholder_description": "Descripción"
 	},

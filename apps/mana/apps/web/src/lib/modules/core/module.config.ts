@@ -6,7 +6,7 @@
  * - mana       → user settings, dashboard config, automations
  * - tags       → globalTags, tagGroups (shared across all modules)
  * - links      → manaLinks (cross-app record links)
- * - timeblocks → unified time model (events/timeEntries/habits/tasks all
+ * - timeblocks → unified time model (events/timeEntries/tasks all
  *                project into timeBlocks for cross-module scheduling)
  */
 

@@ -15,9 +15,9 @@ function makeSpec(
 	overrides: Partial<Pick<AnyToolSpec, 'name' | 'scope' | 'policyHint' | 'module'>> = {}
 ): AnyToolSpec {
 	return {
-		name: overrides.name ?? 'habits.create',
+		name: overrides.name ?? 'todo.create',
 		description: 'test',
-		module: overrides.module ?? 'habits',
+		module: overrides.module ?? 'todo',
 		scope: overrides.scope ?? 'user-space',
 		policyHint: overrides.policyHint ?? 'write',
 		input: z.object({}),

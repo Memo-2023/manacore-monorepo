@@ -134,7 +134,7 @@ export function useEventDragDrop(getConfig: () => EventDragDropConfig) {
 				endTime: newEnd.toISOString(),
 			});
 		} else if (draggedEvent.calendarId === '__external__') {
-			// External items (tasks, habits, timeEntries): update TimeBlock directly
+			// External items (tasks, timeEntries): update TimeBlock directly
 			await updateBlock(draggedEvent.timeBlockId, {
 				startDate: newStart.toISOString(),
 				endDate: newEnd.toISOString(),

@@ -22,7 +22,6 @@ const TYPE_COLORS: Record<TimeBlockType, string> = {
 	event: '#3b82f6',
 	task: '#f59e0b',
 	timeEntry: '#8b5cf6',
-	habit: '#22c55e',
 	focus: '#ef4444',
 	break: '#6b7280',
 	body: '#ef4444',
@@ -42,7 +41,6 @@ const TYPE_LABELS: Record<TimeBlockType, string> = {
 	event: 'Termine',
 	task: 'Aufgaben',
 	timeEntry: 'Zeiterfassung',
-	habit: 'Habits',
 	focus: 'Fokus',
 	break: 'Pausen',
 	body: 'Training',
@@ -148,38 +146,10 @@ export function dailyStats(blocks: TimeBlock[], days: number = 7): DailyStat[] {
 	return [...stats.values()];
 }
 
-// ─── Habit Heatmap ───────────────────────────────────────
-
 export interface HeatmapCell {
 	date: string;
 	count: number;
 	intensity: number; // 0-4 (like GitHub contribution graph)
-}
-
-/** Generate a habit log heatmap for the last N days. */
-export function habitHeatmap(blocks: TimeBlock[], days: number = 90): HeatmapCell[] {
-	const habitBlocks = blocks.filter((b) => b.type === 'habit' && b.kind === 'logged');
-	const countByDate = new Map<string, number>();
-
-	for (const b of habitBlocks) {
-		const dateStr = b.startDate.split('T')[0];
-		countByDate.set(dateStr, (countByDate.get(dateStr) ?? 0) + 1);
-	}
-
-	const maxCount = Math.max(1, ...countByDate.values());
-	const cells: HeatmapCell[] = [];
-	const today = new Date();
-
-	for (let d = days - 1; d >= 0; d--) {
-		const date = new Date(today);
-		date.setDate(date.getDate() - d);
-		const dateStr = date.toISOString().split('T')[0];
-		const count = countByDate.get(dateStr) ?? 0;
-		const intensity = count === 0 ? 0 : Math.min(4, Math.ceil((count / maxCount) * 4));
-		cells.push({ date: dateStr, count, intensity });
-	}
-
-	return cells;
 }
 
 // ─── Plan vs Reality ─────────────────────────────────────

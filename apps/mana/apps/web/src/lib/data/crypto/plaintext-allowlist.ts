@@ -50,8 +50,6 @@ export const PLAINTEXT_ALLOWLIST: readonly string[] = [
 	'goals', // TODO: audit
 	'guideCollections', // TODO: audit
 	'guideTags', // TODO: audit
-	'habitLogs', // TODO: audit
-	'habits', // TODO: audit
 	'imageTags', // TODO: audit
 	'invCategories', // TODO: audit
 	'invCollections', // TODO: audit
@@ -96,7 +94,4 @@ export const PLAINTEXT_ALLOWLIST: readonly string[] = [
 	'userSettings', // TODO: audit
 	'wetterLocations', // TODO: audit
 	'wetterSettings', // TODO: audit
-	'wishesItems', // TODO: audit
-	'wishesLists', // TODO: audit
-	'wishesPriceChecks', // TODO: audit
 ];

@@ -5,7 +5,7 @@
  * Dexie transaction to keep them consistent.
  *
  * Phase 7.1 encryption: title + description are encrypted at rest. The
- * consumer modules (todo, calendar, habits, times) flow their plaintext
+ * consumer modules (todo, calendar, times) flow their plaintext
  * snapshots through this service, which wraps them via encryptRecord
  * before the actual Dexie write — so every caller gets encryption for
  * free without touching their own code paths.

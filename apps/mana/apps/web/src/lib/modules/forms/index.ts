@@ -23,7 +23,6 @@ export { buildResponsesCsv, downloadResponsesCsv } from './lib/csv';
 export {
 	buildContactFromAnswers,
 	buildEventGuestFromAnswers,
-	buildLibraryEntryFromAnswers,
 	buildSpaceInviteFromAnswers,
 	applyAutoSync,
 	runAutoSyncSweep,

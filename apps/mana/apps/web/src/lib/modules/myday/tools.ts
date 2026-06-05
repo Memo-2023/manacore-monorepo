@@ -23,7 +23,7 @@ export const mydayTools: ModuleTool[] = [
 		name: 'get_myday_summary',
 		module: 'myday',
 		description:
-			'Gibt eine komplette Tageszusammenfassung zurueck: Tasks, Termine, Trinken, Ernaehrung, Orte, Habits/Streaks und aktive Ziele. Nutze dieses Tool zuerst, um den vollen Tageskontext zu bekommen.',
+			'Gibt eine komplette Tageszusammenfassung zurueck: Tasks, Termine, Trinken, Ernaehrung, Orte und aktive Ziele. Nutze dieses Tool zuerst, um den vollen Tageskontext zu bekommen.',
 		parameters: [],
 		async execute() {
 			const today = todayStr();

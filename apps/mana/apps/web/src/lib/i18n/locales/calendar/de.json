@@ -160,7 +160,6 @@
 		"block_event": "Termine",
 		"block_task": "Aufgaben",
 		"block_time_entry": "Zeiten",
-		"block_habit": "Habits",
 		"block_body": "Training",
 		"block_watering": "Gießen",
 		"block_sleep": "Schlaf",
@@ -193,7 +192,6 @@
 		"placeholder_title": "Titel hinzufügen",
 		"type_event": "Termin",
 		"type_time_entry": "Zeiterfassung",
-		"type_habit": "Habit",
 		"placeholder_location": "Ort hinzufügen",
 		"placeholder_description": "Beschreibung"
 	},

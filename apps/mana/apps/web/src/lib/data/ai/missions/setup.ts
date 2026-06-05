@@ -39,7 +39,6 @@ async function ensureSeedsRegistered(): Promise<void> {
 	seedsRegistered = true;
 	await Promise.all([
 		import('$lib/modules/meditate/seed'),
-		import('$lib/modules/habits/seed'),
 		import('$lib/companion/goals/seed'),
 	]);
 }

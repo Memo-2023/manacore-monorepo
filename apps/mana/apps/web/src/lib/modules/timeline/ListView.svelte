@@ -10,14 +10,12 @@
 	import type { LocalTimeBlock, TimeBlockType } from '$lib/data/time-blocks/types';
 	import { toTimeBlock, getBlockDuration } from '$lib/data/time-blocks/queries';
 	import type { TimeBlock } from '$lib/data/time-blocks/types';
-	import { getIconComponent } from '@mana/shared-icons';
 	import {
 		CaretLeft,
 		CaretRight,
 		CalendarBlank,
 		CheckSquare,
 		Timer,
-		Heart,
 		Lightning,
 		Clock,
 		Funnel,
@@ -27,7 +25,7 @@
 	let currentDate = $state(new Date());
 	let showFilters = $state(false);
 	let visibleTypes = $state<Set<TimeBlockType>>(
-		new Set(['event', 'task', 'habit', 'timeEntry', 'focus', 'break'])
+		new Set(['event', 'task', 'timeEntry', 'focus', 'break'])
 	);
 
 	let dateStr = $derived(format(currentDate, 'yyyy-MM-dd'));
@@ -62,7 +60,6 @@
 		{ type: 'event', icon: CalendarBlank, label: 'Termine', color: '#3b82f6' },
 		{ type: 'task', icon: CheckSquare, label: 'Aufgaben', color: '#f59e0b' },
 		{ type: 'timeEntry', icon: Timer, label: 'Zeiten', color: '#8b5cf6' },
-		{ type: 'habit', icon: Heart, label: 'Habits', color: '#22c55e' },
 		{ type: 'focus', icon: Lightning, label: 'Fokus', color: '#ef4444' },
 	];
 
@@ -154,8 +151,6 @@
 			<div class="timeline-list">
 				{#each blocks as block, i (block.id)}
 					{@const duration = getBlockDuration(block)}
-					{@const habitIcon =
-						block.type === 'habit' && block.icon ? getIconComponent(block.icon) : null}
 					{@const typeCfg = typeConfig.find((c) => c.type === block.type)}
 
 					<div class="timeline-item" class:live={block.isLive}>
@@ -179,10 +174,7 @@
 						<!-- Content -->
 						<div class="content-col">
 							<div class="item-header">
-								{#if habitIcon}
-									{@const HabitIcon = habitIcon}
-									<HabitIcon size={16} style="color: {block.color || '#6b7280'}" />
-								{:else if typeCfg}
+								{#if typeCfg}
 									{@const TypeIcon = typeCfg.icon}
 									<TypeIcon size={16} class="item-type-icon" />
 								{/if}

@@ -13,7 +13,6 @@ import {
 	CheckSquare,
 	Calendar,
 	AddressBook,
-	Repeat,
 	Notepad,
 	Moon,
 	Drop,
@@ -60,9 +59,7 @@ import {
 	SquaresFour,
 	Spiral,
 	Crown,
-	ShootingStar,
 	CloudSun,
-	Stack,
 	ArrowClockwise,
 	Flask,
 	Exam,
@@ -87,13 +84,13 @@ import {
 //       todo · calendar · contacts
 //
 //   §2  Apps without entity capabilities — module surfaces
-//       Daily-use:    habits · notes · journal · myday · drink ·
+//       Daily-use:    notes · journal · myday · drink ·
 //                     mood · sleep · activity · times · finance
 //       Knowledge:    chat · kontext · cards · quiz · guides ·
 //                     news-research · research-lab · articles ·
-//                     library · writing · presi
+//                     writing · presi
 //       Body & life:  body · meditate · stretch · period ·
-//                     dreams · firsts · lasts · habits · recipes
+//                     dreams · firsts · lasts · recipes
 //       Places & ev.: places · events
 //       Creative:     picture · music · photos
 //       Tools:        calc · inventory ·
@@ -274,51 +271,6 @@ registerApp({
 });
 
 // ── Apps without entity capabilities ────────────────────────
-
-registerApp({
-	id: 'habits',
-	name: 'Habits',
-	color: '#8B5CF6',
-	icon: Repeat,
-	views: {
-		list: { load: () => import('$lib/modules/habits/ListView.svelte') },
-	},
-	contextMenuActions: [
-		{
-			id: 'new-habit',
-			label: 'Neues Habit',
-			icon: Plus,
-			action: () =>
-				window.dispatchEvent(
-					new CustomEvent('mana:quick-action', { detail: { app: 'habits', action: 'new' } })
-				),
-		},
-	],
-	collection: 'habits',
-	paramKey: 'habitId',
-	dragType: 'habit',
-	acceptsDropFrom: ['task'],
-	transformIncoming: {
-		task: (source) => ({
-			title: source.title as string,
-			icon: 'barbell',
-			color: '#6366f1',
-		}),
-	},
-	getDisplayData: (item) => ({
-		title: item.title as string,
-		subtitle: undefined,
-	}),
-	createItem: async (data) => {
-		const { habitsStore } = await import('$lib/modules/habits/stores/habits.svelte');
-		const habit = await habitsStore.createHabit({
-			title: data.title as string,
-			icon: (data.icon as string) ?? 'star',
-			color: (data.color as string) ?? '#6366f1',
-		});
-		return habit.id;
-	},
-});
 
 registerApp({
 	id: 'notes',
@@ -1073,45 +1025,6 @@ registerApp({
 });
 
 registerApp({
-	id: 'wishes',
-	name: 'Wünsche',
-	color: '#F59E0B',
-	icon: ShootingStar,
-	views: {
-		list: { load: () => import('$lib/modules/wishes/ListView.svelte') },
-		detail: { load: () => import('$lib/modules/wishes/views/DetailView.svelte') },
-	},
-	contextMenuActions: [
-		{
-			id: 'new-wish',
-			label: 'Neuer Wunsch',
-			icon: Plus,
-			action: () =>
-				window.dispatchEvent(
-					new CustomEvent('mana:quick-action', { detail: { app: 'wishes', action: 'new' } })
-				),
-		},
-	],
-	collection: 'wishesItems',
-	paramKey: 'wishId',
-	dragType: 'wish',
-	getDisplayData: (item) => ({
-		title: (item.title as string) || 'Wunsch',
-		subtitle: item.targetPrice
-			? `${(item.targetPrice as number).toLocaleString('de-DE')} €`
-			: undefined,
-	}),
-	createItem: async (data) => {
-		const { wishesStore } = await import('$lib/modules/wishes/stores/wishes.svelte');
-		const wish = await wishesStore.create({
-			title: data.title as string,
-			description: data.description as string | undefined,
-		});
-		return wish.id;
-	},
-});
-
-registerApp({
 	id: 'help',
 	name: 'Hilfe',
 	color: '#3B82F6',
@@ -1139,30 +1052,6 @@ registerApp({
 	views: {
 		list: { load: () => import('$lib/modules/feedback/ListView.svelte') },
 	},
-});
-
-registerApp({
-	id: 'library',
-	name: 'Bibliothek',
-	color: '#a855f7',
-	icon: Stack,
-	views: {
-		// Detail view uses the route-based pattern (/library/entry/[id]); the
-		// workbench detail-slot (ViewProps params/navigate) pattern is not
-		// wired up yet. Clicks on a card in the list view navigate via goto().
-		list: { load: () => import('$lib/modules/library/ListView.svelte') },
-	},
-	contextMenuActions: [
-		{
-			id: 'new-entry',
-			label: 'Neuer Eintrag',
-			icon: Plus,
-			action: () =>
-				window.dispatchEvent(
-					new CustomEvent('mana:quick-action', { detail: { app: 'library', action: 'new' } })
-				),
-		},
-	],
 });
 
 registerApp({

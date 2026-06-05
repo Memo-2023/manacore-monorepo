@@ -482,23 +482,6 @@ export const MANA_APPS: ManaApp[] = [
 		requiredTier: 'guest',
 	},
 	{
-		id: 'habits',
-		name: 'Habits',
-		description: {
-			de: 'Gewohnheiten tracken',
-			en: 'Habit Tracking',
-		},
-		longDescription: {
-			de: 'Schnelles Tally-Tracking für Gewohnheiten wie Kaffee, Zigaretten, Wasser — ein Tap pro Eintrag mit Tagesstatistiken und Streaks.',
-			en: 'Quick tally tracking for habits like coffee, cigarettes, water — one tap per entry with daily stats and streaks.',
-		},
-		icon: APP_ICONS.habits,
-		color: '#8b5cf6',
-		comingSoon: false,
-		status: 'development',
-		requiredTier: 'guest',
-	},
-	{
 		id: 'journal',
 		name: 'Journal',
 		description: {
@@ -814,23 +797,6 @@ export const MANA_APPS: ManaApp[] = [
 		requiredTier: 'guest',
 	},
 	{
-		id: 'library',
-		name: 'Bibliothek',
-		description: {
-			de: 'Bücher, Filme, Serien, Comics',
-			en: 'Books, Movies, Series, Comics',
-		},
-		longDescription: {
-			de: 'Protokolliere was du liest und schaust — Bücher, Filme, Serien, Comics. Mit Status, Rating, Fortschritt und Jahresrückblick.',
-			en: 'Log what you read and watch — books, movies, series, comics. With status, rating, progress tracking and year-in-review.',
-		},
-		icon: APP_ICONS.library,
-		color: '#a855f7',
-		comingSoon: false,
-		status: 'development',
-		requiredTier: 'guest',
-	},
-	{
 		id: 'writing',
 		name: 'Schreiben',
 		description: {
@@ -965,23 +931,6 @@ export const MANA_APPS: ManaApp[] = [
 		comingSoon: false,
 		status: 'beta',
 		requiredTier: 'guest', // LOCAL TIER PATCH — revert to 'beta' before release
-	},
-	{
-		id: 'wishes',
-		name: 'Wünsche',
-		description: {
-			de: 'Wunschliste & Inspiration',
-			en: 'Wishlist & inspiration',
-		},
-		longDescription: {
-			de: 'Halte fest, was du dir wünschst — Geschenkideen, Reiseziele, Lebensziele. Ein leichter, freundlicher Ort für die Dinge, die noch keine Aufgabe sind, dich aber begleiten.',
-			en: 'Capture what you wish for — gift ideas, travel destinations, life goals. A light, friendly place for the things that are not yet tasks but stay with you.',
-		},
-		icon: APP_ICONS.wishes,
-		color: '#f59e0b',
-		comingSoon: false,
-		status: 'development',
-		requiredTier: 'guest',
 	},
 ];
 
