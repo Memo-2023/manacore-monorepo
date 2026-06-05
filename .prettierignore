@@ -28,6 +28,10 @@ TESTING_STRATEGY_AUTH_CREDITS.md
 *.gen.ts
 *.generated.ts
 
+# tsup-generated design-token bundler output (theme.ts is the source)
+apps/picture/packages/design-tokens/native/theme.js
+apps/picture/packages/design-tokens/native/theme.d.ts
+
 # Cache files
 .cache/
 .parcel-cache/
