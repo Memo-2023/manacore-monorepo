@@ -506,9 +506,4 @@ ingress:
   - hostname: kollekta.mana.how
     service: http://localhost:3148
 
-  # Avatar — persönlicher Pixel-Art-Charakter-Baukasten (Code/avatar/),
-  # local-first; event-sync gegen sync2 erst nach Login. Host-Port 3150.
-  - hostname: avatar.mana.how
-    service: http://localhost:3150
-
   - service: http_status:404
