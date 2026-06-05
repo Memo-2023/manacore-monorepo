@@ -249,6 +249,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
+      # validate:all's last step (audit:encrypted-tools) runs via `bun run`.
+      # GitHub-hosted runners don't ship bun; without this the whole gate
+      # dies with "bun: not found" right after check:crypto. (Self-hosted
+      # CD runners have bun natively, so this is CI-only.)
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
