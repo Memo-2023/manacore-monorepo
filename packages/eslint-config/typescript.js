@@ -21,8 +21,25 @@ export const typescriptConfig = [
 			parserOptions: {
 				ecmaVersion: 2022,
 				sourceType: 'module',
-				projectService: true,
-				tsconfigRootDir: import.meta.dirname,
+				// `allowDefaultProject` lets type-aware linting fall back to an
+				// inferred program for files a package intentionally keeps out of
+				// its tsconfig (config files, specs, svelte-adapter entries).
+				// Without it those fail "not found by the project service".
+				// tsconfigRootDir is intentionally NOT pinned — it defaults to
+				// process.cwd() (the package being linted); pinning it to
+				// import.meta.dirname pointed every consumer at the eslint-config
+				// package and broke project discovery.
+				projectService: {
+					allowDefaultProject: [
+						'*.config.ts',
+						'*.config.js',
+						'*.config.mjs',
+						'*.config.cjs',
+						'*.spec.ts',
+						'*.test.ts',
+						'src/svelte/index.ts',
+					],
+				},
 			},
 		},
 		plugins: {
