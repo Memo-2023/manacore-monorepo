@@ -55,13 +55,11 @@ export const PLAINTEXT_ALLOWLIST: readonly string[] = [
 	'invCollections', // TODO: audit
 	'invItemTags', // TODO: audit
 	'invLocations', // TODO: audit
-	'linkTags', // TODO: audit
 	'manaLinks', // TODO: audit
 	'markers', // TODO: audit
 	'mealTags', // TODO: audit
 	'moodTags', // TODO: audit
 	'moods', // TODO: audit
-	'newsCachedFeed', // TODO: audit
 	'noteTags', // TODO: audit
 	'periodSymptoms', // TODO: audit
 	'photoFavorites', // TODO: audit
@@ -94,4 +92,36 @@ export const PLAINTEXT_ALLOWLIST: readonly string[] = [
 	'userSettings', // TODO: audit
 	'wetterLocations', // TODO: audit
 	'wetterSettings', // TODO: audit
+
+	// ─── Retired-module legacy tables (lifted to standalone apps) ───
+	// The Dexie schema persists for migration safety; the unified app no
+	// longer actively writes these. Classified plaintext pending audit —
+	// if any holds sensitive content, move it to the encryption registry.
+	'comicCharacters', // TODO: audit (retired: comic → comicello)
+	'comicStories', // TODO: audit (retired: comic → comicello)
+	'customQuotes', // TODO: audit (retired: quotes → zitare)
+	'locationLogs', // TODO: audit (retired: places)
+	'meals', // TODO: audit (retired: food → nutriphi)
+	'mukkeProjects', // TODO: audit (retired: music → mukke)
+	'placeTags', // TODO: audit (retired: places)
+	'places', // TODO: audit (retired: places)
+	'playlistSongs', // TODO: audit (retired: music → mukke)
+	'quotesFavorites', // TODO: audit (retired: quotes → zitare)
+	'quotesListTags', // TODO: audit (retired: quotes → zitare)
+	'quotesLists', // TODO: audit (retired: quotes → zitare)
+	'songTags', // TODO: audit (retired: music → mukke)
+	'wardrobeGarments', // TODO: audit (retired: wardrobe → werdrobe)
+	'wardrobeOutfits', // TODO: audit (retired: wardrobe → werdrobe)
+
+	// ─── Dormant articles/reader feature (schema present, no active
+	// module code writes these in the unified app, no encryptRecord call).
+	// Classified plaintext to match actual storage. AUDIT: articles +
+	// articleHighlights can hold user reading content — if the reader is
+	// revived, add real encryption (registry + encryptRecord) before use.
+	'articles', // TODO: audit (dormant reader — holds user content, currently plaintext)
+	'articleHighlights', // TODO: audit (dormant reader — user highlights, currently plaintext)
+	'articleTags', // TODO: audit (dormant reader)
+	'articleImportJobs', // import worker state — no user content
+	'articleImportItems', // import worker state — no user content
+	'articleExtractPickup', // import worker handoff row — no user content
 ];

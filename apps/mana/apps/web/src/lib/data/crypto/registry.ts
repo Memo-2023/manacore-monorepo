@@ -104,13 +104,6 @@ export const ENCRYPTION_REGISTRY: Record<string, EncryptionConfig> = {
 	conversations: entry<LocalConversation>(['title']),
 	chatTemplates: entry<LocalTemplate>(['name', 'description', 'systemPrompt', 'initialQuestion']),
 
-	// ─── Who (LLM character guessing game) ──────────────────
-	// Conversation content + the revealed character name + free-form
-	// notes count as user-typed content. Plaintext: ids, FK, status,
-	// timestamps, message counts (all needed for query/sort/filter).
-	whoGames: { enabled: true, fields: ['revealedName', 'notes'] },
-	whoMessages: { enabled: true, fields: ['content'] },
-
 	// ─── Notes ───────────────────────────────────────────────
 	// Phase 4 pilot — first table flipped to enabled:true. The schema
 	// uses `title` + `content` (no separate `body` column).
@@ -267,14 +260,6 @@ export const ENCRYPTION_REGISTRY: Record<string, EncryptionConfig> = {
 	// `note` (singular), not `notes` or `merchant`.
 	transactions: { enabled: true, fields: ['description', 'note'] },
 
-	// ─── uLoad ───────────────────────────────────────────────
-	// `originalUrl` STAYS PLAINTEXT — the redirect handler resolves
-	// shortCode → originalUrl on every click, encrypting it would force
-	// the public redirect path to do an async decrypt before the 302.
-	// shortCode is a public lookup key. We encrypt the user-typed
-	// metadata (title + description) which is the part the user actually
-	// expects to be private, and leave the routing primitives alone.
-	links: { enabled: true, fields: ['title', 'description'] },
 	// NOTE: `manaLinks` is intentionally NOT in the registry. Despite
 	// the name it's the cross-app link table — pure foreign keys
 	// (sourceAppId / sourceRecordId / targetAppId / targetRecordId)
@@ -298,44 +283,6 @@ export const ENCRYPTION_REGISTRY: Record<string, EncryptionConfig> = {
 	playgroundSnippets: { enabled: true, fields: ['name', 'systemPrompt'] },
 	playgroundConversations: { enabled: true, fields: ['title', 'systemPrompt'] },
 	playgroundMessages: { enabled: true, fields: ['content'] },
-
-	// ─── News ────────────────────────────────────────────────
-	// Saved articles are reading-behavior data (sensitive). The body
-	// fields (title/excerpt/content/htmlContent/author) are encrypted
-	// at rest. The structural columns — type, isRead, isArchived,
-	// originalUrl, sourceCuratedId, sourceSlug, categoryId, image, the
-	// numeric metrics — stay plaintext for indexing, dedupe, and the
-	// reader's reading-progress logic.
-	//
-	// `newsCategories.name` is the user-named folder label and gets the
-	// same treatment as note titles.
-	//
-	// `newsPreferences` holds selected topics + blocklist + learned
-	// weights. The lists themselves leak less than the *contents* of
-	// the user's reading; still, the topic-weight map is a noisy proxy
-	// for interests, so we encrypt it.
-	//
-	// `newsReactions` records "what did the user say about article X";
-	// the meaningful payload is the (articleId, reaction) tuple. We
-	// encrypt the reaction enum to avoid leaking aggregate "user thumbs
-	// down N% of articles from source X" signals to anyone with raw DB
-	// access. The articleId itself stays plaintext because it's used as
-	// the join key to suppress already-rated articles in the feed scorer.
-	//
-	// `newsCachedFeed` is intentionally NOT registered — it's a local
-	// mirror of the public server pool, the same content already lives
-	// unencrypted in news.curated_articles, and encrypting it would
-	// break the [topic+publishedAt] index used for the feed query.
-	newsArticles: {
-		enabled: true,
-		fields: ['title', 'excerpt', 'content', 'htmlContent', 'author'],
-	},
-	newsCategories: { enabled: true, fields: ['name'] },
-	newsPreferences: {
-		enabled: true,
-		fields: ['selectedTopics', 'blockedSources', 'topicWeights', 'sourceWeights', 'customFeeds'],
-	},
-	newsReactions: { enabled: true, fields: ['reaction', 'sourceSlug', 'topic'] },
 
 	// ─── Body (combined fitness + bodylog) ───────────────────
 	// Health/fitness data is GDPR-sensitive (Art. 9 special category).
