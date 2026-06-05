@@ -106,15 +106,33 @@ export interface MoodSettings {
 
 export const EMOTION_META: Record<
 	CoreEmotion,
-	{ de: string; en: string; emoji: string; valence: 'positive' | 'negative' | 'neutral'; color: string }
+	{
+		de: string;
+		en: string;
+		emoji: string;
+		valence: 'positive' | 'negative' | 'neutral';
+		color: string;
+	}
 > = {
 	happy: { de: 'Fröhlich', en: 'Happy', emoji: '😊', valence: 'positive', color: '#f59e0b' },
 	calm: { de: 'Ruhig', en: 'Calm', emoji: '😌', valence: 'positive', color: '#06b6d4' },
-	energized: { de: 'Energiegeladen', en: 'Energized', emoji: '⚡', valence: 'positive', color: '#f97316' },
+	energized: {
+		de: 'Energiegeladen',
+		en: 'Energized',
+		emoji: '⚡',
+		valence: 'positive',
+		color: '#f97316',
+	},
 	grateful: { de: 'Dankbar', en: 'Grateful', emoji: '🙏', valence: 'positive', color: '#ec4899' },
 	excited: { de: 'Aufgeregt', en: 'Excited', emoji: '🤩', valence: 'positive', color: '#ef4444' },
 	loved: { de: 'Geliebt', en: 'Loved', emoji: '🥰', valence: 'positive', color: '#f43f5e' },
-	hopeful: { de: 'Hoffnungsvoll', en: 'Hopeful', emoji: '🌱', valence: 'positive', color: '#22c55e' },
+	hopeful: {
+		de: 'Hoffnungsvoll',
+		en: 'Hopeful',
+		emoji: '🌱',
+		valence: 'positive',
+		color: '#22c55e',
+	},
 	neutral: { de: 'Neutral', en: 'Neutral', emoji: '😐', valence: 'neutral', color: '#6b7280' },
 	bored: { de: 'Gelangweilt', en: 'Bored', emoji: '😑', valence: 'neutral', color: '#9ca3af' },
 	tired: { de: 'Müde', en: 'Tired', emoji: '😴', valence: 'negative', color: '#8b5cf6' },
@@ -122,14 +140,39 @@ export const EMOTION_META: Record<
 	anxious: { de: 'Ängstlich', en: 'Anxious', emoji: '😰', valence: 'negative', color: '#a855f7' },
 	angry: { de: 'Wütend', en: 'Angry', emoji: '😡', valence: 'negative', color: '#dc2626' },
 	stressed: { de: 'Gestresst', en: 'Stressed', emoji: '😤', valence: 'negative', color: '#ea580c' },
-	frustrated: { de: 'Frustriert', en: 'Frustrated', emoji: '😣', valence: 'negative', color: '#b91c1c' },
-	overwhelmed: { de: 'Überfordert', en: 'Overwhelmed', emoji: '🤯', valence: 'negative', color: '#7c3aed' },
+	frustrated: {
+		de: 'Frustriert',
+		en: 'Frustrated',
+		emoji: '😣',
+		valence: 'negative',
+		color: '#b91c1c',
+	},
+	overwhelmed: {
+		de: 'Überfordert',
+		en: 'Overwhelmed',
+		emoji: '🤯',
+		valence: 'negative',
+		color: '#7c3aed',
+	},
 };
 
 export const CORE_EMOTIONS: readonly CoreEmotion[] = [
-	'happy', 'calm', 'energized', 'grateful', 'excited', 'loved', 'hopeful',
-	'neutral', 'bored',
-	'tired', 'sad', 'anxious', 'angry', 'stressed', 'frustrated', 'overwhelmed',
+	'happy',
+	'calm',
+	'energized',
+	'grateful',
+	'excited',
+	'loved',
+	'hopeful',
+	'neutral',
+	'bored',
+	'tired',
+	'sad',
+	'anxious',
+	'angry',
+	'stressed',
+	'frustrated',
+	'overwhelmed',
 ] as const;
 
 export const ACTIVITY_LABELS: Record<ActivityContext, { de: string; en: string; emoji: string }> = {
@@ -148,9 +191,21 @@ export const ACTIVITY_LABELS: Record<ActivityContext, { de: string; en: string; 
 };
 
 export const MOOD_TAG_PRESETS = [
-	'Kaffee', 'Sport', 'Meditation', 'Schlecht geschlafen', 'Gut geschlafen',
-	'Natur', 'Musik', 'Streit', 'Erfolg', 'Deadline', 'Wochenende',
-	'Regen', 'Sonne', 'Kopfschmerzen', 'Periode',
+	'Kaffee',
+	'Sport',
+	'Meditation',
+	'Schlecht geschlafen',
+	'Gut geschlafen',
+	'Natur',
+	'Musik',
+	'Streit',
+	'Erfolg',
+	'Deadline',
+	'Wochenende',
+	'Regen',
+	'Sonne',
+	'Kopfschmerzen',
+	'Periode',
 ] as const;
 
 export const DEFAULT_MOOD_SETTINGS: Omit<LocalMoodSettings, keyof BaseRecord> = {

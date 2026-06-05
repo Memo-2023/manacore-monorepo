@@ -15,13 +15,6 @@
 import type { MiddlewareHandler } from 'hono';
 import { logger as log, configureLogger } from '@mana/shared-logger';
 
-let _requestIdStore: Map<object, string> | null = null;
-
-function getStore(): Map<object, string> {
-	if (!_requestIdStore) _requestIdStore = new Map();
-	return _requestIdStore;
-}
-
 /**
  * Initialize the Hono logger with a service name.
  * Call once at server startup before registering the middleware.
@@ -35,8 +28,7 @@ export function initLogger(serviceName: string): void {
  */
 export function requestLogger(): MiddlewareHandler {
 	return async (c, next) => {
-		const requestId =
-			c.req.header('x-request-id') || crypto.randomUUID().slice(0, 8);
+		const requestId = c.req.header('x-request-id') || crypto.randomUUID().slice(0, 8);
 		c.header('X-Request-Id', requestId);
 
 		const method = c.req.method;

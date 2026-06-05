@@ -81,6 +81,10 @@ cicd/
 apps/picture/apps/landing/src/components/Features.astro
 apps/picture/apps/landing/src/components/promptTemplates/CategoryGrid.astro
 
+# Svelte CSF story Prettier's svelte plugin can't parse (<script module> +
+# defineMeta) — dev-only; shared-ui is synced from mana/shared-ui anyway.
+packages/shared-ui/src/atoms/DynamicIcon.stories.svelte
+
 # Partial/temporary files
 **/.!*
 

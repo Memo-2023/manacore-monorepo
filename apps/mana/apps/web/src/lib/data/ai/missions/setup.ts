@@ -37,10 +37,7 @@ let seedsRegistered = false;
 async function ensureSeedsRegistered(): Promise<void> {
 	if (seedsRegistered || !browser) return;
 	seedsRegistered = true;
-	await Promise.all([
-		import('$lib/modules/meditate/seed'),
-		import('$lib/companion/goals/seed'),
-	]);
+	await Promise.all([import('$lib/modules/meditate/seed'), import('$lib/companion/goals/seed')]);
 }
 
 /** Default interval between tick scans. One minute is fine for foreground use. */

@@ -12,10 +12,7 @@ export function loadConfig(): Config {
 	const env = (key: string, fallback?: string) => process.env[key] || fallback || '';
 	return {
 		port: parseInt(env('PORT', '3063'), 10),
-		databaseUrl: env(
-			'DATABASE_URL',
-			'postgresql://mana:devpassword@localhost:5432/mana_platform'
-		),
+		databaseUrl: env('DATABASE_URL', 'postgresql://mana:devpassword@localhost:5432/mana_platform'),
 		manaAuthUrl: env('MANA_AUTH_URL', 'http://localhost:3001'),
 		serviceKey: env('MANA_SERVICE_KEY', 'dev-service-key'),
 		baseUrl: env('BASE_URL', 'http://localhost:3063'),

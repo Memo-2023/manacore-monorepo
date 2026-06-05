@@ -31,8 +31,7 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		],
 	},
 	calendar: {
-		description:
-			'Termine und Zeitblöcke planen. Verknüpft sich mit Aufgaben und sozialen Events.',
+		description: 'Termine und Zeitblöcke planen. Verknüpft sich mit Aufgaben und sozialen Events.',
 		features: [
 			'Tages-, Wochen- und Monatsansicht',
 			'Wiederkehrende Termine',
@@ -512,8 +511,7 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		],
 	},
 	myday: {
-		description:
-			'Tagesübersicht — alles Wichtige auf einen Blick: Termine, Aufgaben und Stimmung.',
+		description: 'Tagesübersicht — alles Wichtige auf einen Blick: Termine, Aufgaben und Stimmung.',
 		features: [
 			'Heutige Termine & Aufgaben',
 			'Schnellzugriff auf häufige Aktionen',

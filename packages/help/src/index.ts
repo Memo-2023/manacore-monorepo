@@ -49,11 +49,7 @@ export { default as ChangelogEntry } from './components/ChangelogEntry.svelte';
 export { default as ContactSection } from './components/ContactSection.svelte';
 export { default as HelpSearch } from './components/HelpSearch.svelte';
 
-export {
-	defaultTranslationsDE,
-	defaultTranslationsEN,
-	getHelpTranslations,
-} from './translations';
+export { defaultTranslationsDE, defaultTranslationsEN, getHelpTranslations } from './translations';
 
 export type {
 	HelpPageProps,

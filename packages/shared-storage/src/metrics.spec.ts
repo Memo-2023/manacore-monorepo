@@ -200,13 +200,21 @@ describe('createPrometheusCollector', () => {
 		const hooks = new StorageHooks();
 		attachMetrics(hooks, collector);
 
-		hooks.emit('upload', { bucket: 'test', key: 'f.png', sizeBytes: 512, contentType: 'image/png' });
+		hooks.emit('upload', {
+			bucket: 'test',
+			key: 'f.png',
+			sizeBytes: 512,
+			contentType: 'image/png',
+		});
 		hooks.emit('download', { bucket: 'test', key: 'f.png' });
 		hooks.emit('delete', { bucket: 'test', keys: ['a', 'b'] });
 
 		expect(factory.counters.get('storage_uploads_total')?.inc).toHaveBeenCalledTimes(1);
 		expect(factory.counters.get('storage_downloads_total')?.inc).toHaveBeenCalledTimes(1);
-		expect(factory.counters.get('storage_deletes_total')?.inc).toHaveBeenCalledWith({ bucket: 'test' }, 2);
+		expect(factory.counters.get('storage_deletes_total')?.inc).toHaveBeenCalledWith(
+			{ bucket: 'test' },
+			2
+		);
 		expect(factory.histograms.get('storage_upload_size_bytes')?.observe).toHaveBeenCalledWith(
 			{ bucket: 'test' },
 			512

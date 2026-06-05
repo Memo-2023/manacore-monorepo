@@ -14,10 +14,12 @@ Rest ist erledigt bzw. eine kurze Rest-Checkliste.
 ## 0. Erledigt (live, ohne sudo)
 
 **Aus dem 502-Postmortem (31.5.):**
+
 - ✅ `com.mana.ssh-mux-refresh` abgeschafft (riss planmäßig den colima-SSH-Mux ab → 8h-502). mana `04f0570`.
 - ✅ Watchdog `ensure-containers-running.sh` heilt jetzt selbst (`docker info`-Probe → sanft → `colima restart`, mit Backoff/Locks). managarten `7c6fde148`.
 
 **Aus dem Cleanup-Durchgang (4.6.):**
+
 - ✅ **cloudflared-Config-Footgun weg** — `~/.cloudflared/config.yml` (stale 113 Routen) → **Symlink auf die SOT** (`mana-platform-deploy/…/cloudflared-config.yml`, 126 Routen, von `tunnel-reconcile` gepflegt). Alte Datei: `*.stale-bak-20260604`.
 - ✅ **Doppelter LaunchAgent** `homebrew.mxcl.cloudflared.plist` entfernt.
 - ✅ **cloudflared upgraded** 2026.1.1 → **2026.5.2** (`brew upgrade` + kickstart); 1 gesunder Connector, alle Sites 200.
@@ -38,12 +40,13 @@ ssh mana-server-remote
 sudo bash ~/mac-mini-cleanup-sudo.sh    # fragt nach sudo-Passwort
 ```
 
-| # | Aktion | Warum |
-|---|---|---|
-| 1 | `powernap 0`, `disksleep 0` | kein nächtlicher Dark-Wake / Disk-Sleep-Churn. `sleep`/`displaysleep`/`standby` schon 0. |
-| 2 | root-Daemon `com.cloudflare.cloudflared` ausbooten + Plist beiseite | Zombie seit 20.5.: **0 Netzverbindungen**, leere Logs. Echter Tunnel = User-Agent, bleibt unberührt. |
+| #   | Aktion                                                              | Warum                                                                                                |
+| --- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1   | `powernap 0`, `disksleep 0`                                         | kein nächtlicher Dark-Wake / Disk-Sleep-Churn. `sleep`/`displaysleep`/`standby` schon 0.             |
+| 2   | root-Daemon `com.cloudflare.cloudflared` ausbooten + Plist beiseite | Zombie seit 20.5.: **0 Netzverbindungen**, leere Logs. Echter Tunnel = User-Agent, bleibt unberührt. |
 
 ### Optional (deine Entscheidung): WiFi aus
+
 Der Mini läuft über Ethernet (en0); WiFi (en1, 192.168.1.196) ist zusätzlich an
 (Quelle des „systemWokenByWiFi"). Falls nicht gebraucht:
 `sudo networksetup -setairportpower en1 off`
@@ -53,6 +56,7 @@ Der Mini läuft über Ethernet (en0); WiFi (en1, 192.168.1.196) ist zusätzlich 
 ## 1c. Monitoring konsolidiert: 5 → 2 ✅ (4.6.)
 
 Die fünf überlappenden Monitore sind jetzt **zwei mit klaren Rollen**:
+
 - **Enforcer:** `com.mana.ensure-containers` (300s) — heilt colima+Container aktiv. Unverändert.
 - **Reporter:** `com.mana.server-health` (900s) — `mana-server-health.sh full`,
   meldet via Forgejo-Issues (`till/mana-ops`). Erweitert um die einzigartigen
@@ -62,6 +66,7 @@ Die fünf überlappenden Monitore sind jetzt **zwei mit klaren Rollen**:
   `com.mana.disk-check`, `com.mana.ssd-check`.
 
 Dabei mitgefixt:
+
 - **Flapping behoben** — `probe_vm` nutzt jetzt `docker info` statt `colima status`
   (das lügt/flappt) + HTTP-Retry gegen Tunnel-Reload-Blips. Vorher filete der
   Reporter bei jedem Reload Falsch-Issues. (mana `b818eb2`)
@@ -73,6 +78,7 @@ Dabei mitgefixt:
   deckt Routine). Falls gewünscht → in den Enforcer.
 
 ## 2. Beobachten / kein Handlungsbedarf
+
 - **pelias-Container** (gestoppt): **bleiben** — Abhängigkeit von `mana-discover`
   (im Aufbau), nicht stillgelegt. Disk ist entspannt (2,6 Ti frei).
 - **colima-RAM:** 12 GiB von 16 GB Host, 98 Container, Last ~2. Bei Swap-Druck in
@@ -84,6 +90,7 @@ Dabei mitgefixt:
 ---
 
 ## 3. Verifikation (nach dem sudo-Schritt)
+
 ```bash
 ssh mana-server-remote 'zsh -lc "
   echo == pmset ==; pmset -g custom | grep -E \"powernap|disksleep|sleep|standby\"
@@ -94,11 +101,13 @@ ssh mana-server-remote 'zsh -lc "
 "'
 curl -s -o /dev/null -w "auth.mana.how/login -> %{http_code}\n" "https://auth.mana.how/login?app=wordeck"
 ```
+
 Erwartung: powernap/disksleep=0; **1** cloudflared-Prozess; root-Plist „No such file"; docker OK; ~98 Container; login 200.
 
 ---
 
 ## Quick-Reference: colima-502-Recovery von Hand
+
 ```bash
 # 1. wedged Mux sanft beenden
 ssh mana-server-remote '/usr/bin/ssh -F /dev/null -O exit \

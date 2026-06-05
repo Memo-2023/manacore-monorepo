@@ -5,8 +5,7 @@ export default defineConfig({
 	out: './drizzle',
 	dialect: 'postgresql',
 	dbCredentials: {
-		url:
-			process.env.DATABASE_URL || 'postgresql://mana:devpassword@localhost:5432/mana_platform',
+		url: process.env.DATABASE_URL || 'postgresql://mana:devpassword@localhost:5432/mana_platform',
 	},
 	schemaFilter: ['usr'],
 });

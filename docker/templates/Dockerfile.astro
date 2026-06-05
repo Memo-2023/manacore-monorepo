@@ -4,14 +4,14 @@ Stage # ============================================ FROM node:20-alpine AS buil
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate WORKDIR /app # Copy workspace files
 COPY pnpm-workspace.yaml ./ COPY package.json ./ COPY pnpm-lock.yaml ./ # Copy all shared packages
 COPY packages/ ./packages/ # Copy the specific landing page ARG SERVICE_PATH COPY ${SERVICE_PATH}
-./${SERVICE_PATH}
-# Install all dependencies RUN pnpm install --frozen-lockfile # Build shared packages first RUN pnpm
-run build:packages # Build the landing page WORKDIR /app/${SERVICE_PATH}
+./${SERVICE_PATH} # Install all dependencies RUN pnpm install --frozen-lockfile # Build shared
+packages first RUN pnpm run build:packages # Build the landing page WORKDIR /app/${SERVICE_PATH}
 RUN pnpm build # ============================================ # Production Stage - Nginx # ============================================
-FROM nginx:alpine AS production # Copy nginx configuration COPY docker/nginx/astro.conf /etc/nginx/conf.d/default.conf
-# Copy built static files ARG SERVICE_PATH COPY --from=builder /app/${SERVICE_PATH}/dist
-/usr/share/nginx/html # Add healthcheck script RUN echo '#!/bin/sh' > /usr/local/bin/healthcheck.sh
-&& \ echo 'curl -f http://localhost/ || exit 1' >> /usr/local/bin/healthcheck.sh && \ chmod +x
-/usr/local/bin/healthcheck.sh # Expose port EXPOSE 80 # Health check HEALTHCHECK --interval=30s
---timeout=10s --start-period=10s --retries=3 \ CMD /usr/local/bin/healthcheck.sh # Start nginx CMD
-["nginx", "-g", "daemon off;"]
+FROM nginx:alpine AS production # Copy nginx configuration COPY docker/nginx/astro.conf
+/etc/nginx/conf.d/default.conf # Copy built static files ARG SERVICE_PATH COPY --from=builder /app/${
+	SERVICE_PATH
+}/dist /usr/share/nginx/html # Add healthcheck script RUN echo '#!/bin/sh' >
+/usr/local/bin/healthcheck.sh && \ echo 'curl -f http://localhost/ || exit 1' >>
+/usr/local/bin/healthcheck.sh && \ chmod +x /usr/local/bin/healthcheck.sh # Expose port EXPOSE 80 #
+Health check HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \ CMD
+/usr/local/bin/healthcheck.sh # Start nginx CMD ["nginx", "-g", "daemon off;"]

@@ -88,5 +88,4 @@ export interface AuthStoreActions<TUser extends BaseUser = BaseUser> {
  * Complete auth store interface
  */
 export interface AuthStore<TUser extends BaseUser = BaseUser>
-	extends AuthStoreState<TUser>,
-		AuthStoreActions<TUser> {}
+	extends AuthStoreState<TUser>, AuthStoreActions<TUser> {}

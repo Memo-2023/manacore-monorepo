@@ -32,13 +32,7 @@ const routes = new Hono<{ Variables: AuthVariables }>();
  * honest about what it accepts (a confused client trying to publish
  * an arbitrary collection gets 400).
  */
-const ALLOWED_COLLECTIONS = new Set<string>([
-	'events',
-	'places',
-	'augurEntries',
-	'lasts',
-	'forms',
-]);
+const ALLOWED_COLLECTIONS = new Set<string>(['events', 'places', 'augurEntries', 'lasts', 'forms']);
 
 const PublishBodySchema = z.object({
 	spaceId: z.string().min(1).max(64),
