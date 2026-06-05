@@ -228,6 +228,12 @@ jobs:
     # Läuft auf PRs UND auf direkten Pushes (main/dev) + workflow_dispatch.
     # Wichtig: ohne den Push-Lauf entging der volle `pnpm type-check` jedem
     # Direkt-Push auf main — so verrottete er unbemerkt (2026-05, 9 Pakete rot).
+    env:
+      # Resolves ${NPM_TOKEN} in the root .npmrc so pnpm can auth against
+      # npm.mana.how for private @mana/* packages. Without it every install
+      # 401s and the whole validate gate (type-check/lint/format) never runs.
+      # Secret was wired 2026-06-05 — before that the gate was silently red.
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

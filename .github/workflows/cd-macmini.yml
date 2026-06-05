@@ -309,12 +309,36 @@ jobs:
             trap './scripts/mac-mini/build-memory-headroom.sh stop' EXIT
           fi
 
+          # Build one service with a bounded retry. The mana-web Vite build
+          # peaks near the 12 GiB VM ceiling (8 GiB Node heap + ~3.5 GiB of
+          # live containers + BuildKit overhead), so it OOMs transiently and
+          # the buildkit daemon drops with "rpc error ... EOF". It then
+          # succeeds on a later attempt once peak RSS settles (observed
+          # 2026-04-28 and 2026-06-05). Retrying in-step makes the deploy
+          # self-heal instead of needing a manual re-dispatch. Stays
+          # non-fatal after the last attempt (same as the old `|| true`):
+          # a persistently failing build leaves the previous image running
+          # rather than aborting the whole deploy. Hard fix needs more
+          # physical RAM (box is 16 GiB, VM already at 12).
+          build_one() {
+            local svc="$1" attempt
+            for attempt in 1 2 3; do
+              if docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build "$svc" 2>&1; then
+                return 0
+              fi
+              echo "  [retry] $svc build failed (attempt $attempt/3) — likely transient VM OOM / buildkit EOF; settling 25s before retry"
+              sleep 25
+            done
+            echo "::warning title=Build retries exhausted::$svc failed to build after 3 attempts — keeping the previous image. Check VM memory pressure."
+            return 0
+          }
+
           # Build each service individually to capture build times
           BUILD_TIMES=""
           for svc in $SERVICES; do
             echo "--- Building $svc ---"
             build_start=$(date +%s)
-            docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build "$svc" 2>&1 || true
+            build_one "$svc"
             build_end=$(date +%s)
             build_dur=$(( build_end - build_start ))
             BUILD_TIMES="$BUILD_TIMES $svc:$build_dur"
