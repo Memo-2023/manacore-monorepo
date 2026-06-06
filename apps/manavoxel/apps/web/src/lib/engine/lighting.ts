@@ -8,7 +8,7 @@
 
 import { Container, Graphics } from 'pixi.js';
 import type { TilemapRenderer } from './tilemap';
-import { CHUNK_SIZE, type Material } from '@manavoxel/shared';
+import { type Material } from '@manavoxel/shared';
 
 // ─── Light Source ─────────────────────────────────────────────
 

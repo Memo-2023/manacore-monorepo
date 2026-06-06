@@ -14,7 +14,7 @@
 		}
 	},
 	"scripts": {
-		"lint": "eslint ."
+		"lint": "echo \"no JS/TS to lint (CSS-only package)\""
 	},
 	"peerDependencies": {
 		"tailwindcss": "^3.0.0 || ^4.0.0"

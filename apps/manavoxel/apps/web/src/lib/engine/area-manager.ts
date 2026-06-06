@@ -202,16 +202,12 @@ export function generateDemoStreet(): Area {
 			}
 			// Buildings (top side)
 			else if (x >= 40 && x <= 80 && y >= 40 && y <= 80) {
-				if (x === 40 || x === 80 || y === 40 || y === 80)
-					mat = 8; // Brick walls
-				else if (y === 80 && x >= 56 && x <= 64) mat = MATERIAL_AIR; // Door
+				if (x === 40 || x === 80 || y === 40 || y === 80) mat = 8; // Brick walls
 			}
 			// Second building
 			else if (x >= 120 && x <= 170 && y >= 30 && y <= 90) {
 				if (x === 120 || x === 170 || y === 30 || y === 90)
 					mat = 4; // Wood walls
-				else if (y === 90 && x >= 140 && x <= 150)
-					mat = MATERIAL_AIR; // Door
 				else if (y === 45 && (x === 135 || x === 155)) mat = 9; // Windows
 			}
 			// Trees

@@ -3,7 +3,7 @@
  * Generates worlds, areas, and starter items for the guest experience.
  */
 
-import { DEFAULT_MATERIALS, MATERIAL_AIR } from '@manavoxel/shared';
+import { DEFAULT_MATERIALS } from '@manavoxel/shared';
 import { encodeBytes, type LocalWorld, type LocalArea, type LocalItem } from './local-store';
 
 // Cached result so guest seed is only generated once

@@ -10,7 +10,7 @@ import { DEFAULT_MATERIALS, MATERIAL_AIR, type Material } from '@manavoxel/share
 import type { Inventory } from './inventory.svelte';
 import { GameEventBus, BehaviorRuntime, type ActionContext, type GameEvent } from './behavior';
 import { playSound } from './audio';
-import { NPCManager, NPC } from './npc';
+import { NPCManager } from './npc';
 import { LightingEngine, DayNightCycle } from './lighting';
 import { DialogManager } from './dialog';
 
@@ -46,7 +46,7 @@ export class GameEngine {
 	private _brushSize = 1;
 	private _palette: Material[] = DEFAULT_MATERIALS;
 	private _painting = false;
-	private _npcBehavior: string = 'hostile'; // For NPC placement tool
+	private _npcBehavior = 'hostile'; // For NPC placement tool
 
 	// Area state
 	private _currentFloor = 0;

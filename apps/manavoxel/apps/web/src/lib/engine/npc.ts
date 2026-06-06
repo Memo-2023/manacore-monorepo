@@ -8,7 +8,6 @@
 import { Container, Graphics } from 'pixi.js';
 import type { TilemapRenderer } from './tilemap';
 import type { EntityDef } from '@manavoxel/shared';
-import { playSound } from './audio';
 
 // ─── Constants ────────────────────────────────────────────────
 

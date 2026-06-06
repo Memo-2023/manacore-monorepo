@@ -1,13 +1,14 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { TriggerAction } from '@manavoxel/shared';
 
-	let {
+	const {
 		behaviors = [] as TriggerAction[],
 		onUpdate = undefined as ((behaviors: TriggerAction[]) => void) | undefined,
 		onClose = undefined as (() => void) | undefined,
 	} = $props();
 
-	let rules = $state<TriggerAction[]>(structuredClone(behaviors));
+	let rules = $state<TriggerAction[]>(untrack(() => structuredClone(behaviors)));
 
 	const triggerTypes = [
 		{ value: 'onTouch', label: 'Player touches' },
