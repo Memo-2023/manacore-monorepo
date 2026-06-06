@@ -31,9 +31,17 @@ docs/                # Long-form docs (deployment, hardware, postmortems, etc.)
 .claude/guidelines/  # Coding conventions — read before changing code
 ```
 
-### Active services (`services/`)
+### Services (`services/`)
 
-`mana-auth` (3001), `mana-sync` (3050), `mana-credits`, `mana-user`, `mana-subscriptions`, `mana-analytics`, `mana-search` (3021), `mana-crawler`, `mana-api-gateway`, `mana-notify`, `mana-media`, `mana-llm`, `mana-image-gen`, `mana-video-gen`, `mana-stt`, `mana-tts`, `mana-voice-bot`, `mana-events`, `mana-geocoding` (3018), `mana-landing-builder`, `mana-ai` (3067, background AI Mission Runner — see [`services/mana-ai/CLAUDE.md`](services/mana-ai/CLAUDE.md)), `mana-research` (3068, web research provider orchestration across 16+ providers — see [`services/mana-research/CLAUDE.md`](services/mana-research/CLAUDE.md) and [`docs/plans/mana-research-service.md`](docs/plans/mana-research-service.md)), `mana-mcp` (3069, MCP gateway exposing the shared tool-registry to Claude Desktop / Claude Code / persona-runner — see [`services/mana-mcp/CLAUDE.md`](services/mana-mcp/CLAUDE.md) and [`docs/plans/mana-mcp-and-personas.md`](docs/plans/mana-mcp-and-personas.md)), `mana-persona-runner` (3070, drives M2 personas through Claude + MCP on a tick loop — see [`services/mana-persona-runner/CLAUDE.md`](services/mana-persona-runner/CLAUDE.md)). Each non-trivial service has its own `CLAUDE.md`.
+> **Platform services live in the `mana/` repo (`mana/services/`) — that is the source of truth.** This repo's dev/test compose already builds them from `context: ../mana`. The shared platform services (`mana-auth`, `mana-sync`, `mana-credits`, `mana-events`, `mana-geocoding`, `mana-llm`, `mana-mail`, `mana-media`, `mana-mcp`, `mana-notify`, `mana-research`, `mana-stt`, `mana-tts`, …) are **not** vendored here anymore. Stale local copies of `mana-events`, `mana-geocoding`, `mana-mcp`, `mana-research` and `mana-sync` were removed on 2026-06-06 (`cleanup/dead-duplicate-services`).
+
+What still lives under `services/` in this repo:
+
+- `mana-search` (3021) — **only the SearXNG config** (`services/mana-search/searxng/`) is still mounted by the dev/macmini compose; the Go service itself is superseded by `mana/services/mana-search`.
+- DB-schema owners still pushed by `scripts/mac-mini/push-schemas.sh`: `mana-user`, `mana-subscriptions`, `mana-analytics`, `news-ingester` (the news-ingester runtime container is shut down; only its schema is maintained).
+- Not referenced by any compose/script here (candidates for the next cleanup pass — confirm they aren't deployed elsewhere first): `mana-ai`, `mana-api-gateway`, `mana-crawler`, `mana-image-gen`, `mana-landing-builder`, `mana-persona-runner`, `mana-video-gen`, `mana-voice-bot`.
+
+Each non-trivial service has its own `CLAUDE.md`.
 
 ## Coding Guidelines
 

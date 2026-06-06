@@ -133,9 +133,6 @@ setup_service() {
         cards)
             push_schema "@mana/cards-server" "cards"
             ;;
-        events|mana-events)
-            push_schema "@mana/events" "mana-events"
-            ;;
         news|news-ingester)
             push_schema "@mana/news-ingester" "news-ingester"
             ;;
@@ -144,7 +141,7 @@ setup_service() {
             ;;
         *)
             echo -e "${RED}Unknown service: $service${NC}"
-            echo "Available services: auth, credits, user, subscriptions, analytics, media, todo, traces, presi, uload, cards, events, news, mail"
+            echo "Available services: auth, credits, user, subscriptions, analytics, media, todo, traces, presi, uload, cards, news, mail"
             exit 1
             ;;
     esac

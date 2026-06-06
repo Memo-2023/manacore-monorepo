@@ -106,54 +106,6 @@ const APP_CONFIGS = [
 		},
 	},
 
-	// Mana Research Service (Hono + Bun, Port 3068)
-	{
-		path: 'services/mana-research/.env',
-		vars: {
-			NODE_ENV: () => 'development',
-			PORT: (env) => env.MANA_RESEARCH_PORT || '3068',
-			DATABASE_URL: (env) =>
-				env.MANA_RESEARCH_DATABASE_URL ||
-				'postgresql://mana:devpassword@localhost:5432/mana_platform',
-			REDIS_URL: (env) => env.REDIS_URL || 'redis://localhost:6379',
-			MANA_AUTH_URL: (env) => env.MANA_AUTH_URL || 'http://localhost:3001',
-			MANA_LLM_URL: (env) => env.MANA_LLM_URL || 'http://localhost:3025',
-			MANA_CREDITS_URL: (env) => env.MANA_CREDITS_URL || 'http://localhost:3061',
-			MANA_SEARCH_URL: (env) => env.MANA_SEARCH_URL || 'http://localhost:3021',
-			MANA_SERVICE_KEY: (env) => env.MANA_SERVICE_KEY || 'dev-service-key',
-			CACHE_TTL_SECONDS: (env) => env.MANA_RESEARCH_CACHE_TTL_SECONDS || '3600',
-			CORS_ORIGINS: (env) => env.CORS_ORIGINS || 'http://localhost:5173',
-			BRAVE_API_KEY: (env) => env.BRAVE_API_KEY || '',
-			TAVILY_API_KEY: (env) => env.TAVILY_API_KEY || '',
-			EXA_API_KEY: (env) => env.EXA_API_KEY || '',
-			SERPER_API_KEY: (env) => env.SERPER_API_KEY || '',
-			JINA_API_KEY: (env) => env.JINA_API_KEY || '',
-			FIRECRAWL_API_KEY: (env) => env.FIRECRAWL_API_KEY || '',
-			SCRAPINGBEE_API_KEY: (env) => env.SCRAPINGBEE_API_KEY || '',
-			PERPLEXITY_API_KEY: (env) => env.PERPLEXITY_API_KEY || '',
-			ANTHROPIC_API_KEY: (env) => env.ANTHROPIC_API_KEY || '',
-			OPENAI_API_KEY: (env) => env.OPENAI_API_KEY || '',
-			GOOGLE_GENAI_API_KEY: (env) => env.GOOGLE_GENAI_API_KEY || '',
-		},
-	},
-
-	// Mana Events Service (Hono + Bun, Port 3115 — moved from 3065 on
-	// 2026-05-06 because the platform mana-media owns 3065)
-	{
-		path: 'services/mana-events/.env',
-		vars: {
-			PORT: (env) => env.MANA_EVENTS_PORT || '3115',
-			DATABASE_URL: (env) =>
-				env.MANA_EVENTS_DATABASE_URL ||
-				'postgresql://mana:devpassword@localhost:5432/mana_platform',
-			MANA_AUTH_URL: (env) => env.MANA_AUTH_URL || 'http://localhost:3001',
-			CORS_ORIGINS: (env) => env.CORS_ORIGINS || 'http://localhost:5173',
-			MANA_RESEARCH_URL: (env) => env.MANA_RESEARCH_URL || 'http://localhost:3068',
-			MANA_LLM_URL: (env) => env.MANA_LLM_URL || 'http://localhost:3025',
-			MEETUP_API_KEY: (env) => env.MEETUP_API_KEY || '',
-		},
-	},
-
 	// Mana Mail Service (Hono + Bun, Port 3042)
 	// Stalwart proxy + 1:1 send via JMAP + broadcast (newsletter) via bulk-send.
 	{
