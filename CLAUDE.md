@@ -33,13 +33,14 @@ docs/                # Long-form docs (deployment, hardware, postmortems, etc.)
 
 ### Services (`services/`)
 
-> **Platform services live in the `mana/` repo (`mana/services/`) — that is the source of truth.** This repo's dev/test compose already builds them from `context: ../mana`. The shared platform services (`mana-auth`, `mana-sync`, `mana-credits`, `mana-events`, `mana-geocoding`, `mana-llm`, `mana-mail`, `mana-media`, `mana-mcp`, `mana-notify`, `mana-research`, `mana-stt`, `mana-tts`, …) are **not** vendored here anymore. Stale local copies of `mana-events`, `mana-geocoding`, `mana-mcp`, `mana-research` and `mana-sync` were removed on 2026-06-06 (`cleanup/dead-duplicate-services`).
+> **Platform services live in the `mana/` repo (`mana/services/`) — that is the source of truth.** This repo's dev/test compose already builds them from `context: ../mana`. The shared platform services (`mana-auth`, `mana-sync`, `mana-credits`, `mana-events`, `mana-geocoding`, `mana-llm`, `mana-mail`, `mana-media`, `mana-mcp`, `mana-notify`, `mana-research`, `mana-stt`, `mana-tts`, …) are **not** vendored here anymore. Dead local copies were removed on 2026-06-06 (`cleanup/dead-duplicate-services`): the mana/-duplicates `mana-events`, `mana-geocoding`, `mana-mcp`, `mana-research`, `mana-sync`, plus the managarten-only services confirmed not running on any server (`mana-ai`, `mana-api-gateway`, `mana-crawler`, `mana-persona-runner`).
 
 What still lives under `services/` in this repo:
 
 - `mana-search` (3021) — **only the SearXNG config** (`services/mana-search/searxng/`) is still mounted by the dev/macmini compose; the Go service itself is superseded by `mana/services/mana-search`.
-- DB-schema owners still pushed by `scripts/mac-mini/push-schemas.sh`: `mana-user`, `mana-subscriptions`, `mana-analytics`, `news-ingester` (the news-ingester runtime container is shut down; only its schema is maintained).
-- Not referenced by any compose/script here (candidates for the next cleanup pass — confirm they aren't deployed elsewhere first): `mana-ai`, `mana-api-gateway`, `mana-crawler`, `mana-image-gen`, `mana-landing-builder`, `mana-persona-runner`, `mana-video-gen`, `mana-voice-bot`.
+- `mana-landing-builder` — kept intentionally.
+- DB-schema owners still pushed by `scripts/mac-mini/push-schemas.sh`: `mana-subscriptions`, `mana-analytics` (both running), `mana-user` (schema-only, owns the `usr` pgSchema, no runtime container), `news-ingester` (runtime container shut down; only its schema is maintained).
+- **GPU services — verify on `mana-gpu` (LAN-only) before touching:** `mana-image-gen`, `mana-video-gen`, `mana-voice-bot`. Not running on the Mac-Mini and have no `mana/` equivalent, so they may still run on the GPU box.
 
 Each non-trivial service has its own `CLAUDE.md`.
 
