@@ -241,7 +241,10 @@ services:
       # mana-news-pool — Plattform-Service (Lift-B 2026-05-16). Wird
       # vom news-research-Modul + von der Pageta-Standalone konsumiert.
       MANA_NEWS_POOL_URL: http://mana-news-pool:3079
-      MANA_LLM_DEFAULT_MODEL: ${MANA_LLM_DEFAULT_MODEL:-gemma3:4b}
+      # Legacy/ungenutzt — kein Code liest MANA_LLM_DEFAULT_MODEL mehr; der
+      # echte lokale Default sitzt hartkodiert in chat/traces/analytics
+      # (2026-06-06 gemma3:4b → gemma4:12b). Wert hier nur zur Konsistenz.
+      MANA_LLM_DEFAULT_MODEL: ${MANA_LLM_DEFAULT_MODEL:-gemma4:12b}
       MANA_SERVICE_KEY: ${MANA_SERVICE_KEY}
       # OpenAI — picture module gpt-image-2 path. Optional: without it,
       # /api/v1/picture/generate falls through to Replicate/local Flux.

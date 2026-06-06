@@ -741,7 +741,7 @@ export class FeedbackService {
 					},
 					{ role: 'user', content: text },
 				],
-				model: 'gemma3:4b',
+				model: 'gemma4:12b',
 				max_tokens: 50,
 			}),
 		});

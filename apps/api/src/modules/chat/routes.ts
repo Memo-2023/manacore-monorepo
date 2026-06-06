@@ -37,7 +37,7 @@ routes.post('/completions', async (c) => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				messages,
-				model: model || 'gemma3:4b',
+				model: model || 'gemma4:12b',
 				temperature: temperature || 0.7,
 				max_tokens: maxTokens || 2000,
 			}),
@@ -46,7 +46,7 @@ routes.post('/completions', async (c) => {
 		if (!llmRes.ok) return c.json({ error: 'LLM request failed' }, 502);
 
 		const data = await llmRes.json();
-		await consumeCredits(userId, 'AI_CHAT', cost, `Chat: ${model || 'gemma3:4b'}`);
+		await consumeCredits(userId, 'AI_CHAT', cost, `Chat: ${model || 'gemma4:12b'}`);
 
 		return c.json(data);
 	} catch (_err) {
@@ -77,7 +77,7 @@ routes.post('/completions/stream', async (c) => {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					messages,
-					model: model || 'gemma3:4b',
+					model: model || 'gemma4:12b',
 					temperature: temperature || 0.7,
 					max_tokens: maxTokens || 2000,
 					stream: true,
@@ -105,7 +105,7 @@ routes.post('/completions/stream', async (c) => {
 			}
 
 			await stream.writeSSE({ data: '[DONE]' });
-			consumeCredits(userId, 'AI_CHAT', cost, `Chat stream: ${model || 'gemma3:4b'}`).catch(
+			consumeCredits(userId, 'AI_CHAT', cost, `Chat stream: ${model || 'gemma4:12b'}`).catch(
 				() => {}
 			);
 		} catch (_err) {

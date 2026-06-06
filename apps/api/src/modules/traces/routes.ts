@@ -268,7 +268,7 @@ async function runGuidePipeline(
 							},
 							{ role: 'user', content: `Erzähle mir über: ${poi.name}` },
 						],
-						model: 'gemma3:4b',
+						model: 'gemma4:12b',
 						max_tokens: 300,
 					}),
 				});
