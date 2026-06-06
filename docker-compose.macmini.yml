@@ -246,9 +246,10 @@ services:
       # presi share-links, traces guides). Same Postgres + schema split
       # as the rest of the platform.
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-mana123}@postgres:5432/mana_platform
-      # CORS — only the unified mana.how origin needs access today.
-      # The manavoxel game frontend doesn't call apps/api.
-      CORS_ORIGINS: https://mana.how
+      # CORS — die unified-App-Origins. mana.how (Bestand) + managarten.com
+      # (Brand-Domain seit Domain-Umzug 2026-06; die App ruft mana-api
+      # cross-origin). The manavoxel game frontend doesn't call apps/api.
+      CORS_ORIGINS: https://mana.how,https://managarten.com,https://www.managarten.com
       # Structured-logger format
       LOGGER_FORMAT: json
     ports:
