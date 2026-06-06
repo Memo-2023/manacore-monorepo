@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { type Inventory, type GameItem, MAX_INVENTORY_SLOTS } from '$lib/engine/inventory.svelte';
+	import { type GameItem, MAX_INVENTORY_SLOTS } from '$lib/engine/inventory.svelte';
 
-	let {
+	const {
 		inventory,
 		onDrop = undefined as ((slot: number) => void) | undefined,
 		onInspect = undefined as ((item: GameItem) => void) | undefined,
@@ -9,8 +9,7 @@
 
 	function drawSprite(canvas: HTMLCanvasElement, item: GameItem) {
 		const ctx = canvas.getContext('2d')!;
-		const { pixels, width: w, height: h, frames = 1 } = item.sprite;
-		const frameSize = w * h * 4;
+		const { pixels, width: w, height: h } = item.sprite;
 		const scale = Math.min(32 / w, 32 / h);
 		ctx.clearRect(0, 0, 32, 32);
 
@@ -55,7 +54,7 @@
 </script>
 
 <div class="flex gap-1 rounded-lg bg-gray-800/90 p-1.5 backdrop-blur">
-	{#each { length: MAX_INVENTORY_SLOTS } as _, i}
+	{#each Array.from({ length: MAX_INVENTORY_SLOTS }, (_, idx) => idx) as i (i)}
 		{@const item = inventory.slots[i]}
 		{@const isHeld = inventory.heldSlot === i}
 		<button
@@ -79,7 +78,7 @@
 					width={32}
 					height={32}
 					class="h-full w-full"
-					style="image-rendering: pixelated;"
+					style:image-rendering="pixelated"
 					use:itemCanvas={item}
 				></canvas>
 				{@const ratio = item.properties.durabilityCurrent / item.properties.durabilityMax}
@@ -87,7 +86,8 @@
 					<div class="absolute bottom-0.5 left-0.5 right-0.5 h-[2px] rounded-full bg-gray-700/80">
 						<div
 							class="h-full rounded-full"
-							style="width: {ratio * 100}%; background-color: {durabilityColor(ratio)}"
+							style:width="{ratio * 100}%"
+							style:background-color={durabilityColor(ratio)}
 						></div>
 					</div>
 				{/if}

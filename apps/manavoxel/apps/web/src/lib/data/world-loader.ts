@@ -13,7 +13,6 @@ import {
 	type LocalWorld,
 	type LocalArea,
 	type LocalItem,
-	type LocalInventorySlot,
 } from './local-store';
 import type {
 	Area,
@@ -150,7 +149,7 @@ export async function saveInventory(
 	playerId: string,
 	slots: (GameItem | null)[],
 	heldSlot: number,
-	gold: number = 0
+	gold = 0
 ): Promise<void> {
 	// Clear existing inventory for this player
 	const existing = await inventoryCollection.getAll({ playerId });

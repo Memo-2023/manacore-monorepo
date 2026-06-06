@@ -27,6 +27,7 @@
 		"fs-extra": "^11.2.0"
 	},
 	"devDependencies": {
+		"@mana/eslint-config": "workspace:*",
 		"@nestjs/cli": "^10.4.9",
 		"@nestjs/schematics": "^10.2.3",
 		"@nestjs/testing": "^10.4.17",

@@ -1,5 +1,4 @@
 import type { TilemapRenderer } from '$lib/engine/tilemap';
-import { MATERIAL_AIR } from '@manavoxel/shared';
 
 // ─── Undo/Redo System ───────────────────────────────────────
 
@@ -176,8 +175,8 @@ export function lineDraw(
 	material: number,
 	brushSize: number
 ) {
-	let dx = Math.abs(x2 - x1);
-	let dy = -Math.abs(y2 - y1);
+	const dx = Math.abs(x2 - x1);
+	const dy = -Math.abs(y2 - y1);
 	const sx = x1 < x2 ? 1 : -1;
 	const sy = y1 < y2 ? 1 : -1;
 	let err = dx + dy;

@@ -1,5 +1,5 @@
 import type { SpriteData } from '$lib/editor/types';
-import type { ItemProperties, Rarity, ElementType, TriggerAction } from '@manavoxel/shared';
+import type { ItemProperties, Rarity, TriggerAction } from '@manavoxel/shared';
 
 export interface GameItem {
 	id: string;

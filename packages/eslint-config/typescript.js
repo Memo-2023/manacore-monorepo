@@ -30,15 +30,13 @@ export const typescriptConfig = [
 				// import.meta.dirname pointed every consumer at the eslint-config
 				// package and broke project discovery.
 				projectService: {
-					allowDefaultProject: [
-						'*.config.ts',
-						'*.config.js',
-						'*.config.mjs',
-						'*.config.cjs',
-						'*.spec.ts',
-						'*.test.ts',
-						'src/svelte/index.ts',
-					],
+					// Only top-level files a package keeps out of its tsconfig.
+					// Do NOT list *.config.* here: in SvelteKit apps vite.config.ts
+					// is already claimed by the generated .svelte-kit project, and
+					// listing it again triggers "included by allowDefaultProject but
+					// also found in the project service". config files are handled
+					// by the root config's ignores instead.
+					allowDefaultProject: ['*.spec.ts', '*.test.ts', 'src/svelte/index.ts'],
 				},
 			},
 		},

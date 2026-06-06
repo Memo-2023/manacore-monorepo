@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import type { SpriteData } from './types';
 
 	// Props
-	let {
+	const {
 		width = 16,
 		height = 32,
 		initialData = undefined as Uint8Array | undefined,
@@ -17,13 +17,13 @@
 	let previewCanvas: HTMLCanvasElement;
 	let previewCtx: CanvasRenderingContext2D;
 
-	const frameSize = width * height * 4;
+	const frameSize = untrack(() => width * height * 4);
 	let frames: Uint8Array[] = $state([new Uint8Array(frameSize)]); // RGBA per frame
 	let currentFrame = $state(0);
 	let currentColor = $state('#FF4444');
 	let currentTool = $state<'brush' | 'eraser' | 'fill' | 'pipette'>('brush');
 	let isDrawing = $state(false);
-	let zoom = $state(8); // Each sprite pixel = 8 screen pixels
+	const zoom = $state(8); // Each sprite pixel = 8 screen pixels
 	let animPlaying = $state(false);
 	let animInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -115,6 +115,9 @@
 		if (colorsMatch(target, [r, g, b, a])) return;
 
 		const stack: [number, number][] = [[sx, sy]];
+		// Local, non-reactive scratch set for the flood-fill algorithm — never
+		// rendered or tracked, so SvelteSet would add reactivity overhead for nothing.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const visited = new Set<string>();
 		let iterations = 0;
 
@@ -373,14 +376,15 @@
 	<div class="flex flex-col gap-2">
 		<div
 			class="overflow-auto rounded border border-gray-700 bg-gray-950"
-			style="max-height: 500px; max-width: 500px;"
+			style:max-height="500px"
+			style:max-width="500px"
 		>
 			<canvas
 				bind:this={canvas}
 				width={width * zoom}
 				height={height * zoom}
 				class="cursor-crosshair"
-				style="image-rendering: pixelated;"
+				style:image-rendering="pixelated"
 				onmousedown={handleMouseDown}
 				onmousemove={handleMouseMove}
 				onmouseup={handleMouseUp}
@@ -401,7 +405,7 @@
 				width={width * 2}
 				height={height * 2}
 				class="mx-auto"
-				style="image-rendering: pixelated;"
+				style:image-rendering="pixelated"
 			></canvas>
 		</div>
 
@@ -500,7 +504,7 @@
 			<div class="mb-2 flex items-center gap-2">
 				<div
 					class="h-6 w-6 rounded border border-gray-600"
-					style="background-color: {currentColor}"
+					style:background-color={currentColor}
 				></div>
 				<input type="color" bind:value={currentColor} class="h-6 w-10 cursor-pointer" />
 			</div>
@@ -510,7 +514,8 @@
 						class="h-5 w-5 rounded border transition hover:scale-110 {currentColor === color
 							? 'border-white'
 							: 'border-gray-700'}"
-						style="background-color: {color}"
+						style:background-color={color}
+						aria-label="Color {color}"
 						onclick={() => (currentColor = color)}
 					></button>
 				{/each}

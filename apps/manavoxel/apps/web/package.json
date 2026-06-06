@@ -17,6 +17,7 @@
 		"test:watch": "vitest"
 	},
 	"devDependencies": {
+		"@mana/eslint-config": "workspace:*",
 		"@mana/shared-pwa": "workspace:*",
 		"@mana/shared-vite-config": "workspace:*",
 		"@sveltejs/adapter-node": "^5.0.0",

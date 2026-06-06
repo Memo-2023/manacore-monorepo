@@ -28,6 +28,10 @@ TESTING_STRATEGY_AUTH_CREDITS.md
 *.gen.ts
 *.generated.ts
 
+# Static served HTML assets (not source — hand-authored admin pages,
+# served verbatim; not worth prettier-gating).
+apps/mana/apps/web/static/**/*.html
+
 # tsup-generated design-token bundler output (theme.ts is the source)
 apps/picture/packages/design-tokens/native/theme.js
 apps/picture/packages/design-tokens/native/theme.d.ts

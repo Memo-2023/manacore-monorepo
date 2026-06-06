@@ -92,8 +92,6 @@ export class TilemapRenderer {
 					// Small stone house
 					if (x === 50 || x === 70 || y === 150 || y === 180) {
 						material = 8; // Brick
-					} else if (y === 180 && x >= 58 && x <= 62) {
-						material = MATERIAL_AIR; // Door opening
 					} else if (y === 155 && (x === 55 || x === 65)) {
 						material = 9; // Glass windows
 					}

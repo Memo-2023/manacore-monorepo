@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { gameStore } from '$lib/data/local-store';
 	import { getAllWorlds, createWorld, deleteWorld } from '$lib/data/world-loader';
 	import { WORLD_TEMPLATES } from '$lib/data/templates';
@@ -26,7 +27,7 @@
 		const worldId = await createWorld(newWorldName, selectedTemplate, generated.areas);
 
 		showNewDialog = false;
-		goto(`/?world=${worldId}`);
+		goto(resolve(`/?world=${worldId}`));
 	}
 
 	async function handleDelete(worldId: string) {
@@ -35,7 +36,7 @@
 	}
 
 	function handlePlay(worldId: string) {
-		goto(`/?world=${worldId}`);
+		goto(resolve(`/?world=${worldId}`));
 	}
 </script>
 
@@ -120,25 +121,31 @@
 		onclick={(e) => {
 			if (e.target === e.currentTarget) showNewDialog = false;
 		}}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') showNewDialog = false;
+		}}
 		role="dialog"
+		tabindex="-1"
 	>
 		<div class="w-full max-w-lg rounded-xl bg-gray-900 p-6 shadow-2xl">
 			<h2 class="mb-4 text-lg font-bold text-white">New World</h2>
 
 			<!-- Name -->
 			<div class="mb-4">
-				<label class="mb-1 block text-sm text-gray-400">World Name</label>
-				<input
-					type="text"
-					bind:value={newWorldName}
-					class="w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none focus:ring-1 focus:ring-emerald-500"
-					placeholder="My World"
-				/>
+				<label class="block text-sm text-gray-400">
+					World Name
+					<input
+						type="text"
+						bind:value={newWorldName}
+						class="mt-1 w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none focus:ring-1 focus:ring-emerald-500"
+						placeholder="My World"
+					/>
+				</label>
 			</div>
 
 			<!-- Template Selection -->
 			<div class="mb-6">
-				<label class="mb-2 block text-sm text-gray-400">Template</label>
+				<span class="mb-2 block text-sm text-gray-400">Template</span>
 				<div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
 					{#each WORLD_TEMPLATES as template}
 						<button

@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 	import { GameEngine } from '$lib/engine/game';
-	import { DEFAULT_MATERIALS, MATERIAL_AIR } from '@manavoxel/shared';
+	import {
+		DEFAULT_MATERIALS,
+		MATERIAL_AIR,
+		type ElementType,
+		type Rarity,
+	} from '@manavoxel/shared';
 	import type { ToolType } from '$lib/editor/tools';
 	import SpriteEditor from '$lib/editor/sprite-editor.svelte';
-	import type { SpriteData } from '$lib/editor/types';
 	import InventoryUI from '$lib/components/Inventory.svelte';
 	import PropertyPanel from '$lib/editor/property-panel.svelte';
 	import TriggerEditor from '$lib/editor/trigger-editor.svelte';
@@ -14,7 +19,7 @@
 		MERCHANT_OFFERS,
 		rollLoot,
 		rollGold,
-		type MerchantOffer,
+		type DialogOption,
 		type LootDrop,
 	} from '$lib/engine/dialog';
 	import {
@@ -42,7 +47,7 @@
 	let showPropertyPanel = $state(false);
 	let showTriggerEditor = $state(false);
 	let editingItem = $state<GameItem | null>(null);
-	let inventory = $state(new Inventory());
+	const inventory = $state(new Inventory());
 	let itemCounter = $state(0);
 	let timeString = $state('08:00');
 	let isNight = $state(false);
@@ -309,7 +314,7 @@
 			</div>
 			<div class="flex gap-2">
 				<a
-					href="/worlds"
+					href={resolve('/worlds')}
 					class="rounded-lg bg-gray-800/80 px-3 py-1.5 text-sm text-gray-400 backdrop-blur hover:bg-gray-700/80 hover:text-white"
 				>
 					Worlds
@@ -385,7 +390,7 @@
 										engine?.setNpcBehavior(npc.value);
 									}}
 								>
-									<span class="h-2 w-2 rounded-full" style="background-color: {npc.color}"></span>
+									<span class="h-2 w-2 rounded-full" style:background-color={npc.color}></span>
 									{npc.label}
 								</button>
 							{/each}
@@ -424,7 +429,7 @@
 							mat.id
 								? 'border-white scale-110'
 								: 'border-transparent'}"
-							style="background-color: {mat.color}"
+							style:background-color={mat.color}
 							onclick={() => engine?.setMaterial(mat.id)}
 							title="{mat.name} ({i + 1})"
 						>
@@ -543,12 +548,12 @@
 				<div class="mb-2 text-xs font-bold text-emerald-400">{dialogLine.speaker}</div>
 				<div class="mb-3 text-sm text-gray-200">{dialogLine.text}</div>
 				<div class="flex gap-2">
-					{#each dialogLine.options ?? [{ label: 'Close', action: 'close' }] as option}
+					{#each dialogLine.options ?? [{ label: 'Close', action: 'close' } as DialogOption] as option}
 						<button
 							class="rounded-lg bg-gray-700 px-4 py-1.5 text-xs text-white transition hover:bg-gray-600"
 							onclick={() => {
 								if (engine) {
-									const result = engine.dialog.selectOption(option as any);
+									const result = engine.dialog.selectOption(option as DialogOption);
 									dialogActive = engine.dialog.active;
 									dialogLine = engine.dialog.currentLine;
 									if (result === 'trade') {
@@ -616,8 +621,8 @@
 										speed: offer.speed,
 										durabilityMax: offer.durabilityMax,
 										durabilityCurrent: offer.durabilityMax,
-										element: offer.element as any,
-										rarity: offer.rarity as any,
+										element: offer.element as ElementType,
+										rarity: offer.rarity as Rarity,
 										particle: offer.particle,
 										sound: 'hit_default',
 									});
@@ -663,8 +668,8 @@
 							speed: nearby.loot.speed,
 							durabilityMax: nearby.loot.durabilityMax,
 							durabilityCurrent: nearby.loot.durabilityMax,
-							element: nearby.loot.element as any,
-							rarity: nearby.loot.rarity as any,
+							element: nearby.loot.element as ElementType,
+							rarity: nearby.loot.rarity as Rarity,
 							particle: nearby.loot.particle,
 							sound: 'hit_default',
 						});

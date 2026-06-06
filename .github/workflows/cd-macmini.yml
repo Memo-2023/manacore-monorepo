@@ -82,21 +82,24 @@ jobs:
           # HEAD~1 HEAD, which made pushes of more than one commit silently
           # drop all-but-the-tip's changes.
           BEFORE="${{ github.event.before }}"
-          AFTER="${{ github.sha }}"
-          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-            # First push to the branch / force-push with no shared history.
-            # Fall back to the last commit only — better than failing open.
-            echo "No valid 'before' SHA (first push or force reset), using HEAD~1"
-            CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+
+          # ALWAYS fetch first. The self-hosted runner reuses a long-lived
+          # clone that lags behind the just-pushed commits, so BOTH endpoints
+          # of the push range can be missing locally. `origin/main` after the
+          # fetch is the authoritative AFTER (== github.sha); using the local
+          # HEAD or a raw github.sha that isn't in the clone made
+          # `git diff BEFORE AFTER` silently return nothing → the whole deploy
+          # no-op'd (observed 2026-06-05: a 170-file push deployed nothing).
+          git fetch origin main --no-tags --quiet || true
+          AFTER="origin/main"
+
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            # First push / force-reset / 'before' not in history: diff the tip
+            # commit only (against origin/main, not the stale local HEAD).
+            echo "No usable 'before' SHA — diffing origin/main~1..origin/main"
+            CHANGED=$(git diff --name-only "origin/main~1" "$AFTER" 2>/dev/null || echo "")
           else
-            # Make sure we actually have the 'before' commit locally. The
-            # self-hosted runner works in a long-lived clone that usually does,
-            # but a forced push to a rebased branch can leave it missing.
-            if ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-              echo "Fetching origin to resolve $BEFORE..."
-              git fetch origin main --no-tags --quiet || true
-            fi
-            CHANGED=$(git diff --name-only "$BEFORE" "$AFTER" 2>/dev/null || git diff --name-only HEAD~1 HEAD)
+            CHANGED=$(git diff --name-only "$BEFORE" "$AFTER" 2>/dev/null || git diff --name-only "origin/main~1" "$AFTER")
           fi
 
           # Shared packages trigger rebuilds for all web services that import

@@ -3,7 +3,7 @@
  * Each template generates one or more areas with pixel data.
  */
 
-import { DEFAULT_MATERIALS, MATERIAL_AIR } from '@manavoxel/shared';
+import { DEFAULT_MATERIALS } from '@manavoxel/shared';
 import { encodeBytes, type LocalArea } from './local-store';
 
 export interface WorldTemplate {
@@ -162,7 +162,7 @@ function generateDungeon() {
 		// Outer stone walls
 		if (x <= 2 || x >= w - 3 || y <= 2 || y >= h - 3) return 1;
 		// Stone floor everywhere
-		let mat = 12;
+		const mat = 12;
 		// Corridors (cross shape)
 		const inHCorridor = y >= 140 && y <= 160;
 		const inVCorridor = x >= 140 && x <= 160;
