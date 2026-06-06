@@ -31,6 +31,7 @@
  */
 
 import { authBaseUrl as resolveAuthBaseUrl } from '$lib/data/scope/auth-fetch';
+import { isBffHost } from '$lib/auth/bff';
 
 const TOKEN_KEY = 'mana.auth.accessToken';
 const USER_KEY = 'mana.auth.user';
@@ -165,7 +166,13 @@ class Session {
 		if (this.refreshing) return this.refreshing;
 		this.refreshing = (async () => {
 			try {
-				const res = await fetch(`${authBaseUrl()}/api/v1/auth/refresh`, {
+				// managarten.com: same-origin BFF-Refresh (First-Party-Cookie).
+				// mana.how: Cookie-SSO gegen auth.mana.how (.mana.how-Cookie).
+				// Beide liefern `{ accessToken }`.
+				const refreshUrl = isBffHost()
+					? '/auth/refresh'
+					: `${authBaseUrl()}/api/v1/auth/refresh`;
+				const res = await fetch(refreshUrl, {
 					method: 'POST',
 					credentials: 'include',
 				});
@@ -238,7 +245,11 @@ class Session {
 		this.clearLocal();
 		if (had && typeof window !== 'undefined') {
 			try {
-				await fetch(`${authBaseUrl()}/api/v1/auth/logout`, {
+				// BFF: eigene First-Party-Cookies löschen; sonst Portal-Logout.
+				const logoutUrl = isBffHost()
+					? '/auth/logout'
+					: `${authBaseUrl()}/api/v1/auth/logout`;
+				await fetch(logoutUrl, {
 					method: 'POST',
 					credentials: 'include',
 				});

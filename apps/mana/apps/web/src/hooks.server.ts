@@ -63,6 +63,36 @@ const RESERVED_WEBSITE_SUBDOMAINS = new Set([
 	's', // reserved to match the /s/ public-renderer prefix
 ]);
 
+// Registrable product domains the unified app is served under. The
+// legacy `mana.how` and the new brand `managarten.com` (Domain-Umzug
+// 2026-06) both point at this same container; host-matching must accept
+// either, so the apex dashboard AND every module subdomain (chat./todo./
+// …) resolve identically on both. Order is irrelevant.
+const PRODUCT_DOMAINS = ['mana.how', 'managarten.com'];
+
+/** True if `host` is the apex of a product domain (no subdomain). */
+function isProductApex(host: string): boolean {
+	return PRODUCT_DOMAINS.includes(host);
+}
+
+/** True if `host` is the apex or any subdomain of a product domain. */
+function isProductHost(host: string): boolean {
+	return PRODUCT_DOMAINS.some((d) => host === d || host.endsWith(`.${d}`));
+}
+
+/**
+ * If `host` is `{label}.<product-domain>`, returns the matched product
+ * domain (e.g. `mana.how` / `managarten.com`); otherwise null. Lets the
+ * single-label guard generalise across domains with different label
+ * counts (both current domains have two, but don't hardcode that).
+ */
+function productDomainOf(host: string): string | null {
+	for (const d of PRODUCT_DOMAINS) {
+		if (host.endsWith(`.${d}`)) return d;
+	}
+	return null;
+}
+
 // In-memory cache for custom-domain resolutions. Short TTL keeps
 // mana-api query load low without leaving stale bindings around.
 // Replaces with Redis/edge KV in M7.
@@ -102,15 +132,17 @@ async function resolveWebsiteRewrite(rawHost: string, subdomain: string): Promis
 	const host = rawHost.toLowerCase().split(':')[0] ?? '';
 	if (!host) return null;
 
-	// Case a — {slug}.mana.how subdomains.
-	if (host.endsWith('.mana.how')) {
+	// Case a — {slug}.<product-domain> subdomains (mana.how, managarten.com).
+	const productDomain = productDomainOf(host);
+	if (productDomain) {
 		const sub = subdomain.toLowerCase();
 		// Guard: reserved + existing app subdomains win over website.
 		if (APP_SUBDOMAINS.has(sub)) return null;
 		if (RESERVED_WEBSITE_SUBDOMAINS.has(sub)) return null;
-		// Only single-label subdomains match (no `foo.bar.mana.how`).
-		// The label count on `foo.mana.how` is 3 (foo + mana + how).
-		if (host.split('.').length !== 3) return null;
+		// Only single-label subdomains match (no `foo.bar.mana.how`). The
+		// label count must be exactly the product domain's labels + 1, e.g.
+		// `foo.mana.how` = 3 and `foo.managarten.com` = 3.
+		if (host.split('.').length !== productDomain.split('.').length + 1) return null;
 		return sub;
 	}
 
@@ -122,7 +154,7 @@ async function resolveWebsiteRewrite(rawHost: string, subdomain: string): Promis
 	if (
 		host === 'localhost' ||
 		host.startsWith('127.') ||
-		host === 'mana.how' ||
+		isProductApex(host) ||
 		host.endsWith('.local')
 	) {
 		return null;
@@ -171,8 +203,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		actualProto = 'http';
 	}
 	const isLocal = host.startsWith('localhost') || host.startsWith('127.');
-	const isMana = host.endsWith('mana.how');
-	if (actualProto === 'http' && !isLocal && isMana) {
+	const isProduct = isProductHost(host.split(':')[0] ?? host);
+	if (actualProto === 'http' && !isLocal && isProduct) {
 		return new Response(null, {
 			status: 301,
 			headers: { Location: `https://${host}${event.url.pathname}${event.url.search}` },

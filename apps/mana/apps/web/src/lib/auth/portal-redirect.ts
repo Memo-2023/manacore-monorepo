@@ -20,9 +20,21 @@
  */
 
 import { browser } from '$app/environment';
+import { isBffHost } from '$lib/auth/bff';
 
 const FALLBACK_PORTAL = 'https://auth.mana.how';
 const APP_ID = 'mana';
+
+/**
+ * BFF-Login-URL auf der eigenen Origin (managarten.com). Startet den
+ * OIDC-Code-Flow über `/auth/login` statt des Portal-Redirects — der
+ * Browser bleibt auf der eigenen Domain, das Cookie ist First-Party.
+ */
+function bffLoginUrl(next: string): string {
+	const url = new URL('/auth/login', window.location.origin);
+	if (next.startsWith('/')) url.searchParams.set('next', next);
+	return url.toString();
+}
 
 function portalUrl(): string {
 	if (browser && typeof window !== 'undefined') {
@@ -63,6 +75,12 @@ export function redirectToPortal(options: RedirectToPortalOptions = {}): void {
 	if (typeof window === 'undefined') return;
 	const target = options.target ?? 'login';
 	const next = options.next ?? window.location.pathname + window.location.search;
+	// managarten.com: über die eigene BFF-Login-Route (login + register
+	// laufen beide über die Portal-UI hinter /auth/login).
+	if (isBffHost()) {
+		window.location.href = bffLoginUrl(next);
+		return;
+	}
 	const url = new URL(`${portalUrl()}/${target}`);
 	url.searchParams.set('app', APP_ID);
 	url.searchParams.set('redirect', callbackUrl(next));
@@ -77,6 +95,7 @@ export function redirectToPortal(options: RedirectToPortalOptions = {}): void {
 export function portalHref(options: RedirectToPortalOptions = {}): string {
 	const target = options.target ?? 'login';
 	const next = options.next ?? (typeof window !== 'undefined' ? window.location.pathname : '/');
+	if (isBffHost()) return bffLoginUrl(next);
 	const url = new URL(`${portalUrl()}/${target}`);
 	url.searchParams.set('app', APP_ID);
 	url.searchParams.set('redirect', callbackUrl(next));
