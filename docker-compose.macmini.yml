@@ -87,6 +87,13 @@ services:
       # injection (`window.__PUBLIC_AUTH_WEB_URL__`).
       PUBLIC_AUTH_WEB_URL: https://auth.mana.how
       PUBLIC_AUTH_WEB_URL_CLIENT: https://auth.mana.how
+      # OIDC-BFF für die Brand-Domain managarten.com (Domain-Umzug 2026-06).
+      # PUBLIC_APP_URL bestimmt die redirect_uri (/auth/oidc-callback); das
+      # Secret (in mana-auth als Client `mana-web` registriert) kommt aus
+      # .env.macmini, NIE committen. Auf mana.how greift der BFF nicht
+      # (isBffHost()=false) → diese Vars sind dort schlicht ungenutzt.
+      PUBLIC_APP_URL: https://managarten.com
+      MANA_WEB_OIDC_CLIENT_SECRET: ${MANA_WEB_OIDC_CLIENT_SECRET:-}
       PUBLIC_SYNC_SERVER_URL: http://mana-sync:3010
       PUBLIC_SYNC_SERVER_URL_CLIENT: https://sync.mana.how
       # Unified Hono/Bun API server (apps/api) — hosts all 16 product
