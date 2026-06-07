@@ -59,13 +59,6 @@
 			"refresh": "New quote",
 			"view_all": "All quotes"
 		},
-		"picture": {
-			"title": "Images",
-			"description": "Recent AI generations",
-			"empty": "No images created yet",
-			"create": "Create image",
-			"view_all": "View all images"
-		},
 		"cards": {
 			"title": "Learning Progress",
 			"description": "Your flashcards",

@@ -59,13 +59,6 @@
 			"refresh": "Neues Zitat",
 			"view_all": "Alle Zitate"
 		},
-		"picture": {
-			"title": "Bilder",
-			"description": "Letzte KI-Generierungen",
-			"empty": "Noch keine Bilder erstellt",
-			"create": "Bild erstellen",
-			"view_all": "Alle Bilder"
-		},
 		"cards": {
 			"title": "Lernfortschritt",
 			"description": "Deine Lernkarten",

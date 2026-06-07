@@ -94,8 +94,11 @@ const LEGACY_TABLES = new Set([
 	'places',
 	'locationLogs',
 	'placeTags',
-	// Articles — reading-list + bulk-import surfaces; tables predate the
-	// per-module registry refactor (import worker lives in apps/api).
+	// Articles (reading-list / save-it-later) — lifted to the standalone
+	// pageta app (pageta.com). Module, routes + the apps/api import worker
+	// are gone from managarten; these Dexie tables remain orphaned in
+	// schema history (no destructive drop migration). No managarten code
+	// writes them anymore, so they correctly fall out of the per-appId sync.
 	'articles',
 	'articleHighlights',
 	'articleTags',

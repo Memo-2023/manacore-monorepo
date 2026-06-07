@@ -59,13 +59,6 @@
 			"refresh": "Nuova citazione",
 			"view_all": "Tutte le citazioni"
 		},
-		"picture": {
-			"title": "Immagini",
-			"description": "Generazioni IA recenti",
-			"empty": "Nessuna immagine ancora",
-			"create": "Crea immagine",
-			"view_all": "Vedi tutte le immagini"
-		},
 		"cards": {
 			"title": "Progresso di studio",
 			"description": "Le tue flashcard",

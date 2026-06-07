@@ -59,13 +59,6 @@
 			"refresh": "Nueva cita",
 			"view_all": "Todas las citas"
 		},
-		"picture": {
-			"title": "Imágenes",
-			"description": "Generaciones IA recientes",
-			"empty": "Aún no hay imágenes",
-			"create": "Crear imagen",
-			"view_all": "Ver todas"
-		},
 		"cards": {
 			"title": "Progreso de estudio",
 			"description": "Tus flashcards",
