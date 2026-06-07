@@ -261,17 +261,17 @@ The companion is a **second actor** that works alongside the human in every modu
 - **Scene lens** — workbench scenes can bind to an agent via `scene.viewingAsAgentId` (context menu → "An Agent binden…"). Pure UI lens, not a data-scope change. `SceneAppBar` shows the agent avatar on bound scene tabs.
 - **Workbench timeline** — `/ai-workbench` renders every AI-attributed event grouped by mission iteration with per-**agent** filter, per-module, per-mission. Each bucket header shows agent avatar + name + mission title. Per-bucket **Revert button** undoes the iteration's writes via `data/ai/revert/` (TaskCreated → delete, TaskCompleted → uncomplete, etc., newest-first). Separate **"Datenzugriff"** tab exposes the server-side decrypt audit (for missions with Key-Grants).
 
-### Tool Coverage (68 tools, 20 modules)
+### Tool Coverage
 
-Agents interact with the app through tools — each one either auto (executes silently during reasoning) or propose (creates a Proposal card the user must approve). Source of truth: `AI_TOOL_CATALOG` in `@mana/shared-ai/src/tools/schemas.ts` — both webapp policy (`src/lib/data/ai/policy.ts`) and server-side planner (`services/mana-ai/src/planner/tools.ts`) derive from it automatically, so drift is structurally impossible.
+Agents interact with the app through tools — each one either auto (executes silently during reasoning) or propose (creates a Proposal card the user must approve). Source of truth: `AI_TOOL_CATALOG` in `@mana/shared-ai/src/tools/schemas.ts` — both webapp policy (`src/lib/data/ai/policy.ts`) and server-side planner (`services/mana-ai/src/planner/tools.ts`) derive from it automatically, so policy ↔ planner can't drift.
 
-> **Note (2026-06-07):** the catalog still carries tool schemas for a few
-> modules that were lifted out of the unified app to standalone apps —
-> `articles` (→ pageta), `news`, `comic` (→ comicello), `places`. Their
-> module UI + executors are gone from managarten, so these entries are
-> orphaned tool declarations pending a catalog cleanup in `@mana/shared-ai`.
-> The table below mirrors the catalog verbatim, so they still appear; treat
-> rows for lifted modules as not-yet-pruned, not as live surfaces.
+> The table below is a hand-maintained illustrative subset; the catalog is
+> authoritative and carries additional modules (augur, broadcast, forms,
+> lasts, website, …) not shown here. Some modules' web UI was lifted to
+> standalone apps and no longer renders in the unified app — `places` for
+> instance has no web surface here anymore, but its tools remain live
+> **server-side** via the MCP gateway (`apps/api/src/mcp/executor.ts`), which
+> reads/writes the still-synced data directly.
 
 | Module | Propose | Auto |
 |--------|---------|------|
@@ -280,9 +280,7 @@ Agents interact with the app through tools — each one either auto (executes si
 | notes | `create_note`, `update_note`, `append_to_note`, `add_tag_to_note` | `list_notes` |
 | places | `create_place`, `visit_place` | `get_places`, `get_current_location` |
 | drink | `undo_drink` | `get_drink_progress`, `log_drink` |
-| news | `save_news_article` | — |
 | news-research | `research_news` | — |
-| articles | `save_article`, `archive_article`, `tag_article`, `add_article_highlight`, `import_articles_from_urls` (auto) | `list_articles` |
 | journal | `create_journal_entry` | — |
 | contacts | `create_contact` | `get_contacts` |
 | quiz | `create_quiz`, `update_quiz`, `add_quiz_question`, `update_quiz_question`, `delete_quiz_question` | `list_quizzes`, `get_quiz_questions`, `get_quiz_stats` |
@@ -295,7 +293,6 @@ Agents interact with the app through tools — each one either auto (executes si
 | wetter | — | `get_weather`, `get_rain_forecast` |
 | invoices | `create_invoice`, `mark_invoice_paid` | `list_invoices`, `get_invoice_stats` |
 | writing | `create_draft`, `generate_draft_content`, `refine_draft_selection`, `set_draft_status`, `save_draft_as_article` | `list_drafts`, `get_draft`, `list_writing_styles` |
-| comic | `create_comic_story`, `generate_comic_panel`, `create_comic_character`, `generate_character_variant`, `pin_character_variant` | `list_comic_stories`, `list_comic_characters` |
 
 **Server-side web-research**: mana-ai calls mana-api's `/api/v1/news-research/discover` + `/search` directly before the planner prompt is built (pre-planning injection). Missions with research-keyword objectives get real article URLs + excerpts injected as a synthetic ResolvedInput. See `services/mana-ai/src/planner/news-research-client.ts`.
 
