@@ -173,8 +173,6 @@ const APP_SUBDOMAINS = new Set([
 	'cards',
 	'storage',
 	'presi',
-	'photos',
-	'picture',
 	'calc',
 	'inventory',
 	'times',

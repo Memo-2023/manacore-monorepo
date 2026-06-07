@@ -13,7 +13,6 @@ import type { LocalTask } from '$lib/modules/todo/types';
 import type { LocalTimeBlock } from '$lib/data/time-blocks/types';
 import type { LocalContact } from '$lib/modules/contacts/types';
 import type { LocalConversation } from '$lib/modules/chat/types';
-import type { LocalImage } from '$lib/modules/picture/types';
 import type { LocalAlarm, LocalCountdownTimer } from '$lib/modules/times/types';
 import type { LocalFile } from '$lib/modules/storage/types';
 import type { LocalDeck as LocalPresiDeck } from '$lib/modules/presi/types';
@@ -136,27 +135,6 @@ export function useRecentConversations(limit = 5) {
 			.limit(limit)
 			.toArray();
 	}, [] as LocalConversation[]);
-}
-
-// ─── Picture Queries ────────────────────────────────────────
-
-/** Recent generated images. */
-export function useRecentImages(limit = 6) {
-	return useLiveQueryWithDefault(async () => {
-		// Reverse-walk the indexed updatedAt column. Generated images have
-		// updatedAt stamped on creation and rarely move afterwards, so this
-		// is effectively "newest first" for the dashboard widget's purpose.
-		const recent = await db
-			.table<LocalImage>('images')
-			.orderBy('updatedAt')
-			.reverse()
-			.filter((i) => !i.isArchived && !i.deletedAt)
-			.limit(limit)
-			.toArray();
-		// prompt is encrypted on disk; the dashboard widget renders it as
-		// the alt text + caption, so decrypt the small slice we return.
-		return decryptRecords('images', recent);
-	}, [] as LocalImage[]);
 }
 
 // ─── Clock Queries ──────────────────────────────────────────

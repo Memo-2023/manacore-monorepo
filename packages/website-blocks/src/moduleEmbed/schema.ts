@@ -27,7 +27,6 @@ export const EmbedResolvedSchema = z.object({
  * in the editor's publish resolver.
  */
 export const EmbedSourceSchema = z.enum([
-	'picture.board',
 	'calendar.events',
 	'todo.tasks',
 	'goals.goals',
@@ -42,8 +41,8 @@ export const EmbedSourceSchema = z.enum([
 export type EmbedSource = z.infer<typeof EmbedSourceSchema>;
 
 export const ModuleEmbedSchema = z.object({
-	source: EmbedSourceSchema.default('picture.board'),
-	/** Target id — board id for picture, empty for "all entries" in library. */
+	source: EmbedSourceSchema.default('calendar.events'),
+	/** Target id — empty for "all entries". */
 	sourceId: z.string().max(64).default(''),
 	/** Display title. Optional; renderer falls back to source default. */
 	title: z.string().max(160).default(''),
@@ -52,7 +51,6 @@ export const ModuleEmbedSchema = z.object({
 	/**
 	 * Optional filters depending on source.
 	 *   library.entries: { isFavorite?, status?, kind? }
-	 *   picture.board:   ignored (board is the source)
 	 *   calendar.events: { upcomingDays?, tagIds? } — omit upcomingDays
 	 *                    to include past events; tagIds OR-filter on
 	 *                    event tag assignments
@@ -86,7 +84,7 @@ export const ModuleEmbedSchema = z.object({
 export type ModuleEmbedProps = z.infer<typeof ModuleEmbedSchema>;
 
 export const MODULE_EMBED_DEFAULTS: ModuleEmbedProps = {
-	source: 'picture.board',
+	source: 'calendar.events',
 	sourceId: '',
 	title: '',
 	layout: 'grid',

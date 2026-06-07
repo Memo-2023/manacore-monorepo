@@ -56,18 +56,6 @@ function asString(v: unknown, fallback = 'Ohne Titel'): string {
 
 const TABLES: TableConfig[] = [
 	{
-		module: 'picture',
-		collection: 'boards',
-		moduleLabel: 'Bilder (Boards)',
-		encrypted: false,
-		title: (r) => asString(r.name ?? r.title),
-		href: (id) => `/picture/board/${id}`,
-		setVisibility: async (id, next) => {
-			const { boardsStore } = await import('$lib/modules/picture/stores/boards.svelte');
-			return boardsStore.setVisibility(id, next);
-		},
-	},
-	{
 		module: 'calendar',
 		collection: 'events',
 		moduleLabel: 'Kalender',

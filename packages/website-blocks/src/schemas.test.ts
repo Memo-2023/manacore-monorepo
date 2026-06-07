@@ -186,7 +186,7 @@ describe('form', () => {
 
 describe('moduleEmbed', () => {
 	it('accepts declared sources', () => {
-		for (const source of ['picture.board', 'calendar.events']) {
+		for (const source of ['calendar.events']) {
 			expect(safeValidateSchema('moduleEmbed', { source }).success).toBe(true);
 		}
 	});

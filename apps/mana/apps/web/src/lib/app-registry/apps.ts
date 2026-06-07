@@ -19,8 +19,6 @@ import {
 	MoneyWavy,
 	ChatCircle,
 	Clock,
-	Image,
-	Camera,
 	HardDrives,
 	Presentation,
 	Package,
@@ -92,7 +90,7 @@ import {
 //       Body & life:  body · meditate · stretch · period ·
 //                     dreams · firsts · lasts · recipes
 //       Places & ev.: places · events
-//       Creative:     picture · music · photos
+//       Creative:     music
 //       Tools:        calc · inventory ·
 //                     storage · skilltree · questions
 //       Long-tail:    quotes · automations · companion · wetter ·
@@ -499,25 +497,8 @@ registerApp({
 // Quotes-Modul: dekommissioniert 2026-05-19, lebt als zitare standalone
 // auf zitare.mana.how (Code/zitare).
 
-registerApp({
-	id: 'picture',
-	name: 'Picture',
-	color: '#8B5CF6',
-	icon: Image,
-	views: {
-		list: { load: () => import('$lib/modules/picture/ListView.svelte') },
-	},
-});
-
-registerApp({
-	id: 'photos',
-	name: 'Photos',
-	color: '#06B6D4',
-	icon: Camera,
-	views: {
-		list: { load: () => import('$lib/modules/photos/ListView.svelte') },
-	},
-});
+// picture + photos: decommissioned 2026-06-07 — lifted into the standalone
+// app `bilda` (bilda.mana.how). See repo `Code/bilda`.
 
 registerApp({
 	id: 'storage',

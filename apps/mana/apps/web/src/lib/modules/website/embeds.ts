@@ -19,9 +19,7 @@ import { db } from '$lib/data/database';
 import { decryptRecords } from '$lib/data/crypto';
 import { canEmbedOnWebsite } from '@mana/shared-privacy';
 import { timeBlockTable } from '$lib/data/time-blocks/collections';
-import { mediaFileUrl } from './upload';
 import type { EmbedItem, EmbedSource, ModuleEmbedProps } from '@mana/website-blocks';
-import type { LocalBoard, LocalBoardItem, LocalImage } from '$lib/modules/picture/types';
 import type { LocalEvent } from '$lib/modules/calendar/types';
 import type { LocalTask } from '$lib/modules/todo/types';
 import type { LocalTaskTag } from '$lib/modules/todo/types';
@@ -45,9 +43,6 @@ export async function resolveEmbed(props: ModuleEmbedProps): Promise<ResolvedEmb
 	try {
 		let items: EmbedItem[];
 		switch (props.source as EmbedSource) {
-			case 'picture.board':
-				items = await resolvePictureBoard(props);
-				break;
 			case 'calendar.events':
 				items = await resolveCalendarEvents(props);
 				break;
@@ -89,61 +84,6 @@ export async function resolveEmbed(props: ModuleEmbedProps): Promise<ResolvedEmb
 		const message = err instanceof Error ? err.message : String(err);
 		return { items: [], error: message, resolvedAt: now };
 	}
-}
-
-/**
- * Picture-board: returns image items for a board whose owner flipped
- * its visibility to 'public' via the VisibilityPicker. `canEmbedOnWebsite`
- * is the hard gate.
- */
-async function resolvePictureBoard(props: ModuleEmbedProps): Promise<EmbedItem[]> {
-	if (!props.sourceId) {
-		throw new Error('Bitte wähle ein Board aus');
-	}
-
-	const [rawBoard] = await db
-		.table<LocalBoard>('boards')
-		.where('id')
-		.equals(props.sourceId)
-		.toArray();
-
-	if (!rawBoard || rawBoard.deletedAt) {
-		throw new Error('Board nicht gefunden');
-	}
-	const boardVisibility = rawBoard.visibility ?? 'private';
-	if (!canEmbedOnWebsite(boardVisibility)) {
-		throw new Error('Board ist nicht öffentlich — setze es im Picture-Modul auf "Öffentlich"');
-	}
-
-	const items = await db
-		.table<LocalBoardItem>('boardItems')
-		.where('boardId')
-		.equals(props.sourceId)
-		.toArray();
-
-	const imageItems = items
-		.filter((i) => !i.deletedAt && i.itemType === 'image' && i.imageId)
-		.sort((a, b) => a.zIndex - b.zIndex);
-
-	if (imageItems.length === 0) return [];
-
-	const imageIds = imageItems.map((i) => i.imageId as string);
-	const images = await db.table<LocalImage>('images').where('id').anyOf(imageIds).toArray();
-	const decrypted = (await decryptRecords('images', images)) as LocalImage[];
-	const imageById = new Map<string, LocalImage>();
-	for (const img of decrypted) imageById.set(img.id, img);
-
-	const out: EmbedItem[] = [];
-	for (const item of imageItems) {
-		const img = imageById.get(item.imageId as string);
-		if (!img) continue;
-		const url = img.publicUrl ?? mediaFileUrl(img.id, 'medium');
-		out.push({
-			title: img.prompt?.slice(0, 120) || 'Bild',
-			imageUrl: url,
-		});
-	}
-	return out;
 }
 
 /**

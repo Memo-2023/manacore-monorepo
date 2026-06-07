@@ -28,12 +28,11 @@ export async function collectAppSnapshots(): Promise<AppSnapshot[]> {
 	const snapshots: AppSnapshot[] = [];
 
 	// Run all reads in parallel
-	const [tasks, events, contacts, conversations, images, alarms, files, decks] = await Promise.all([
+	const [tasks, events, contacts, conversations, alarms, files, decks] = await Promise.all([
 		safeGetAll('tasks'),
 		safeGetAll('events'),
 		safeGetAll('contacts'),
 		safeGetAll('conversations'),
-		safeGetAll('images'),
 		safeGetAll('alarms'),
 		safeGetAll('files'),
 		safeGetAll('presiDecks'),
@@ -86,19 +85,6 @@ export async function collectAppSnapshots(): Promise<AppSnapshot[]> {
 			completedItems: 0,
 			favoriteItems: 0,
 			label: `${conversations.length} Gespräche`,
-		});
-	}
-
-	// Picture
-	if (images.length > 0) {
-		const favs = images.filter((i: any) => i.isFavorite).length;
-		snapshots.push({
-			app: 'Picture',
-			appIndex: MANA_APP_INDEX.picture,
-			totalItems: images.length,
-			completedItems: 0,
-			favoriteItems: favs,
-			label: `${images.length} Bilder`,
 		});
 	}
 

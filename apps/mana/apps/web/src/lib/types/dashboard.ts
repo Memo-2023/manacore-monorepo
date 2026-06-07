@@ -17,7 +17,6 @@ export type WidgetType =
 	| 'chat-recent' // Chat API: recent conversations
 	| 'contacts-favorites' // Contacts API: favorite contacts
 	| 'contacts-recent' // Contacts: recently updated
-	| 'picture-recent' // Picture API: recent generations
 	| 'clock-timers' // Clock: active timers and alarms
 	| 'storage-usage' // Storage: file storage stats
 	| 'presi-decks' // Presi: recent presentations
@@ -118,7 +117,6 @@ export interface WidgetMeta {
 		| 'calendar'
 		| 'chat'
 		| 'contacts'
-		| 'picture'
 		| 'cards'
 		| 'storage'
 		| 'presi'
@@ -202,15 +200,6 @@ export const WIDGET_REGISTRY: WidgetMeta[] = [
 		defaultSize: 'medium',
 		allowMultiple: false,
 		requiredBackend: 'contacts',
-	},
-	{
-		type: 'picture-recent',
-		nameKey: 'dashboard.widgets.picture.title',
-		descriptionKey: 'dashboard.widgets.picture.description',
-		icon: '🎨',
-		defaultSize: 'medium',
-		allowMultiple: false,
-		requiredBackend: 'picture',
 	},
 	{
 		type: 'clock-timers',

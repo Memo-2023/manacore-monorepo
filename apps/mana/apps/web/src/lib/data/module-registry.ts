@@ -55,11 +55,9 @@ import { todoModuleConfig } from '$lib/modules/todo/module.config';
 import { calendarModuleConfig } from '$lib/modules/calendar/module.config';
 import { contactsModuleConfig } from '$lib/modules/contacts/module.config';
 import { chatModuleConfig } from '$lib/modules/chat/module.config';
-import { pictureModuleConfig } from '$lib/modules/picture/module.config';
 import { storageModuleConfig } from '$lib/modules/storage/module.config';
 import { presiModuleConfig } from '$lib/modules/presi/module.config';
 import { inventoryModuleConfig } from '$lib/modules/inventory/module.config';
-import { photosModuleConfig } from '$lib/modules/photos/module.config';
 import { skilltreeModuleConfig } from '$lib/modules/skilltree/module.config';
 import { timesModuleConfig } from '$lib/modules/times/module.config';
 import { questionsModuleConfig } from '$lib/modules/questions/module.config';
@@ -102,11 +100,9 @@ export const MODULE_CONFIGS: readonly ModuleConfig[] = [
 	calendarModuleConfig,
 	contactsModuleConfig,
 	chatModuleConfig,
-	pictureModuleConfig,
 	storageModuleConfig,
 	presiModuleConfig,
 	inventoryModuleConfig,
-	photosModuleConfig,
 	skilltreeModuleConfig,
 	timesModuleConfig,
 	questionsModuleConfig,

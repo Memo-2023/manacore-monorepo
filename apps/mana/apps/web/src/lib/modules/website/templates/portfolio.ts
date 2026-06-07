@@ -91,18 +91,6 @@ export const portfolioTemplate: SiteTemplate = {
 						lightbox: true,
 					},
 				},
-				{
-					localId: 'boards',
-					type: 'moduleEmbed',
-					props: {
-						source: 'picture.board',
-						sourceId: '',
-						title: 'Picture-Board einbetten',
-						layout: 'grid',
-						maxItems: 12,
-						filter: {},
-					},
-				},
 			],
 		},
 		{

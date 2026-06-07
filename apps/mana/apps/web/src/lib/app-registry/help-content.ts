@@ -203,16 +203,6 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 		],
 		tips: ['Nutze kurze, präzise Fragen auf der Vorderseite für besseren Lerneffekt'],
 	},
-	picture: {
-		description: 'AI-Bildgenerierung — erstelle Bilder mit Textprompts auf deinem GPU-Server.',
-		features: [
-			'Text-zu-Bild Generierung',
-			'Prompt & Negativ-Prompt',
-			'Bildgalerie mit Verlauf',
-			'Verschiedene Modelle & Stile',
-		],
-		tips: ['Detaillierte Prompts mit Stil-Angaben liefern bessere Ergebnisse'],
-	},
 	music: {
 		description:
 			'Musik-Sammlung und Playlists verwalten. Titel und Metadaten sind verschlüsselt gespeichert.',
@@ -223,17 +213,6 @@ export const MODULE_HELP: Record<string, ModuleHelp> = {
 			'Durchsuchen und Filtern',
 		],
 		tips: ['Nutze Playlists um Musik nach Stimmung oder Anlass zu sortieren'],
-	},
-	photos: {
-		description:
-			'Fotoalben organisieren und durchsuchen. Bilder werden im persönlichen Cloud-Speicher abgelegt.',
-		features: [
-			'Alben erstellen und benennen',
-			'Fotos hochladen & organisieren',
-			'Bildvorschau & Vollbild-Ansicht',
-			'Gespeichert in deinem privaten MinIO-Speicher',
-		],
-		tips: ['Fotos werden in deinem persönlichen Speicher abgelegt — nicht bei Drittanbietern'],
 	},
 	storage: {
 		description:

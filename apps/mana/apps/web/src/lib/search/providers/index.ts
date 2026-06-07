@@ -21,7 +21,6 @@ export function registerAllProviders(registry: SearchRegistry): void {
 	registry.registerLazy('chat', () => import('./chat').then((m) => m.chatSearchProvider));
 	registry.registerLazy('storage', () => import('./storage').then((m) => m.storageSearchProvider));
 	// 'cards': dekommissioniert 2026-05-08 — Cards eigenständig auf cardecky.mana.how.
-	registry.registerLazy('picture', () => import('./picture').then((m) => m.pictureSearchProvider));
 	registry.registerLazy('presi', () => import('./presi').then((m) => m.presiSearchProvider));
 	registry.registerLazy('clock', () => import('./clock').then((m) => m.clockSearchProvider));
 }

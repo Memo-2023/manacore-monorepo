@@ -108,44 +108,6 @@ export const appConfigs: Record<string, AppConfig> = {
 		website: 'https://chat.mana.how',
 	},
 
-	picture: {
-		name: 'picture',
-		displayName: 'ManaPicture',
-		tagline: 'KI Bildgenerierung',
-		description: 'Erschaffe einzigartige Bilder mit der Kraft künstlicher Intelligenz.',
-		logoEmoji: '🎨',
-		primaryColor: '#22C55E',
-		accentColor: '#4ADE80',
-		features: [
-			{
-				icon: '🎨',
-				title: 'KI-Bildgenerierung',
-				description: 'Erstelle Bilder aus Textbeschreibungen',
-				color: '#22C55E',
-			},
-			{
-				icon: '🖼️',
-				title: 'Galerie',
-				description: 'Alle generierten Bilder organisiert',
-				color: '#10B981',
-			},
-			{
-				icon: '✨',
-				title: 'Verschiedene Stile',
-				description: 'Fotorealistisch, Cartoon, Kunst und mehr',
-				color: '#8B5CF6',
-			},
-			{
-				icon: '📐',
-				title: 'Flexible Formate',
-				description: 'Verschiedene Größen und Seitenverhältnisse',
-				color: '#F59E0B',
-			},
-		],
-		dashboardRoute: '/',
-		website: 'https://picture.mana.how',
-	},
-
 	presi: {
 		name: 'presi',
 		displayName: 'Presi',
@@ -584,7 +546,7 @@ export function getAppsByCategory(): {
 } {
 	return {
 		core: [appConfigs.mana],
-		ai: [appConfigs.chat, appConfigs.picture, appConfigs.presi, appConfigs.mail],
+		ai: [appConfigs.chat, appConfigs.presi, appConfigs.mail],
 		productivity: [
 			appConfigs.cards,
 			appConfigs.todo,

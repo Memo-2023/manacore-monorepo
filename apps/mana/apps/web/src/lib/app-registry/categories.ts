@@ -94,8 +94,6 @@ export const APP_CATEGORY_MAP: Record<string, AppCategory> = {
 
 	// Kreativ — generation, learning, media
 	music: 'creative',
-	picture: 'creative',
-	photos: 'creative',
 	presi: 'creative',
 	cards: 'creative',
 	skilltree: 'creative',

@@ -29,7 +29,6 @@ import { contactsRoutes } from './modules/contacts/routes';
 import { musicRoutes } from './modules/music/routes';
 import { chatRoutes } from './modules/chat/routes';
 import { notesRoutes } from './modules/notes/routes';
-import { pictureRoutes } from './modules/picture/routes';
 import { profileRoutes } from './modules/profile/routes';
 import { storageRoutes } from './modules/storage/routes';
 import { todoRoutes } from './modules/todo/routes';
@@ -99,7 +98,6 @@ const RESOURCE_MODULES = [
 	'kontext',
 	'news-research',
 	'notes',
-	'picture',
 	'research',
 	'traces',
 	'writing',
@@ -121,7 +119,6 @@ app.route('/api/v1/contacts', contactsRoutes);
 app.route('/api/v1/music', musicRoutes);
 app.route('/api/v1/chat', chatRoutes);
 app.route('/api/v1/notes', notesRoutes);
-app.route('/api/v1/picture', pictureRoutes);
 app.route('/api/v1/profile', profileRoutes);
 app.route('/api/v1/storage', storageRoutes);
 app.route('/api/v1/todo', todoRoutes);

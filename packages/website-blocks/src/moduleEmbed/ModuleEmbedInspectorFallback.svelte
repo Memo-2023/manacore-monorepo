@@ -16,7 +16,6 @@
 			value={block.props.source}
 			onchange={(e) => onChange({ source: e.currentTarget.value as ModuleEmbedProps['source'] })}
 		>
-			<option value="picture.board">Picture-Board</option>
 			<option value="calendar.events">Kalender (Termine)</option>
 			<option value="todo.tasks">Todos</option>
 			<option value="goals.goals">Ziele</option>

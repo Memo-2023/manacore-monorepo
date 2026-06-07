@@ -67,6 +67,41 @@ const INTERNAL_TABLES = new Set([
 // the "every Dexie table is registered" guard doesn't break on legacy
 // schema history.
 const LEGACY_TABLES = new Set([
+	// Picture + Photos → bilda.mana.how (2026-06-07 lifted to standalone bilda).
+	// Module + routes removed; Dexie schema history kept intact (no destructive
+	// table-drop migration). See repo Code/bilda.
+	'images',
+	'boards',
+	'boardItems',
+	'imageTags',
+	'albums',
+	'albumItems',
+	'photoFavorites',
+	'photoMediaTags',
+	// Quotes module — decommissioned; tables still in Dexie history.
+	'quotesFavorites',
+	'quotesLists',
+	'quotesListTags',
+	'customQuotes',
+	// Music/Mukke → standalone mukke; tables still in Dexie history.
+	'songs',
+	'mukkePlaylists',
+	'playlistSongs',
+	'mukkeProjects',
+	'markers',
+	'songTags',
+	// Places module — decommissioned; tables still in Dexie history.
+	'places',
+	'locationLogs',
+	'placeTags',
+	// Articles — reading-list + bulk-import surfaces; tables predate the
+	// per-module registry refactor (import worker lives in apps/api).
+	'articles',
+	'articleHighlights',
+	'articleTags',
+	'articleImportJobs',
+	'articleImportItems',
+	'articleExtractPickup',
 	// Cards → wordeck.com (2026-05-17 rebrand)
 	'cardDecks',
 	'cards',
@@ -195,11 +230,9 @@ describe('module-registry — snapshot', () => {
 			calendar: ['calendars', 'events', 'eventTags'],
 			contacts: ['contacts', 'contactTags'],
 			chat: ['conversations', 'messages', 'chatTemplates', 'conversationTags'],
-			picture: ['images', 'boards', 'boardItems', 'imageTags'],
 			storage: ['files', 'storageFolders', 'fileTags'],
 			presi: ['presiDecks', 'slides', 'presiDeckTags'],
 			inventory: ['invCollections', 'invItems', 'invLocations', 'invCategories', 'invItemTags'],
-			photos: ['albums', 'albumItems', 'photoFavorites', 'photoMediaTags'],
 			skilltree: ['skills', 'activities', 'achievements', 'skillTags'],
 			times: [
 				'timeClients',
@@ -271,8 +304,6 @@ describe('module-registry — snapshot', () => {
 			invItems: 'items',
 			invLocations: 'locations',
 			invCategories: 'categories',
-			photoFavorites: 'favorites',
-			photoMediaTags: 'photoTags',
 			timeClients: 'clients',
 			timeProjects: 'projects',
 			timeTemplates: 'templates',
