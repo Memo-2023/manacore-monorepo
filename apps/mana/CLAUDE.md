@@ -4,7 +4,7 @@ Project-level guidance for `apps/mana/`. For monorepo-wide patterns (auth, servi
 
 ## Project Overview
 
-**Mana** is the unified web app at **mana.how**, serving 27+ product modules (todo, calendar, contacts, chat, notes, dreams, memoro, cards, picture, presi, music, storage, …) under one SvelteKit build, one IndexedDB, one auth session, one deployment.
+**Mana** is the unified web app at **mana.how**, serving many product modules (todo, calendar, contacts, chat, notes, dreams, memoro, presi, storage, …) under one SvelteKit build, one IndexedDB, one auth session, one deployment. Some former modules have been lifted to standalone apps (picture/photos → bilda, articles → pageta, comic → comicello, music → mukke, cards → wordeck) and no longer live here.
 
 ```
 apps/mana/apps/
@@ -252,7 +252,7 @@ The companion is a **second actor** that works alongside the human in every modu
 - **Actor attribution** — every event, record, and sync row carries `{ kind, principalId, displayName }` (+ mission/iteration/rationale for AI). `principalId` is the userId / agentId / `system:<source>` sentinel; `displayName` is cached at write time so rename doesn't rewrite history. Factories in `@mana/shared-ai/src/actor.ts`; runtime ambient context in `src/lib/data/events/actor.ts`.
 - **Agents** — named AI personas that own Missions. `/ai-agents` module for CRUD (policy editor, memory, budget, concurrency). Default "Mana" agent auto-bootstrapped on first login; legacy missions backfilled. `data/ai/agents/{store,queries,bootstrap}.ts`.
 - **AI policy** — per-tool `auto | propose | deny`. Lives on the agent (`agent.policy`). Proposable tool names come from `@mana/shared-ai`'s `AI_PROPOSABLE_TOOL_NAMES`; the mana-ai service runs a boot-time drift guard against the same list. Resolution in `src/lib/data/ai/policy.ts`; executor loads `agent.policy` for every AI write.
-- **Proposal inbox** — drop `<AiProposalInbox module="…" />` into any module page to render pending proposals inline with approve / freitext-reject buttons. Cards show the owning agent's name + avatar chip. Wired in `/todo`, `/calendar`, `/places`, `/drink`, `/news`, `/notes`. The mission-detail view also embeds a **cross-module inbox** (`<AiProposalInbox missionId={id} />`): shows all pending proposals for that mission across all modules with a module-badge per card, so the user can review and approve without navigating to individual module pages.
+- **Proposal inbox** — drop `<AiProposalInbox module="…" />` into any module page to render pending proposals inline with approve / freitext-reject buttons. Cards show the owning agent's name + avatar chip. Wired in `/todo`, `/calendar`, `/drink`, `/notes`. The mission-detail view also embeds a **cross-module inbox** (`<AiProposalInbox missionId={id} />`): shows all pending proposals for that mission across all modules with a module-badge per card, so the user can review and approve without navigating to individual module pages.
 - **Reasoning loop** — the foreground Runner chains up to 5 planner calls per iteration. Read-only tools (`list_notes`, `get_task_stats`, etc.) execute inline as auto-policy, their outputs are fed back as synthetic `ResolvedInput`s for the next planner call. The loop exits when a propose-policy tool is staged (human must approve), the planner returns 0 steps, or the budget exhausts. This enables "read → reason → act" missions like *"list all notes and tag them"* in a single run. Code: `data/ai/missions/runner.ts` reasoning loop.
 - **Missions** — long-lived autonomous work items at `/ai-missions` with concept + objective + linked inputs + cadence + **owning agent** (AgentPicker in the create flow). Both the foreground tick AND the server-side `mana-ai` service produce plans under the agent's identity; `data/ai/missions/server-iteration-staging.ts` translates server-source iterations into local Proposals on sync.
 - **Input picker** — `<MissionInputPicker>` sources candidates from the `input-index` registry (notes / kontext / goals / tasks / calendar). The Runner resolves via the parallel `input-resolvers` registry. Encrypted tables (notes, tasks, …) decrypt client-side only.
@@ -264,6 +264,14 @@ The companion is a **second actor** that works alongside the human in every modu
 ### Tool Coverage (68 tools, 20 modules)
 
 Agents interact with the app through tools — each one either auto (executes silently during reasoning) or propose (creates a Proposal card the user must approve). Source of truth: `AI_TOOL_CATALOG` in `@mana/shared-ai/src/tools/schemas.ts` — both webapp policy (`src/lib/data/ai/policy.ts`) and server-side planner (`services/mana-ai/src/planner/tools.ts`) derive from it automatically, so drift is structurally impossible.
+
+> **Note (2026-06-07):** the catalog still carries tool schemas for a few
+> modules that were lifted out of the unified app to standalone apps —
+> `articles` (→ pageta), `news`, `comic` (→ comicello), `places`. Their
+> module UI + executors are gone from managarten, so these entries are
+> orphaned tool declarations pending a catalog cleanup in `@mana/shared-ai`.
+> The table below mirrors the catalog verbatim, so they still appear; treat
+> rows for lifted modules as not-yet-pruned, not as live surfaces.
 
 | Module | Propose | Auto |
 |--------|---------|------|
@@ -301,36 +309,6 @@ Pre-configured starter-kits at `/agents/templates` — two sections:
 Each template bundles: optional agent + optional scene layout + optional starter missions (paused) + optional per-module seeds. Template shape: `WorkbenchTemplate` in `@mana/shared-ai/src/agents/templates/types.ts`. Applicator: `src/lib/data/ai/agents/apply-template.ts`. Seed-handler registry: `src/lib/data/ai/agents/seed-registry.ts` — modules register via side-effect imports in `missions/setup.ts`. Current handlers: meditate, goals. Plan: [`docs/plans/workbench-templates.md`](../../docs/plans/workbench-templates.md).
 
 Full architecture (Planner prompt + parser in `@mana/shared-ai`, server-side runner, Postgres actor column, materialized snapshots, Multi-Agent gating, server-side web-research, Prometheus metrics + status.mana.how integration): [`docs/architecture/COMPANION_BRAIN_ARCHITECTURE.md`](../../docs/architecture/COMPANION_BRAIN_ARCHITECTURE.md) §20 (AI Workbench) + §21 (Mission Grants) + §22 (Multi-Agent Workbench).
-
-## Articles bulk-import
-
-Background pipeline that ingests N URLs into a user's reading list as
-one Job, with the same encryption + scope semantics as a single-URL
-save. Same shape as the AI mission runner: state lives in
-`sync_changes`, a server-side worker projects + writes back, the
-client encrypts the final article.
-
-```
-client createJob(urls)
-  → bulkAdd articleImportItems(state='pending') + articleImportJobs(queued)
-  → sync push → mana_sync.sync_changes
-  → apps/api worker tick (every 2s, advisory-lock-gated)
-  → extractFromUrl (shared-rss / Readability)
-  → write articleExtractPickup row + flip item → 'extracted'
-  → sync pull → liveQuery
-  → consume-pickup encryptRecord + articleTable.add
-  → flip item → 'saved' (or 'duplicate' / 'consent-wall')
-  → delete pickup row
-  → server flips job → 'done', emits ArticleImportFinished
-```
-
-Tables: `articleImportJobs`, `articleImportItems`, `articleExtractPickup`
-(all plaintext-allowlisted — see `data/crypto/plaintext-allowlist.ts`).
-Actor on every server-write: `system:articles-import-worker`. Worker
-metrics under `mana_api_articles_import_*`. Hard cap of 200 URLs per
-job (`MAX_URLS_PER_JOB` in `modules/articles/stores/imports.svelte`).
-
-Plan: [`docs/plans/articles-bulk-import.md`](../../docs/plans/articles-bulk-import.md).
 
 ## Reference Documents
 
