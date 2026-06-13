@@ -255,7 +255,7 @@ services:
       # Database (used by modules that have server-side state — research,
       # presi share-links, traces guides). Same Postgres + schema split
       # as the rest of the platform.
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-mana123}@postgres:5432/mana_platform
+      DATABASE_URL: postgresql://platform_app:${PLATFORM_APP_DB_PASSWORD:?required}@postgres:5432/mana_platform
       # CORS — die unified-App-Origins. mana.how (Bestand) + managarten.com
       # (Brand-Domain seit Domain-Umzug 2026-06; die App ruft mana-api
       # cross-origin). The manavoxel game frontend doesn't call apps/api.
