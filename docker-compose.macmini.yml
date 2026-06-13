@@ -222,6 +222,8 @@ services:
         NPM_TOKEN: ${NPM_AUTH_TOKEN:-${NPM_TOKEN:-}}
     image: mana-api:local
     container_name: mana-api
+    mem_limit: 512m
+    memswap_limit: 1g
     restart: always
     mem_limit: 384m
     # Kern (postgres, mana-auth) lebt in Projekt mana-core, erreichbar übers Netz.
