@@ -181,6 +181,18 @@ BACKUP_COUNT=0
 BACKUP_SIZE=0
 FAILED_DBS=""
 
+# Globals (Rollen + Passwörter + Grants) der konsolidierten Instanz.
+# Seit der Postgres-Konsolidierung (2026-06-13) tragen die App-Rollen
+# (<app>_app) eigene Passwörter — ohne diesen Dump wäre ein Restore
+# der per-DB-Dumps nicht lauffähig (FATAL: role does not exist).
+if docker exec mana-infra-postgres pg_dumpall -U postgres --globals-only 2>/dev/null \
+    | gzip > "$BACKUP_DIR/daily/mana-infra-postgres_GLOBALS_${DATE}.sql.gz"; then
+    log "  OK: mana-infra-postgres GLOBALS (Rollen/Grants)"
+else
+    log "  FAILED: globals-Dump mana-infra-postgres"
+    FAILED_DBS="$FAILED_DBS mana-infra-postgres:globals"
+fi
+
 for CONTAINER in $CONTAINERS; do
     USER=$(db_user_for_container "$CONTAINER")
     log "--- Container: $CONTAINER (user: $USER) ---"
