@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd-Job für die Intra-Day-Postgres-Sicherung (backup-intraday.sh).
+  Läuft 4×/Tag (01/07/13/19 Uhr, versetzt zum nächtlichen Daily um 03:00)
+  → RPO ~6 h. Wie der Daily via `ssh localhost` + Forced-Command-Key
+  (TCC/FDA-Sandbox-Umgehung); eigener Key ~/.ssh/backup_localhost_intraday
+  mit authorized_keys-Eintrag command="…/backup-intraday.sh".
+
+  Installieren:
+    cp scripts/mac-mini/com.mana.backup-intraday.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.mana.backup-intraday.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict><key>PATH</key><string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string></dict>
+	<key>Label</key>
+	<string>com.mana.backup-intraday</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/ssh</string>
+		<string>-i</string><string>/Users/mana/.ssh/backup_localhost_intraday</string>
+		<string>-o</string><string>BatchMode=yes</string>
+		<string>-o</string><string>StrictHostKeyChecking=accept-new</string>
+		<string>-o</string><string>ConnectTimeout=20</string>
+		<string>localhost</string>
+	</array>
+	<key>StandardOutPath</key><string>/tmp/mana-backup-intraday.log</string>
+	<key>StandardErrorPath</key><string>/tmp/mana-backup-intraday.error.log</string>
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict><key>Hour</key><integer>1</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
+	</array>
+</dict>
+</plist>
