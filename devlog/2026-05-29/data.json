@@ -1,0 +1,134 @@
+{
+  "date": "2026-05-29",
+  "day_number": 118,
+  "weekday": "Freitag",
+  "commits": 4,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 4
+    }
+  ],
+  "additions": 369,
+  "deletions": 626,
+  "net_lines": -257,
+  "files_changed": 22,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-05-29T15:00:33.000Z",
+    "last_commit_at": "2026-05-29T20:53:37.000Z",
+    "total_span_minutes": 353,
+    "active_minutes": 29,
+    "pauses": [
+      {
+        "from": "17:00",
+        "to": "18:19",
+        "minutes": 79
+      },
+      {
+        "from": "18:19",
+        "to": "22:23",
+        "minutes": 245
+      }
+    ],
+    "longest_focus_minutes": 30
+  },
+  "top_dirs": [
+    {
+      "path": "apps/calendar/apps/landing",
+      "pct": 9
+    },
+    {
+      "path": "apps/chat/apps/landing",
+      "pct": 9
+    },
+    {
+      "path": "apps/contacts/apps/landing",
+      "pct": 9
+    },
+    {
+      "path": "apps/mana/apps/landing",
+      "pct": 9
+    },
+    {
+      "path": "apps/news/apps/landing",
+      "pct": 9
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".json",
+      "count": 9
+    },
+    {
+      "ext": ".astro",
+      "count": 8
+    },
+    {
+      "ext": ".yaml",
+      "count": 2
+    },
+    {
+      "ext": ".sh",
+      "count": 2
+    },
+    {
+      "ext": ".svelte",
+      "count": 1
+    },
+    {
+      "ext": ".md",
+      "count": 1
+    }
+  ],
+  "tags": [
+    "landings",
+    "shared-ui",
+    "backup",
+    "deps"
+  ],
+  "commits_list": [
+    {
+      "hash": "ec32f56",
+      "short": "fix(landings): self-host Inter statt Google-Fonts-CDN (DSGVO)",
+      "type": "fix",
+      "scope": "landings",
+      "additions": 54,
+      "deletions": 74,
+      "timestamp": "2026-05-29T17:00:33+02:00"
+    },
+    {
+      "hash": "bd6186f",
+      "short": "fix(shared-ui): aktiver Pill voll gefüllt (Parität zu mana shared-ui@1.3.0)",
+      "type": "fix",
+      "scope": "shared-ui",
+      "additions": 5,
+      "deletions": 5,
+      "timestamp": "2026-05-29T18:19:18+02:00"
+    },
+    {
+      "hash": "a76c728",
+      "short": "feat(backup): MinIO-Objektspeicher ins zentrale Backup aufnehmen",
+      "type": "feat",
+      "scope": "backup",
+      "additions": 163,
+      "deletions": 1,
+      "timestamp": "2026-05-29T22:23:53+02:00"
+    },
+    {
+      "hash": "9a9cf5f",
+      "short": "fix(deps): @types/node workspace-weit auf 24.12.2 pinnen",
+      "type": "fix",
+      "scope": "deps",
+      "additions": 147,
+      "deletions": 546,
+      "timestamp": "2026-05-29T22:53:37+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

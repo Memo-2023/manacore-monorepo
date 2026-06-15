@@ -1,0 +1,95 @@
+{
+  "date": "2026-06-03",
+  "day_number": 122,
+  "weekday": "Mittwoch",
+  "commits": 3,
+  "authors": [
+    {
+      "name": "Claude (für Till)",
+      "count": 2
+    },
+    {
+      "name": "Till JS",
+      "count": 1
+    }
+  ],
+  "additions": 23,
+  "deletions": 0,
+  "net_lines": 23,
+  "files_changed": 3,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-06-03T14:59:24.000Z",
+    "last_commit_at": "2026-06-03T15:20:59.000Z",
+    "total_span_minutes": 22,
+    "active_minutes": 22,
+    "pauses": [],
+    "longest_focus_minutes": 22
+  },
+  "top_dirs": [
+    {
+      "path": "scripts/mac-mini/backup-objects.sh",
+      "pct": 33
+    },
+    {
+      "path": "docs/BACKUP_STRATEGY.md",
+      "pct": 33
+    },
+    {
+      "path": "cloudflared-config.yml",
+      "pct": 33
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".sh",
+      "count": 1
+    },
+    {
+      "ext": ".md",
+      "count": 1
+    },
+    {
+      "ext": ".yml",
+      "count": 1
+    }
+  ],
+  "tags": [
+    "backup"
+  ],
+  "commits_list": [
+    {
+      "hash": "c8c4752",
+      "short": "fix(backup): backup-objects.sh wieder ausfuehrbar (x-Bit)",
+      "type": "fix",
+      "scope": "backup",
+      "additions": 0,
+      "deletions": 0,
+      "timestamp": "2026-06-03T16:59:24+02:00"
+    },
+    {
+      "hash": "7a06a39",
+      "short": "docs(backup): Off-Site aktiv + MinIO-x-Bit-Fix dokumentiert (2026-06-03)",
+      "type": "docs",
+      "scope": "backup",
+      "additions": 18,
+      "deletions": 0,
+      "timestamp": "2026-06-03T17:20:23+02:00"
+    },
+    {
+      "hash": "ec2fca4",
+      "short": "cloudflared: Route kollekta.mana.how -> :3148",
+      "type": null,
+      "scope": null,
+      "additions": 5,
+      "deletions": 0,
+      "timestamp": "2026-06-03T17:20:59+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

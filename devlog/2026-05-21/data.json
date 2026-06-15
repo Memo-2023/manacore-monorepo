@@ -1,0 +1,118 @@
+{
+  "date": "2026-05-21",
+  "day_number": 113,
+  "weekday": "Donnerstag",
+  "commits": 3,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 3
+    }
+  ],
+  "additions": 6872,
+  "deletions": 20600,
+  "net_lines": -13728,
+  "files_changed": 218,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-05-21T12:56:54.000Z",
+    "last_commit_at": "2026-05-21T15:24:56.000Z",
+    "total_span_minutes": 148,
+    "active_minutes": 17,
+    "pauses": [
+      {
+        "from": "14:56",
+        "to": "17:07",
+        "minutes": 131
+      }
+    ],
+    "longest_focus_minutes": 17
+  },
+  "top_dirs": [
+    {
+      "path": "packages/shared-ui/src",
+      "pct": 95
+    },
+    {
+      "path": "apps/mana/apps/web",
+      "pct": 1
+    },
+    {
+      "path": "packages/shared-ui/.gitignore",
+      "pct": 0
+    },
+    {
+      "path": "packages/shared-ui/README.md",
+      "pct": 0
+    },
+    {
+      "path": "packages/shared-ui/package.json",
+      "pct": 0
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".svelte",
+      "count": 148
+    },
+    {
+      "ext": ".ts",
+      "count": 66
+    },
+    {
+      "ext": ".json",
+      "count": 2
+    },
+    {
+      "ext": ".gitignore",
+      "count": 1
+    },
+    {
+      "ext": ".md",
+      "count": 1
+    },
+    {
+      "ext": ".mjs",
+      "count": 1
+    }
+  ],
+  "tags": [
+    "profile,infra",
+    "shared-ui"
+  ],
+  "commits_list": [
+    {
+      "hash": "ce923bb",
+      "short": "shared-ui: Sync auf mana/shared-ui v1.0.0 + AppSlider tot weg",
+      "type": null,
+      "scope": null,
+      "additions": 6685,
+      "deletions": 20592,
+      "timestamp": "2026-05-21T14:56:54+02:00"
+    },
+    {
+      "hash": "db1dc9a",
+      "short": "feat(profile,infra): mana-me Write-Through-Brücke + me.mana.how-Route",
+      "type": "feat",
+      "scope": "profile,infra",
+      "additions": 157,
+      "deletions": 0,
+      "timestamp": "2026-05-21T17:07:32+02:00"
+    },
+    {
+      "hash": "abafdfb",
+      "short": "fix(shared-ui): TagChip nested button + Pill svelte:element ARIA role",
+      "type": "fix",
+      "scope": "shared-ui",
+      "additions": 30,
+      "deletions": 8,
+      "timestamp": "2026-05-21T17:24:56+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

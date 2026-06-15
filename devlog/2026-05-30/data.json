@@ -1,0 +1,129 @@
+{
+  "date": "2026-05-30",
+  "day_number": 119,
+  "weekday": "Samstag",
+  "commits": 4,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 4
+    }
+  ],
+  "additions": 63,
+  "deletions": 499,
+  "net_lines": -436,
+  "files_changed": 24,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-05-30T12:45:12.000Z",
+    "last_commit_at": "2026-05-30T15:18:48.000Z",
+    "total_span_minutes": 154,
+    "active_minutes": 6,
+    "pauses": [
+      {
+        "from": "14:50",
+        "to": "17:18",
+        "minutes": 148
+      }
+    ],
+    "longest_focus_minutes": 6
+  },
+  "top_dirs": [
+    {
+      "path": "packages/credits/src",
+      "pct": 16
+    },
+    {
+      "path": "packages/credits/tsconfig.json",
+      "pct": 8
+    },
+    {
+      "path": "packages/mana-tool-registry/src",
+      "pct": 8
+    },
+    {
+      "path": "apps/api/package.json",
+      "pct": 4
+    },
+    {
+      "path": "apps/api/src/modules",
+      "pct": 4
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".json",
+      "count": 14
+    },
+    {
+      "ext": ".ts",
+      "count": 5
+    },
+    {
+      "ext": ".yml",
+      "count": 2
+    },
+    {
+      "ext": ".tsx",
+      "count": 2
+    },
+    {
+      "ext": ".yaml",
+      "count": 1
+    },
+    {
+      "ext": ".md",
+      "count": 1
+    }
+  ],
+  "tags": [
+    "types",
+    "sync-field-meta",
+    "cleanup",
+    "tunnel"
+  ],
+  "commits_list": [
+    {
+      "hash": "1743375",
+      "short": "fix(types): Monorepo-type-check grün — 9 vorbestehend kaputte Pakete repariert",
+      "type": "fix",
+      "scope": "types",
+      "additions": 39,
+      "deletions": 12,
+      "timestamp": "2026-05-30T14:45:12+02:00"
+    },
+    {
+      "hash": "99d6b7e",
+      "short": "docs(sync-field-meta): record prod mana_sync field_meta migration (F1 nachtrag)",
+      "type": "docs",
+      "scope": "sync-field-meta",
+      "additions": 1,
+      "deletions": 1,
+      "timestamp": "2026-05-30T14:48:21+02:00"
+    },
+    {
+      "hash": "74998f3",
+      "short": "chore(cleanup): tote credits/mobile löschen, type-check als Push-Gate, comic-ModuleId raus",
+      "type": "chore",
+      "scope": "cleanup",
+      "additions": 10,
+      "deletions": 486,
+      "timestamp": "2026-05-30T14:50:45+02:00"
+    },
+    {
+      "hash": "7a2ea16",
+      "short": "chore(tunnel): Live-Routen ins git reconcilen (memoro.ai, audioguide, wunsch)",
+      "type": "chore",
+      "scope": "tunnel",
+      "additions": 13,
+      "deletions": 0,
+      "timestamp": "2026-05-30T17:18:48+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

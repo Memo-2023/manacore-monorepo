@@ -1,0 +1,92 @@
+{
+  "date": "2026-06-12",
+  "day_number": 127,
+  "weekday": "Freitag",
+  "commits": 3,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 3
+    }
+  ],
+  "additions": 15,
+  "deletions": 1,
+  "net_lines": 14,
+  "files_changed": 2,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-06-13T00:15:17.000Z",
+    "last_commit_at": "2026-06-13T01:39:49.000Z",
+    "total_span_minutes": 85,
+    "active_minutes": 0,
+    "pauses": [
+      {
+        "from": "02:15",
+        "to": "02:46",
+        "minutes": 32
+      },
+      {
+        "from": "02:46",
+        "to": "03:39",
+        "minutes": 53
+      }
+    ],
+    "longest_focus_minutes": 0
+  },
+  "top_dirs": [
+    {
+      "path": "docker-compose.macmini.yml",
+      "pct": 67
+    },
+    {
+      "path": "scripts/mac-mini/backup-databases.sh",
+      "pct": 33
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".yml",
+      "count": 2
+    },
+    {
+      "ext": ".sh",
+      "count": 1
+    }
+  ],
+  "tags": [],
+  "commits_list": [
+    {
+      "hash": "b48b448",
+      "short": "backup: Globals-Dump (Rollen/Grants) der konsolidierten infra-Postgres",
+      "type": null,
+      "scope": null,
+      "additions": 12,
+      "deletions": 0,
+      "timestamp": "2026-06-13T02:15:17+02:00"
+    },
+    {
+      "hash": "93ea5a4",
+      "short": "infra: mana-api auf Rolle platform_app (Superuser-Entwöhnung)",
+      "type": null,
+      "scope": null,
+      "additions": 1,
+      "deletions": 1,
+      "timestamp": "2026-06-13T02:46:59+02:00"
+    },
+    {
+      "hash": "305750b",
+      "short": "infra: mem_limit für mana-api dauerhaft im Compose",
+      "type": null,
+      "scope": null,
+      "additions": 2,
+      "deletions": 0,
+      "timestamp": "2026-06-13T03:39:49+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

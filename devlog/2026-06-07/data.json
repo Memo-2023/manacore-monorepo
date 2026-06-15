@@ -1,0 +1,113 @@
+{
+  "date": "2026-06-07",
+  "day_number": 126,
+  "weekday": "Sonntag",
+  "commits": 4,
+  "authors": [
+    {
+      "name": "Till",
+      "count": 4
+    }
+  ],
+  "additions": 68,
+  "deletions": 8025,
+  "net_lines": -7957,
+  "files_changed": 91,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-06-07T12:51:53.000Z",
+    "last_commit_at": "2026-06-07T13:37:03.000Z",
+    "total_span_minutes": 45,
+    "active_minutes": 45,
+    "pauses": [],
+    "longest_focus_minutes": 45
+  },
+  "top_dirs": [
+    {
+      "path": "apps/mana/apps/web",
+      "pct": 91
+    },
+    {
+      "path": "packages/website-blocks/src",
+      "pct": 3
+    },
+    {
+      "path": "apps/mana/CLAUDE.md",
+      "pct": 2
+    },
+    {
+      "path": "apps/api/src/index.ts",
+      "pct": 1
+    },
+    {
+      "path": "apps/api/src/modules",
+      "pct": 1
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".ts",
+      "count": 40
+    },
+    {
+      "ext": ".svelte",
+      "count": 26
+    },
+    {
+      "ext": ".json",
+      "count": 25
+    },
+    {
+      "ext": ".md",
+      "count": 2
+    }
+  ],
+  "tags": [
+    "mana",
+    "shared-ai"
+  ],
+  "commits_list": [
+    {
+      "hash": "ff80aed",
+      "short": "decommission photos + picture modules (lifted to standalone bilda)",
+      "type": null,
+      "scope": null,
+      "additions": 44,
+      "deletions": 7792,
+      "timestamp": "2026-06-07T14:51:53+02:00"
+    },
+    {
+      "hash": "083601a",
+      "short": "cleanup: prune orphaned photos/picture i18n keys + correct articles legacy note",
+      "type": null,
+      "scope": null,
+      "additions": 5,
+      "deletions": 52,
+      "timestamp": "2026-06-07T15:10:22+02:00"
+    },
+    {
+      "hash": "06d7e6d",
+      "short": "docs(mana): prune stale lifted-module references in apps/mana/CLAUDE.md",
+      "type": "docs",
+      "scope": "mana",
+      "additions": 10,
+      "deletions": 32,
+      "timestamp": "2026-06-07T15:21:31+02:00"
+    },
+    {
+      "hash": "b0ee532",
+      "short": "chore(shared-ai): prune orphaned `articles` tool schemas + fix AI-tools doc",
+      "type": "chore",
+      "scope": "shared-ai",
+      "additions": 9,
+      "deletions": 149,
+      "timestamp": "2026-06-07T15:37:03+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

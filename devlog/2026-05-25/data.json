@@ -1,0 +1,97 @@
+{
+  "date": "2026-05-25",
+  "day_number": 116,
+  "weekday": "Montag",
+  "commits": 3,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 3
+    }
+  ],
+  "additions": 116,
+  "deletions": 2,
+  "net_lines": 114,
+  "files_changed": 4,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-05-25T12:03:55.000Z",
+    "last_commit_at": "2026-05-25T13:34:12.000Z",
+    "total_span_minutes": 90,
+    "active_minutes": 29,
+    "pauses": [
+      {
+        "from": "14:03",
+        "to": "15:04",
+        "minutes": 61
+      }
+    ],
+    "longest_focus_minutes": 30
+  },
+  "top_dirs": [
+    {
+      "path": "cloudflared-config.yml",
+      "pct": 25
+    },
+    {
+      "path": "infrastructure/docker-compose.gpu-box.yml",
+      "pct": 25
+    },
+    {
+      "path": "scripts/mac-mini/ensure-containers-running.sh",
+      "pct": 25
+    },
+    {
+      "path": "scripts/mac-mini/backup-databases.sh",
+      "pct": 25
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".yml",
+      "count": 2
+    },
+    {
+      "ext": ".sh",
+      "count": 2
+    }
+  ],
+  "tags": [
+    "infra"
+  ],
+  "commits_list": [
+    {
+      "hash": "800a91f",
+      "short": "fix(infra): credits-Port-Drift 3002→3061 entschärfen",
+      "type": "fix",
+      "scope": "infra",
+      "additions": 2,
+      "deletions": 2,
+      "timestamp": "2026-05-25T14:03:55+02:00"
+    },
+    {
+      "hash": "4e26637",
+      "short": "feat(infra): colima-VM-Liveness-Guard in ensure-containers",
+      "type": "feat",
+      "scope": "infra",
+      "additions": 39,
+      "deletions": 0,
+      "timestamp": "2026-05-25T15:04:37+02:00"
+    },
+    {
+      "hash": "1d9a19d",
+      "short": "feat(infra): Backup-Zweitkopie auf GPU-Box (Phase 1 Off-Site)",
+      "type": "feat",
+      "scope": "infra",
+      "additions": 75,
+      "deletions": 0,
+      "timestamp": "2026-05-25T15:34:12+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

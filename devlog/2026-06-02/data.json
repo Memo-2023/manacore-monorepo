@@ -1,0 +1,78 @@
+{
+  "date": "2026-06-02",
+  "day_number": 121,
+  "weekday": "Dienstag",
+  "commits": 2,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 2
+    }
+  ],
+  "additions": 20,
+  "deletions": 1,
+  "net_lines": 19,
+  "files_changed": 3,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-06-02T13:18:13.000Z",
+    "last_commit_at": "2026-06-02T13:46:09.000Z",
+    "total_span_minutes": 28,
+    "active_minutes": 28,
+    "pauses": [],
+    "longest_focus_minutes": 28
+  },
+  "top_dirs": [
+    {
+      "path": "services/mana-image-gen/app",
+      "pct": 33
+    },
+    {
+      "path": ".husky/pre-commit",
+      "pct": 33
+    },
+    {
+      "path": ".husky/pre-push",
+      "pct": 33
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": "<no-ext>",
+      "count": 2
+    },
+    {
+      "ext": ".py",
+      "count": 1
+    }
+  ],
+  "tags": [
+    "husky"
+  ],
+  "commits_list": [
+    {
+      "hash": "16c78f3",
+      "short": "mana-image-gen: FLUX.2-klein per CPU-Offload statt resident",
+      "type": null,
+      "scope": null,
+      "additions": 5,
+      "deletions": 1,
+      "timestamp": "2026-06-02T15:18:13+02:00"
+    },
+    {
+      "hash": "642784e",
+      "short": "chore(husky): Hooks bei fehlendem node_modules sauber überspringen",
+      "type": "chore",
+      "scope": "husky",
+      "additions": 15,
+      "deletions": 0,
+      "timestamp": "2026-06-02T15:46:09+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

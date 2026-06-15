@@ -1,0 +1,270 @@
+{
+  "date": "2026-05-26",
+  "day_number": 117,
+  "weekday": "Dienstag",
+  "commits": 19,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 19
+    }
+  ],
+  "additions": 541,
+  "deletions": 1637,
+  "net_lines": -1096,
+  "files_changed": 75,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-05-26T12:21:04.000Z",
+    "last_commit_at": "2026-05-26T16:35:57.000Z",
+    "total_span_minutes": 255,
+    "active_minutes": 151,
+    "pauses": [
+      {
+        "from": "15:43",
+        "to": "16:16",
+        "minutes": 33
+      },
+      {
+        "from": "16:18",
+        "to": "17:28",
+        "minutes": 71
+      }
+    ],
+    "longest_focus_minutes": 82
+  },
+  "top_dirs": [
+    {
+      "path": "apps/mana/apps/web",
+      "pct": 13
+    },
+    {
+      "path": "apps/mana/apps/landing",
+      "pct": 9
+    },
+    {
+      "path": "packages/shared-utils/src",
+      "pct": 6
+    },
+    {
+      "path": "packages/website-blocks/src",
+      "pct": 5
+    },
+    {
+      "path": "scripts/mac-mini/build-app.sh",
+      "pct": 3
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".md",
+      "count": 31
+    },
+    {
+      "ext": ".ts",
+      "count": 12
+    },
+    {
+      "ext": ".astro",
+      "count": 11
+    },
+    {
+      "ext": ".sh",
+      "count": 9
+    },
+    {
+      "ext": ".yml",
+      "count": 5
+    },
+    {
+      "ext": ".json",
+      "count": 5
+    }
+  ],
+  "tags": [
+    "analytics",
+    "mac-mini",
+    "mana-web",
+    "web",
+    "umami"
+  ],
+  "commits_list": [
+    {
+      "hash": "9720cd9",
+      "short": "chore(analytics): Umami-Kern entfernen — Injection, Client-Lib, Auth-Hook, Container, DB",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 10,
+      "deletions": 585,
+      "timestamp": "2026-05-26T14:21:04+02:00"
+    },
+    {
+      "hash": "3a72691",
+      "short": "chore(analytics): Umami aus Landing-Pages — Script-Loader + shared Analytics-Komponente",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 0,
+      "deletions": 112,
+      "timestamp": "2026-05-26T14:44:59+02:00"
+    },
+    {
+      "hash": "dfcda85",
+      "short": "chore(analytics): Umami-Script-Loader + <Analytics /> aus 7 App-Landing-Layouts entfernt",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 5,
+      "deletions": 96,
+      "timestamp": "2026-05-26T14:45:21+02:00"
+    },
+    {
+      "hash": "f812140",
+      "short": "chore(analytics): Umami aus Config + Admin-UI (Welle B)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 11,
+      "deletions": 68,
+      "timestamp": "2026-05-26T14:47:55+02:00"
+    },
+    {
+      "hash": "394e520",
+      "short": "chore(analytics): Umami aus Legal/Cookies/Features/Schema (Welle C)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 0,
+      "deletions": 242,
+      "timestamp": "2026-05-26T14:51:54+02:00"
+    },
+    {
+      "hash": "3ea8703",
+      "short": "chore(analytics): Umami aus i18n, CSP, website-blocks-Feature, infra (Welle D)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 20,
+      "deletions": 36,
+      "timestamp": "2026-05-26T14:56:34+02:00"
+    },
+    {
+      "hash": "100543b",
+      "short": "chore(analytics): Umami aus mac-mini-Ops-Scripts (DB-Loop, Container-Liste, Doku)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 2,
+      "deletions": 4,
+      "timestamp": "2026-05-26T14:58:22+02:00"
+    },
+    {
+      "hash": "04bfa71",
+      "short": "chore(analytics): Umami-Tabellen-/Listen-Einträge aus Referenz-Docs (Welle E)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 0,
+      "deletions": 16,
+      "timestamp": "2026-05-26T14:58:57+02:00"
+    },
+    {
+      "hash": "0b04ec3",
+      "short": "chore(analytics): Umami aus Doku-Sektionen + manascore-Content (Welle E2)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 16,
+      "deletions": 74,
+      "timestamp": "2026-05-26T15:03:25+02:00"
+    },
+    {
+      "hash": "bcb4df0",
+      "short": "chore(analytics): Umami-Token auch aus datierten Records genericisiert (Web-Analytics)",
+      "type": "chore",
+      "scope": "analytics",
+      "additions": 24,
+      "deletions": 24,
+      "timestamp": "2026-05-26T15:16:32+02:00"
+    },
+    {
+      "hash": "7db881b",
+      "short": "fix(mana-web): drop deleted quotes/content module from Dockerfile",
+      "type": "fix",
+      "scope": "mana-web",
+      "additions": 0,
+      "deletions": 5,
+      "timestamp": "2026-05-26T15:28:08+02:00"
+    },
+    {
+      "hash": "bffb5be",
+      "short": "build(web): supply Verdaccio npm auth to SvelteKit builds via BuildKit secret",
+      "type": "build",
+      "scope": "web",
+      "additions": 43,
+      "deletions": 6,
+      "timestamp": "2026-05-26T15:43:23+02:00"
+    },
+    {
+      "hash": "5f5287d",
+      "short": "chore(umami): commit the 6 umami-removal edits left dirty after the earlier reset",
+      "type": "chore",
+      "scope": "umami",
+      "additions": 19,
+      "deletions": 24,
+      "timestamp": "2026-05-26T16:16:20+02:00"
+    },
+    {
+      "hash": "113e88e",
+      "short": "docs(mac-mini): document Verdaccio npm-auth via BuildKit secret for web builds",
+      "type": "docs",
+      "scope": "mac-mini",
+      "additions": 25,
+      "deletions": 0,
+      "timestamp": "2026-05-26T16:18:01+02:00"
+    },
+    {
+      "hash": "d5c0c02",
+      "short": "fix(mac-mini): Watchdog label-getrieben + mana-core-Reconciliation",
+      "type": "fix",
+      "scope": "mac-mini",
+      "additions": 176,
+      "deletions": 129,
+      "timestamp": "2026-05-26T17:28:41+02:00"
+    },
+    {
+      "hash": "2448a50",
+      "short": "fix(mac-mini): Watchdog-Reconciliation generisch über alle App-Stacks",
+      "type": "fix",
+      "scope": "mac-mini",
+      "additions": 89,
+      "deletions": 45,
+      "timestamp": "2026-05-26T17:45:58+02:00"
+    },
+    {
+      "hash": "8318d7b",
+      "short": "infra(cloudflared): add stats.mana.how ingress → localhost:3118",
+      "type": "infra",
+      "scope": "cloudflared",
+      "additions": 5,
+      "deletions": 0,
+      "timestamp": "2026-05-26T18:13:12+02:00"
+    },
+    {
+      "hash": "7455df0",
+      "short": "fix(mac-mini): Watchdog env-sicher — start/restart statt rm+compose-up",
+      "type": "fix",
+      "scope": "mac-mini",
+      "additions": 86,
+      "deletions": 167,
+      "timestamp": "2026-05-26T18:14:32+02:00"
+    },
+    {
+      "hash": "339afa6",
+      "short": "fix(build-app): drop --remove-orphans — it nuked 23 cross-app containers",
+      "type": "fix",
+      "scope": "build-app",
+      "additions": 10,
+      "deletions": 4,
+      "timestamp": "2026-05-26T18:35:57+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}

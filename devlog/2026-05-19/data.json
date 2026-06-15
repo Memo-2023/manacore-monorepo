@@ -1,0 +1,167 @@
+{
+  "date": "2026-05-19",
+  "day_number": 111,
+  "weekday": "Dienstag",
+  "commits": 7,
+  "authors": [
+    {
+      "name": "Till JS",
+      "count": 7
+    }
+  ],
+  "additions": 125,
+  "deletions": 29335,
+  "net_lines": -29210,
+  "files_changed": 216,
+  "new_files": 0,
+  "deleted_files": 0,
+  "session": {
+    "first_commit_at": "2026-05-19T13:19:42.000Z",
+    "last_commit_at": "2026-05-19T17:49:57.000Z",
+    "total_span_minutes": 270,
+    "active_minutes": 43,
+    "pauses": [
+      {
+        "from": "15:34",
+        "to": "16:15",
+        "minutes": 41
+      },
+      {
+        "from": "16:43",
+        "to": "17:22",
+        "minutes": 39
+      },
+      {
+        "from": "17:22",
+        "to": "19:49",
+        "minutes": 147
+      }
+    ],
+    "longest_focus_minutes": 29
+  },
+  "top_dirs": [
+    {
+      "path": "apps/mana/apps/web",
+      "pct": 78
+    },
+    {
+      "path": "apps/quotes/packages/content",
+      "pct": 6
+    },
+    {
+      "path": "apps/mukke/packages/shared",
+      "pct": 4
+    },
+    {
+      "path": "apps/api/src/modules",
+      "pct": 4
+    },
+    {
+      "path": "apps/mukke/apps/landing",
+      "pct": 2
+    }
+  ],
+  "top_extensions": [
+    {
+      "ext": ".ts",
+      "count": 138
+    },
+    {
+      "ext": ".svelte",
+      "count": 62
+    },
+    {
+      "ext": ".json",
+      "count": 33
+    },
+    {
+      "ext": ".md",
+      "count": 3
+    },
+    {
+      "ext": ".astro",
+      "count": 2
+    },
+    {
+      "ext": ".map",
+      "count": 2
+    }
+  ],
+  "tags": [
+    "mana",
+    "infra",
+    "repo",
+    "mana+api",
+    "lasts"
+  ],
+  "commits_list": [
+    {
+      "hash": "d2bfaf1",
+      "short": "chore(infra): cards-Reste raus, CORS für mukke + manaclick",
+      "type": "chore",
+      "scope": "infra",
+      "additions": 3,
+      "deletions": 84,
+      "timestamp": "2026-05-19T15:19:42+02:00"
+    },
+    {
+      "hash": "f915974",
+      "short": "chore(mana): music + apps/mukke aus unified-App entfernen",
+      "type": "chore",
+      "scope": "mana",
+      "additions": 0,
+      "deletions": 4753,
+      "timestamp": "2026-05-19T15:20:13+02:00"
+    },
+    {
+      "hash": "1b637b9",
+      "short": "chore(repo): fix pre-existing svelte-check errors blocking pre-push",
+      "type": "chore",
+      "scope": "repo",
+      "additions": 79,
+      "deletions": 126,
+      "timestamp": "2026-05-19T15:34:21+02:00"
+    },
+    {
+      "hash": "001548c",
+      "short": "chore(mana): quotes + apps/quotes aus unified-App entfernen",
+      "type": "chore",
+      "scope": "mana",
+      "additions": 5,
+      "deletions": 11938,
+      "timestamp": "2026-05-19T16:15:22+02:00"
+    },
+    {
+      "hash": "0112161",
+      "short": "chore(mana+api): articles + Backend-Worker raus, pageta trägt allein",
+      "type": "chore",
+      "scope": "mana+api",
+      "additions": 21,
+      "deletions": 9057,
+      "timestamp": "2026-05-19T16:43:54+02:00"
+    },
+    {
+      "hash": "7b842ca",
+      "short": "chore(mana): places + locationLogs aus unified-App entfernen",
+      "type": "chore",
+      "scope": "mana",
+      "additions": 7,
+      "deletions": 3374,
+      "timestamp": "2026-05-19T17:22:38+02:00"
+    },
+    {
+      "hash": "8b7b56f",
+      "short": "docs(lasts): scan.ts Header an leere SOURCES anpassen, auf Followup-Playbook verweisen",
+      "type": "docs",
+      "scope": "lasts",
+      "additions": 10,
+      "deletions": 3,
+      "timestamp": "2026-05-19T19:49:57+02:00"
+    }
+  ],
+  "review_state": "auto",
+  "llm": {
+    "model": null,
+    "generated_at": null
+  }
+}
