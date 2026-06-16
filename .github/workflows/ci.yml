@@ -346,7 +346,7 @@ jobs:
     if: needs.detect-changes.outputs.mana-search == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -376,7 +376,7 @@ jobs:
     if: needs.detect-changes.outputs.mana-sync == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -405,7 +405,7 @@ jobs:
     if: needs.detect-changes.outputs.mana-api-gateway == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -434,7 +434,7 @@ jobs:
     if: needs.detect-changes.outputs.mana-crawler == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
